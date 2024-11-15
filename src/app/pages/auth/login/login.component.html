@@ -1,0 +1,34 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <img src="assets/img/tibia_logo.png" alt="Tibia Browser" class="mb-5 w-6rem flex-shrink-0">                
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                <div class="text-center mb-5">
+                    <img src="assets/img/tibia_icon.png" alt="Image" height="50" class="mb-3">
+                    <div class="text-900 text-3xl font-medium mb-3">Bem vindo!</div>
+                    <span class="text-600 font-medium">Faça login para continuar.</span>
+                </div>
+
+                <p-toast key="tst"></p-toast>
+
+                <div>
+                    <label for="username" class="block text-900 text-xl font-medium mb-2">Usuario</label>
+                    <input id="username" [(ngModel)]="username" type="text" placeholder="Username" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                    <label for="password" class="block text-900 text-xl font-medium mb-2">Senha</label>
+                    <p-password id="password" [(ngModel)]="password" placeholder="Senha" [toggleMask]="true" [feedback]="false" styleClass="mb-5 w-full" inputStyleClass="p-3 w-full md:w-30rem"></p-password>
+
+                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <div class="flex align-items-center">
+                            <p-checkbox id="remember" [binary]="true" styleClass="mr-2" [(ngModel)]="remember"></p-checkbox>
+                            <label for="remember">Lembrar-me</label>
+                        </div>
+                        <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Perdeu a senha?</a>
+                    </div>
+                    <button pButton pRipple label="Logar" class="w-full p-3 text-xl mb-3" (click)="login()"></button>
+                    <button pButton pRipple label="Registrar" class="w-full p-3 text-xl p-button-info" [routerLink]="['/auth/register']"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

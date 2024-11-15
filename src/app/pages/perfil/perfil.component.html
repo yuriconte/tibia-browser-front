@@ -1,0 +1,122 @@
+<p-toast key="tst" [style]="{'white-space': 'pre-line'}"></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12 pb-0" *ngIf="character.level >= 8 && character.vocationId === 1">
+    <p-panel header="Escolha uma Vovação">
+      <div class="grid">
+        <div class="col-12 md:col-6 lg:col-3 xl:col-3 pb-0">
+          <button (click)="confirmVocation($event, 2)" pButton label="Knight" class="p-button-secondary w-full"></button>
+        </div>
+        <div class="col-12 md:col-6 lg:col-3 xl:col-3 pb-0">
+          <button (click)="confirmVocation($event, 3)" pButton label="Paladin" class="p-button-warning w-full"></button>
+        </div>
+        <div class="col-12 md:col-6 lg:col-3 xl:col-3 pb-0">
+          <button (click)="confirmVocation($event, 4)" pButton label="Druid" class="p-button-info w-full"></button>
+        </div>
+        <div class="col-12 md:col-6 lg:col-3 xl:col-3 pb-0">
+          <button (click)="confirmVocation($event, 5)" pButton label="Sorcerer" class="p-button-danger w-full"></button>
+        </div>
+      </div>
+      <p-confirmPopup key="confirm2"></p-confirmPopup>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-0">
+    <p-panel header="Informações do Personagem" [toggleable]="true">
+      <p><strong>Nome:</strong> {{ character.name }}</p>
+      <p><strong>Sex:</strong> {{ character.sex ? 'Masculino' : 'Feminino' }}</p>
+      <p><strong>Vocação:</strong> {{ character.vocationId === 1 ? 'Sem Vocação' : character.vocationId === 2 ? 'Knight' : character.vocationId === 3 ? 'Paladin' : character.vocationId === 4 ? 'Druid' : 'Sorcerer' }}</p>
+      <p><strong>Nível:</strong> {{ character.level }}</p>
+      <p><strong>Gold:</strong> {{ character.balance + (character.balance > 1000 ? ' (' + (character.balance > 1000000000 ? ((character.balance/1000000000).toFixed(2) + ' kkk') : character.balance > 1000000 ? ((character.balance/1000000).toFixed(2) + ' kk') : ((character.balance/1000).toFixed(2) + ' k')) + ')' : '')}}</p>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-0">
+    <p-panel header="Vida / Mana" [toggleable]="true">
+      <div class="grid">
+        <div class="col-8 md:col-4 lg:col-4 health-bar pb-0">
+          <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false" styleClass="mb-1"></p-progressBar>
+        </div>
+        <div class="col-4 md:col-2 lg:col-2 pb-0" style="font-size: 1.3rem; padding-right: 0;">
+          {{character.life}} / {{character.maxLife}}
+        </div>
+        <div class="col-8 md:col-4 lg:col-4 mana-bar pb-0">
+          <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
+        </div>
+        <div class="col-4 md:col-2 lg:col-2 pb-0" style="font-size: 1.3rem; padding-right: 0;">
+          {{character.mana}} / {{character.maxMana}}
+        </div>
+      </div>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-0">
+    <p-panel header="Skills" [toggleable]="true">
+      <div class="grid">
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Sword" badge="{{character.sword}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Axe" badge="{{character.axe}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Club" badge="{{character.club}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Distance" badge="{{character.distance}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Shielding" badge="{{character.shielding}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Magic" badge="{{character.magicLevel}}" styleClass="w-full p-button-secondary"></p-button>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-5">
+    <p-panel header="Equipamentos" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary">
+            Helmet
+          </p-button>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <p-splitButton styleClass="custom-button" [model]="items">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/Club.gif" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <p-splitButton styleClass="custom-button" [model]="items">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/Coat.gif" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary">
+            Shield
+          </p-button>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary">
+            Legs
+          </p-button>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary">
+            Boots
+          </p-button>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+
+</div>

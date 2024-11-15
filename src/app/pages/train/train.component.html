@@ -1,0 +1,45 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12 pb-0">
+    <p-panel header="Skills" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Sword" badge="{{character.sword}}" [styleClass]="character.swordTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingSwordTime)" styleClass="w-full mb-2" *ngIf="!character.swordTrainDate" (click)="startSwordTraining()" [disabled]="character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingSwordTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.swordTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressSword" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.swordTrainDate"></p-progressBar>
+        </div>
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Axe" badge="{{character.axe}}" [styleClass]="character.axeTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingAxeTime)" styleClass="w-full mb-2" *ngIf="!character.axeTrainDate" (click)="startAxeTraining()" [disabled]="character.swordTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingAxeTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.axeTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressAxe" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.axeTrainDate"></p-progressBar>
+        </div>
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Club" badge="{{character.club}}" [styleClass]="character.clubTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingClubTime)" styleClass="w-full mb-2" *ngIf="!character.clubTrainDate" (click)="startClubTraining()" [disabled]="character.axeTrainDate || character.swordTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingClubTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.clubTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressClub" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.clubTrainDate"></p-progressBar>
+        </div>
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Distance" badge="{{character.distance}}" [styleClass]="character.distanceTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingDistanceTime)" styleClass="w-full mb-2" *ngIf="!character.distanceTrainDate" (click)="startDistanceTraining()" [disabled]="character.axeTrainDate || character.clubTrainDate || character.swordTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingDistanceTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.distanceTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressDistance" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.distanceTrainDate"></p-progressBar>
+        </div>
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Shielding" badge="{{character.shielding}}" [styleClass]="character.shieldingTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingShieldingTime)" styleClass="w-full mb-2" *ngIf="!character.shieldingTrainDate" (click)="startShieldingTraining()" [disabled]="character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.swordTrainDate || character.magicLevelTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingShieldingTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.shieldingTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressShielding" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.shieldingTrainDate"></p-progressBar>
+        </div>
+        <div class="col-12 md:col-4 lg:col-4 xl:col-2 pb-0">
+          <p-button label="Magic Level" badge="{{character.magicLevel}}" [styleClass]="character.magicLevelTrainDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'" [disabled]="character.vocationId === 1 || character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate"></p-button>
+          <p-button label="Treinar" [badge]="formatTime(remainingMagicLevelTime)" styleClass="w-full mb-2" *ngIf="!character.magicLevelTrainDate" (click)="startMagicLevelTraining()" [disabled]="character.vocationId === 1 || character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate"></p-button>
+          <p-button label="Cancelar" [badge]="formatTime(remainingMagicLevelTime)" styleClass="w-full p-button-danger mb-2" *ngIf="character.magicLevelTrainDate" (click)="cancelTraining()"></p-button>
+          <p-progressBar [value]="progressMagicLevel" [showValue]="true" styleClass="w-full exp-bar" *ngIf="character.magicLevelTrainDate"></p-progressBar>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</div>
