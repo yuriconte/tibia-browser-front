@@ -18,6 +18,7 @@ import { ToastModule } from 'primeng/toast';
 import { ChipModule } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
+import { TableModule } from 'primeng/table';
 
 @NgModule({
   declarations: [HuntComponent],
@@ -39,7 +40,8 @@ import { MessageModule } from 'primeng/message';
     InputNumberModule,
     ToastModule,
     ChipModule,
-    TooltipModule
+    TooltipModule,
+    TableModule
   ]
 })
 export class HuntModule { }

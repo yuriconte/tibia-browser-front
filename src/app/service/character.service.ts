@@ -28,8 +28,8 @@ export class CharacterService {
     );
   }
 
-  updateCharacter(characterId: number, bestiaryId: number, experience: number, life: number, mana: number, expHour: number, increaseBalance: number) {
-    this.httpClient.post<void>(`${this.apiUrl}/updateCharacter`, { characterId, bestiaryId, experience, life, mana, expHour, increaseBalance }).subscribe({
+  updateCharacter(characterId: number, bestiaryId: number, experience: number, life: number, mana: number, expHour: number, increaseBalance: number, itemLooted: number[]) {
+    this.httpClient.post<void>(`${this.apiUrl}/updateCharacter`, { characterId, bestiaryId, experience, life, mana, expHour, increaseBalance, itemLooted }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },

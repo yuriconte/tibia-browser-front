@@ -78,44 +78,108 @@
     <p-panel header="Equipamentos" [toggleable]="true">
       <div class="grid">
         <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot1Item">
             Helmet
           </p-button>
-        </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-splitButton styleClass="custom-button" [model]="items">
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot1Item">
             <ng-template pTemplate="content">
               <span class="flex align-items-center font-bold">
-                <img src="assets/gifs/items/Club.gif" style="width: 2rem" >
+                <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" style="width: 2rem" >
               </span>
             </ng-template>
           </p-splitButton>
         </div>
         <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-splitButton styleClass="custom-button" [model]="items">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot2Item">
+            Weapon
+          </p-button>
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot2Item">
             <ng-template pTemplate="content">
               <span class="flex align-items-center font-bold">
-                <img src="assets/gifs/items/Coat.gif" style="width: 2rem" >
+                <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" style="width: 2rem" >
               </span>
             </ng-template>
           </p-splitButton>
         </div>
         <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot3Item">
+            Armor
+          </p-button>
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot3Item">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot4Item">
             Shield
           </p-button>
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot4Item">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
         </div>
         <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot5Item">
             Legs
           </p-button>
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot5Item">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
         </div>
         <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot6Item">
             Boots
           </p-button>
+          <p-splitButton styleClass="custom-button" [model]="items" *ngIf="character.slot6Item">
+            <ng-template pTemplate="content">
+              <span class="flex align-items-center font-bold">
+                <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" style="width: 2rem" >
+              </span>
+            </ng-template>
+          </p-splitButton>
         </div>
       </div>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-5" *ngIf="character.items">
+    <p-panel header="Depot" [toggleable]="true">
+      <p-table [value]="character.items">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Item</th>
+            <th>Imagem</th>
+            <th>Quantidade</th>
+            <th>Valor Total</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td class="font-bold">{{item.item.name}}</td>
+            <td>
+              <img src="assets/gifs/items/{{item.item.imagePath}}" width="30">
+            </td>
+            <td>
+              <span class="image-text ml-2">{{item.quantity}}</span>
+            </td>
+            <td>
+              <span class="image-text ml-2">{{item.quantity*item.item.gold}}</span>
+              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </p-panel>
   </div>
 

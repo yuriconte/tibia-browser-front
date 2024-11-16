@@ -6,6 +6,8 @@ import { AuthService } from '../auth/auth.service';
 import { Character } from 'src/app/model/character.model';
 import { Bestiary } from 'src/app/model/bestiary.model';
 import { Creature } from 'src/app/model/creature.model';
+import { Item } from 'src/app/model/item.model';
+import { CharacterItem } from 'src/app/model/character-item.model';
 
 @Component({
   selector: 'app-hunt',
@@ -68,6 +70,9 @@ export class HuntComponent {
   totalGoldEarned: number = 0;
   avgExpHour: string = "0";
   expNextLevel:number = 0;
+  expPreviousLevel:number = 0;
+  monster: Creature;
+  lootDrop: CharacterItem[] = [];
 
   constructor(private characterService: CharacterService,
     private bestiaryService: BestiaryService,
@@ -97,10 +102,11 @@ export class HuntComponent {
       this.characterService.getCharacter(username).subscribe({
         next: (data) => {
             this.character = data
-            this.character.totalArmor = 1;
-            this.character.totalAtk = 7;
-            this.character.totalDef = 7;
+            this.character.totalArmor = (this.character.slot1Item?.armor || 0) + (this.character.slot3Item?.armor || 0) + (this.character.slot5Item?.armor || 0) + (this.character.slot6Item?.armor || 0)
+            this.character.totalAtk = (this.character.slot2Item?.atk || 0);
+            this.character.totalDef = (this.character.slot1Item?.def || 0) + (this.character.slot4Item?.def || 0);
             this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
+            this.expPreviousLevel = this.calculateExpLevelFormula(this.character.level-1)
             if (this.character.level >= 8 && this.character.vocationId === 1) {
               this.msgs = []
               this.msgs.push({ severity: 'info', summary: 'Level 8', detail: "Escolha uma vocação no seu perfil: Knight, Paladin, Druid, Sorcerer" });
@@ -131,8 +137,17 @@ export class HuntComponent {
   prepareCreatures() {
     this.creatures.map((creature, index) => {
         this.testeDificuldade(index);
+        creature.creature.items.sort((itemA, itemB) => {
+          const rateOrder = { comum: 1, incomum: 2, raro: 3, ultra: 4 };
+          //return rateOrder[itemA.rate] - rateOrder[itemB.rate];
+          const rateComparison = rateOrder[itemA.rate] - rateOrder[itemB.rate];
+          if (rateComparison === 0) {
+            return itemA.item.gold - itemB.item.gold;
+          }
+          return rateComparison;
+        });
     });
-}
+  }
 
   calculateExpLevelFormula(x: number): number {
     x += 1;
@@ -149,7 +164,8 @@ export class HuntComponent {
 
     const character = this.character
 
-    let monster = { ...this.selectedCreature.creature }
+    this.monster = { ...this.selectedCreature.creature }
+    this.monster.maxLife = this.monster.life
     let bestiaryId = this.selectedCreature.id
 
     this.countMonsterKill = 0;
@@ -157,9 +173,9 @@ export class HuntComponent {
 
     this.atkInterval = setInterval(() => {
       countTimeToKill += 1;
-      let damage = this.getDamage(character, monster)
-      monster.life -= damage.cDamage
-      if (monster.life > 0) {
+      let damage = this.getDamage(character, this.monster)
+      this.monster.life -= damage.cDamage
+      if (this.monster.life > 0) {
         character.life -= damage.mDamage
         if (character.life <= 0) {
           this.statusHunt = false;
@@ -172,8 +188,8 @@ export class HuntComponent {
         }
       } else {
         this.countMonsterKill += 1
-        this.totalExpEarned = this.countMonsterKill*monster.experience
-        this.avgExpHour = ((this.countMonsterKill*monster.experience)/countTimeToKill*3600/1000).toFixed(1) + 'k'
+        this.totalExpEarned = this.countMonsterKill*this.monster.experience
+        this.avgExpHour = ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600/1000).toFixed(1) + 'k'
 
         if (character.life + 1 <= character.maxLife) {
           character.life += 1
@@ -181,21 +197,46 @@ export class HuntComponent {
         if (character.mana + 1 <= character.maxMana) {
           character.mana += 1
         }
-        character.experience += monster.experience;
-        let goldEarned = Math.round(this.getRandomInRange(monster.minGold, monster.maxGold));
+        character.experience += this.monster.experience;
+        let goldEarned = Math.round(this.getRandomInRange(this.monster.minGold, this.monster.maxGold));
         this.totalGoldEarned += goldEarned;
-        this.characterService.updateCharacter(character.id, bestiaryId, monster.experience, character.life, character.mana, ((this.countMonsterKill*monster.experience)/countTimeToKill*3600), goldEarned);
+        let itemLooted: number[] = [];
+        if (this.monster.items) {
+          this.monster.items.forEach(item => {
+            let drop = this.shouldDrop(item.rate)
+            if (drop) {
+              let characterItem: CharacterItem = {characterId: this.character.id, item: item.item, quantity: 1}
+              if (this.lootDrop) {
+                const existingItem = this.lootDrop.find(
+                  (dropItem: CharacterItem) => dropItem.item.id === item.item.id
+                );            
+                if (existingItem) {
+                  existingItem.quantity += 1;
+                } else {
+                  this.lootDrop.push(characterItem);
+                }
+              } else {
+                this.lootDrop = [characterItem];
+              }
+              itemLooted.push(item.item.id)
+              this.msgs.push({ severity: 'success', summary: 'Drop', detail: "Dropou um " + item.item.name });
+            }
+          })
+        }
+        this.characterService.updateCharacter(character.id, bestiaryId, this.monster.experience, character.life, character.mana, ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600), goldEarned, itemLooted);
         if (character.experience >= this.expNextLevel) {
           this.characterService.increaseLevel(character.id);
           character.level += 1;
           character.maxLife += 5;
           character.maxMana += 5;
           this.expNextLevel = this.calculateExpLevelFormula(character.level)
+          this.expPreviousLevel = this.calculateExpLevelFormula(character.level-1)
           if (character.level >= 8 && character.vocationId === 1 && this.msgs.length == 0) {
             this.msgs.push({ severity: 'info', summary: 'Level 8', detail: "Escolha uma vocação no seu perfil: Knight, Paladin, Druid, Sorcerer" });
           }
         }
-        monster = { ...this.selectedCreature.creature }
+        this.monster = { ...this.selectedCreature.creature }
+        this.monster.maxLife = this.monster.life
       }
     }, 1000);
     
@@ -209,7 +250,9 @@ export class HuntComponent {
     D = Fator de dano (Full ATK = 1, Balanced = 0.75, Full Def = 0.5)
     */
   
-    let characterMaxDamage = Math.round((0.085*this.huntStyleSelected.value*character.totalAtk*character.club)+(character.level/5)) 
+    let skill = character.slot2Item?.type == 'sword' ? character.sword : character.slot2Item?.type == 'axe' ? character.axe : character.slot2Item?.type == 'club' ? character.club : character.slot2Item?.type == 'distance' ? character.distance : 10
+
+    let characterMaxDamage = Math.round((0.085*this.huntStyleSelected.value*character.totalAtk*skill)+(character.level/5)) 
 
     /* Armadura mínima (ArmaduraTotal * 0.475)
       Armadura Máxima ((ArmaduraTotal * 0.95) - 1)
@@ -283,4 +326,11 @@ export class HuntComponent {
       }
     }, 10);
   }
+
+  shouldDrop(rarity: string): boolean {
+    const dropChance = rarity === 'comum' ? 0.30 : rarity === 'incomum' ? 0.15 : rarity === 'raro' ? 0.7 : 0.02
+    const randomValue = Math.random();
+    return randomValue <= dropChance;
+  }
+
 }

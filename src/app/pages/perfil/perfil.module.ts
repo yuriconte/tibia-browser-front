@@ -24,7 +24,8 @@ import { ToastModule } from 'primeng/toast';
         ButtonModule,
         SplitButtonModule,
         ConfirmPopupModule,
-        ToastModule
+        ToastModule,
+        TableModule
     ],
     declarations: [PerfilComponent]
 })

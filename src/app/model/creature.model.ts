@@ -1,7 +1,10 @@
+import { CreatureItem } from "./creature-item.model";
+
 export class Creature {
     id: number;
     name: string;
     life: number;
+    maxLife: number;
     armor: number;
     minDamage: number;
     maxDamage: number;
@@ -12,4 +15,5 @@ export class Creature {
     imgPath: string;
     minGold: number;
     maxGold: number;
+    items: CreatureItem[];
 }

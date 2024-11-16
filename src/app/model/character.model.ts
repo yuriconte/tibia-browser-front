@@ -1,4 +1,6 @@
 import { CharacterBestiary } from "./character-bestiary.model";
+import { CharacterItem } from "./character-item.model";
+import { Item } from "./item.model";
 
 export class Character {
     id: number;
@@ -33,4 +35,12 @@ export class Character {
     distanceTrainDate: Date;
     shieldingTrainDate: Date;
     magicLevelTrainDate: Date;
+
+    slot1Item: Item;
+    slot2Item: Item;
+    slot3Item: Item;
+    slot4Item: Item;
+    slot5Item: Item;
+    slot6Item: Item;
+    items: CharacterItem[];
 }
