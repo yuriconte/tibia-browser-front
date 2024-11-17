@@ -57,7 +57,29 @@ export class TrainComponent {
   }
 
   ngOnDestroy() {
-    this.cancelTraining();
+    if (this.timerSwordInterval) {
+      clearInterval(this.timerSwordInterval);
+    }
+
+    if (this.timerAxeInterval) {
+      clearInterval(this.timerAxeInterval);
+    }
+
+    if (this.timerClubInterval) {
+      clearInterval(this.timerClubInterval);
+    }
+
+    if (this.timerDistanceInterval) {
+      clearInterval(this.timerDistanceInterval);
+    }
+
+    if (this.timerShieldingInterval) {
+      clearInterval(this.timerShieldingInterval);
+    }
+
+    if (this.timerMagicLevelInterval) {
+      clearInterval(this.timerMagicLevelInterval);
+    }
   }
 
   loadCharacter() {
@@ -85,10 +107,10 @@ export class TrainComponent {
               this.remainingClubTime = this.calcRemaingTime(this.character.club);
             }
             if (this.character.distanceTrainDate) {
-              this.remainingDistanceTime = this.calcRemaingTime(this.character.distance) - this.getDifferenceFromNowInSeconds(this.character.distanceTrainDate);
+              this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance) - this.getDifferenceFromNowInSeconds(this.character.distanceTrainDate);
               this.initDistanceTraining()
             } else {
-              this.remainingDistanceTime = this.calcRemaingTime(this.character.distance);
+              this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
             }
             if (this.character.shieldingTrainDate) {
               this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding) - this.getDifferenceFromNowInSeconds(this.character.shieldingTrainDate);
@@ -199,7 +221,7 @@ export class TrainComponent {
   /* ------------------------------- DISTANCE ----------------------------------- */
   startDistanceTraining() {
     this.character.distanceTrainDate = new Date();
-    this.remainingDistanceTime = this.calcRemaingTime(this.character.distance);
+    this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
     this.characterService.startDistance(this.character.id)
     this.initDistanceTraining()
   }
@@ -207,7 +229,7 @@ export class TrainComponent {
   initDistanceTraining() {
     this.timerDistanceInterval = setInterval(() => {
       this.remainingDistanceTime--;
-      let totalTime = this.calcRemaingTime(this.character.distance);
+      let totalTime = this.calcRemaingTimeDistace(this.character.distance);
       this.progressDistance = (((totalTime - this.remainingDistanceTime) / totalTime) * 100).toFixed(0);
       if (this.remainingDistanceTime <= 0) {
         this.finishDistanceTraining();
@@ -219,7 +241,7 @@ export class TrainComponent {
     this.character.distanceTrainDate = null;
     this.character.distance += 1;
     clearInterval(this.timerDistanceInterval);
-    this.remainingDistanceTime = this.calcRemaingTime(this.character.distance);
+    this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
     this.characterService.increaseDistance(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Distance subiu para " + this.character.distance + "!"});
   }
@@ -313,10 +335,20 @@ export class TrainComponent {
     this.remainingSwordTime = this.calcRemaingTime(this.character.sword);
     this.remainingAxeTime = this.calcRemaingTime(this.character.axe);
     this.remainingClubTime = this.calcRemaingTime(this.character.club);
-    this.remainingDistanceTime = this.calcRemaingTime(this.character.distance);
+    this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
     this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding);
     this.remainingMagicLevelTime = this.calcRemaingTimeML(this.character.magicLevel);
     this.characterService.cancelSkill(this.character.id)
+  }
+
+
+  calcRemaingTimeDistace(x:number) {
+    /* 50*(y^(x-10))
+    x = skill atual, 
+    y = fator (pally 1.1, pally 1.4, mage/rook 2)
+    */
+    let y = this.character.vocationId === 3 ? 1.1 : this.character.vocationId === 2 ? 1.4 : 2
+    return Math.round(50 * Math.pow(y, x - 10))
   }
 
   calcRemaingTime(x:number) {

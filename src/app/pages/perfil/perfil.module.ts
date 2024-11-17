@@ -11,6 +11,8 @@ import { ButtonModule } from 'primeng/button';
 import { SplitButtonModule } from 'primeng/splitbutton' ;
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @NgModule({
     imports: [
@@ -25,7 +27,9 @@ import { ToastModule } from 'primeng/toast';
         SplitButtonModule,
         ConfirmPopupModule,
         ToastModule,
-        TableModule
+        TableModule,
+        DialogModule,
+        ProgressSpinnerModule
     ],
     declarations: [PerfilComponent]
 })

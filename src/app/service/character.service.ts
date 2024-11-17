@@ -203,4 +203,48 @@ export class CharacterService {
       }
     })
   }
+
+  sellItem(characterId: number, itemId) {
+    this.httpClient.post<void>(this.apiUrl + "/sellItem", { characterId, itemId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  equipItem(characterId: number, itemId) {
+    this.httpClient.post<void>(this.apiUrl + "/equipItem", { characterId, itemId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  deEquipItem(characterId: number, slotNumber) {
+    this.httpClient.post<void>(this.apiUrl + "/deEquipItem", { characterId, slotNumber }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  updateVocation(characterId: number, vocationId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/updateVocation", { characterId, vocationId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
 }

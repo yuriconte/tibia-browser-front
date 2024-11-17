@@ -104,7 +104,7 @@ export class HuntComponent {
             this.character = data
             this.character.totalArmor = (this.character.slot1Item?.armor || 0) + (this.character.slot3Item?.armor || 0) + (this.character.slot5Item?.armor || 0) + (this.character.slot6Item?.armor || 0)
             this.character.totalAtk = (this.character.slot2Item?.atk || 0);
-            this.character.totalDef = (this.character.slot1Item?.def || 0) + (this.character.slot4Item?.def || 0);
+            this.character.totalDef = (this.character.slot2Item?.def || 0) + (this.character.slot4Item?.def || 0);
             this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
             this.expPreviousLevel = this.calculateExpLevelFormula(this.character.level-1)
             if (this.character.level >= 8 && this.character.vocationId === 1) {
@@ -328,7 +328,7 @@ export class HuntComponent {
   }
 
   shouldDrop(rarity: string): boolean {
-    const dropChance = rarity === 'comum' ? 0.30 : rarity === 'incomum' ? 0.15 : rarity === 'raro' ? 0.7 : 0.02
+    const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.5 : 0.01
     const randomValue = Math.random();
     return randomValue <= dropChance;
   }

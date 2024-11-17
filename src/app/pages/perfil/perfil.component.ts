@@ -3,6 +3,7 @@ import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Character } from 'src/app/model/character.model';
 import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
+import { Item } from 'src/app/model/item.model';
 
 @Component({
   selector: 'app-perfil',
@@ -25,6 +26,7 @@ import { AuthService } from '../auth/auth.service';
 
     :host ::ng-deep .custom-button {
         padding: 0.5rem 1.5rem !important;
+        height: 50px;
     }
   `],
   providers: [ConfirmationService, MessageService]
@@ -35,7 +37,11 @@ export class PerfilComponent {
   items: MenuItem[] = [];
 
   characterName = 'Knight of Rookgaard';
-  bankBalance = 250;
+  
+  showItemDetailSelected: Item;
+  showItemDetail: boolean = false;
+
+  loading: boolean = false;
 
   constructor(private characterService: CharacterService,
     private service: MessageService,
@@ -43,11 +49,6 @@ export class PerfilComponent {
     private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
-    this.items = [
-        { label: 'Equipar', icon: 'pi pi-check-circle' },
-        { separator: true },
-        { label: 'Desequipar', icon: 'pi pi-ban' }
-    ];
     this.loadCharacter();
   }
 
@@ -57,6 +58,7 @@ export class PerfilComponent {
       this.characterService.getCharacter(username).subscribe({
         next: (data) => {
             this.character = data;
+            this.loading = false
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -76,8 +78,113 @@ export class PerfilComponent {
         acceptLabel: 'Sim',
         rejectLabel: 'Não',
         accept: () => {
-            this.service.add({ key: 'tst', severity: 'info', summary: 'Parabéns', detail: 'Agora você é um ' + (vocation === 2 ? 'Knight' : vocation === 3 ? 'Paladin' : vocation === 4 ? 'Druid' : 'Sorcerer') });
+          this.characterService.updateVocation(this.character.id, vocation);
+          this.character.vocationId = vocation;
+          this.service.add({ key: 'tst', severity: 'info', summary: 'Parabéns', detail: 'Agora você é um ' + (vocation === 2 ? 'Knight' : vocation === 3 ? 'Paladin' : vocation === 4 ? 'Druid' : 'Sorcerer') });
         },
+    });
+  }
+
+  confirmEquipedItem(event: Event, item:Item) {
+    this.confirmationService.confirm({
+        key: 'confirm2',
+        target: event.target || new EventTarget,
+        message: 'O que deseja fazer?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Remover',
+        rejectLabel: 'Detalhes',
+        accept: () => {
+          this.deequip(item, true)
+        },
+        reject: () => {
+          this.showEquipDetail(item)
+        }
+    });
+  }
+   
+  showEquipDetail(item: Item) {
+    this.showItemDetailSelected = item
+    this.showItemDetail = true;
+  }
+ 
+  equip(item: Item) {
+    switch(item.slot) {
+      case 1:
+        if (this.character.slot1Item) {
+          this.deequip({...this.character.slot1Item}, false)
+        }
+        break;
+      case 2:
+        if (this.character.slot2Item) {
+          this.deequip({...this.character.slot2Item}, false)
+        }
+        break;
+      case 3:
+        if (this.character.slot3Item) {
+          this.deequip({...this.character.slot3Item}, false)
+        }
+        break;
+      case 4:
+        if (this.character.slot4Item) {
+          this.deequip({...this.character.slot4Item}, false)
+        }
+        break;
+      case 5:
+        if (this.character.slot5Item) {
+          this.deequip({...this.character.slot5Item}, false)
+        }
+        break;
+      case 6:
+        if (this.character.slot6Item) {
+          this.deequip({...this.character.slot6Item}, false)
+        }
+        break;
+      default:
+    }
+    setTimeout(() => {
+      this.characterService.equipItem(this.character.id, item.id);
+      setTimeout(() => {
+        window.location.reload();
+      }, 500)
+    }, 500)
+  }
+
+  deequip(item: Item, updateCharacter: boolean) {
+    this.characterService.deEquipItem(this.character.id, item.slot);
+    if (updateCharacter) {
+      window.location.reload();
+    }
+  }
+
+  sellItem(item: Item) {
+    this.characterService.sellItem(this.character.id, item.id);
+    this.character.balance += item.gold;
+    const itemIndex = this.character.items.findIndex(i => i.item.id === item.id);
+    if (itemIndex !== -1) {
+      this.character.items[itemIndex].quantity -= 1;
+      if (this.character.items[itemIndex].quantity === 0) {
+          this.character.items.splice(itemIndex, 1);
+      }
+      this.service.add({ key: 'tst', severity: 'success', summary: 'Parabéns', detail: 'Item vendido com sucesso' });
+    } else {
+      this.service.add({ key: 'tst', severity: 'danger', summary: 'Erro', detail: 'Ocorreu um erro. Atualize a página e tente novamente.' });
+    }
+  }
+
+  confirmUnequipedItem(event: Event, item:Item) {
+    this.confirmationService.confirm({
+        key: 'confirm2',
+        target: event.target || new EventTarget,
+        message: 'O que deseja fazer?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Equipar',
+        rejectLabel: 'Detalhes',
+        accept: () => {
+          this.equip(item)
+        },
+        reject: () => {
+          this.showEquipDetail(item)
+        }
     });
   }
 }

@@ -110,14 +110,12 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th>Item</th>
-                  <th>Imagem</th>
                   <th>Raridade</th>
                   <th>Valor</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-item>
                 <tr>
-                  <td class="font-bold">{{item.item.name}}</td>
                   <td>
                     <img src="assets/gifs/items/{{item.item.imagePath}}" width="30">
                   </td>
@@ -200,13 +198,11 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th>Item</th>
-                  <th>Imagem</th>
                   <th>Quantidade</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-item>
                 <tr>
-                  <td class="font-bold">{{item.item.name}}</td>
                   <td>
                     <img src="assets/gifs/items/{{item.item.imagePath}}" width="30">
                   </td>
