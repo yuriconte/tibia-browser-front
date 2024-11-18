@@ -20,6 +20,7 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Caçar Online', icon: 'pi pi-fw pi-home', routerLink: ['/hunt'] },
                     { label: 'Caçar AFK (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Treino', icon: 'pi pi-fw pi-home', routerLink: ['/train'] },
+                    { label: 'Bestiario', icon: 'pi pi-fw pi-home', routerLink: ['/bestiary'] },
                     { label: 'Quests (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Mapa Global (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
                 ]

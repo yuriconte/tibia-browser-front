@@ -1,4 +1,5 @@
 <p-toast key="tst" [style]="{'white-space': 'pre-line'}"></p-toast>
+<p-confirmPopup key="confirm2"></p-confirmPopup>
 <div class="grid">
   <div class="col-12 md:col-12 pb-0" *ngIf="character.level >= 8 && character.vocationId === 1">
     <p-panel header="Escolha uma Vovação">
@@ -16,7 +17,6 @@
           <button (click)="confirmVocation($event, 5)" pButton label="Sorcerer" class="p-button-danger w-full"></button>
         </div>
       </div>
-      <p-confirmPopup key="confirm2"></p-confirmPopup>
     </p-panel>
   </div>
 
@@ -33,17 +33,17 @@
   <div class="col-12 md:col-12 pb-0">
     <p-panel header="Vida / Mana" [toggleable]="true">
       <div class="grid">
-        <div class="col-8 md:col-4 lg:col-4 health-bar pb-0">
-          <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false" styleClass="mb-1"></p-progressBar>
+        <div class="col-12 md:col-12 lg:col-12 health-bar pb-0">
+          <div class="progress-container">
+            <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">{{character.life}} / {{character.maxLife}}</div>
+          </div>
         </div>
-        <div class="col-4 md:col-2 lg:col-2 pb-0" style="font-size: 1.3rem; padding-right: 0;">
-          {{character.life}} / {{character.maxLife}}
-        </div>
-        <div class="col-8 md:col-4 lg:col-4 mana-bar pb-0">
-          <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
-        </div>
-        <div class="col-4 md:col-2 lg:col-2 pb-0" style="font-size: 1.3rem; padding-right: 0;">
-          {{character.mana}} / {{character.maxMana}}
+        <div class="col-12 md:col-12 lg:col-12 mana-bar pb-0">
+          <div class="progress-container">
+            <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">{{character.mana}} / {{character.maxMana}}</div>
+          </div>
         </div>
       </div>
     </p-panel>

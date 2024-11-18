@@ -19,6 +19,7 @@ import { AccessComponent } from './pages/auth/access/access.component';
                 children: [
                     { path: 'hunt', loadChildren: () => import('./pages/hunt/hunt.module').then(m => m.HuntModule) },
                     { path: 'train', loadChildren: () => import('./pages/train/train.module').then(m => m.TrainModule) },
+                    { path: 'bestiary', loadChildren: () => import('./pages/bestiary/bestiary.module').then(m => m.BestiaryModule) },
                     { path: 'perfil', loadChildren: () => import('./pages/perfil/perfil.module').then(m => m.PerfilModule) }
                 ]
             },

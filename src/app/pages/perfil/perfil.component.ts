@@ -21,12 +21,36 @@ import { Item } from 'src/app/model/item.model';
     }
 
     ::ng-deep .mana-bar .p-progressbar .p-progressbar-value {
-      background-color: #7dd3fc; /* Azul para mana */
+      background-color: #38bdf8; /* Azul para mana */
+    }
+
+    ::ng-deep .exp-bar .p-progressbar .p-progressbar-value {
+      background-color: #a855f7; 
     }
 
     :host ::ng-deep .custom-button {
         padding: 0.5rem 1.5rem !important;
         height: 50px;
+    }
+
+    .progress-container {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Estilos para o texto fixo */
+    .progress-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      color: white;
+      font-weight: bold;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none; /* Garante que o texto não interfira na interação com a barra */
     }
   `],
   providers: [ConfirmationService, MessageService]

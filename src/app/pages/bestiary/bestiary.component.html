@@ -1,0 +1,47 @@
+<div class="grid">
+  <div class="col-12 md:col-12 pb-0">
+    <p-panel header="Bestiario" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0">
+          <p-table [value]="character.bestiary">
+            <ng-template pTemplate="header">
+              <tr>
+                <th></th>
+                <th>
+                  <i class="pi pi-star-fill" style="color: #CD7F32;"></i>
+                </th>
+                <th>
+                  <i class="pi pi-star-fill" style="color: #C0C0C0;"></i>
+                  <i class="pi pi-star-fill" style="color: #C0C0C0;"></i>
+                </th>
+                <th>
+                  <i class="pi pi-star-fill" style="color: #FFD700;"></i>
+                  <i class="pi pi-star-fill" style="color: #FFD700;"></i>
+                  <i class="pi pi-star-fill" style="color: #FFD700;"></i>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-character>
+              <tr>
+                <td>
+                  <p-button badge="{{character.totalKills}}" styleClass="p-button-text" [ngStyle]="{color: '#FFD700'}">
+                    <img src="assets/gifs/creatures/{{character.bestiary.creature.imagePath}}" width="30">
+                  </p-button>
+                </td>
+                <td style="text-align: center;">
+                 {{character.bestiary.totalKillsTier1}}
+                </td>
+                <td style="text-align: center;">
+                  {{character.bestiary.totalKillsTier2}}
+                </td>
+                <td style="text-align: center;">
+                  {{character.bestiary.totalKillsTier3}}
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</div>

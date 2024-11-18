@@ -348,7 +348,8 @@ export class TrainComponent {
     y = fator (pally 1.1, pally 1.4, mage/rook 2)
     */
     let y = this.character.vocationId === 3 ? 1.1 : this.character.vocationId === 2 ? 1.4 : 2
-    return Math.round(50 * Math.pow(y, x - 10))
+    let result = Math.round(50 * Math.pow(y, x - 10))
+    return result >= 0 ? result : 0
   }
 
   calcRemaingTime(x:number) {
@@ -357,7 +358,8 @@ export class TrainComponent {
     y = fator (kina 1.1, pally 1.2, mage/rook 2)
     */
     let y = this.character.vocationId === 2 ? 1.1 : this.character.vocationId === 3 ? 1.2 : 2
-    return Math.round(50 * Math.pow(y, x - 10))
+    let result = Math.round(50 * Math.pow(y, x - 10))
+    return result >= 0 ? result : 0
   }
 
   calcRemaingTimeML(x:number) {
@@ -367,7 +369,8 @@ export class TrainComponent {
     */
     x +=1
     let f = this.character.vocationId === 4 || this.character.vocationId === 5 ? 1.1 : this.character.vocationId === 3 ? 1.4 : 3
-    return Math.round(17 * Math.pow(f, x));
+    let result = Math.round(17 * Math.pow(f, x));
+    return result >= 0 ? result : 0
   }
 
   formatTime(seconds: number): string {

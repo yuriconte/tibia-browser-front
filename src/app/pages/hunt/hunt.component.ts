@@ -18,11 +18,11 @@ import { CharacterItem } from 'src/app/model/character-item.model';
     }
 
     ::ng-deep .mana-bar .p-progressbar .p-progressbar-value {
-      background-color: #7dd3fc; /* Azul para mana */
+      background-color: #38bdf8; /* Azul para mana */
     }
 
     ::ng-deep .exp-bar .p-progressbar .p-progressbar-value {
-      background-color: #94a3b8; 
+      background-color: #a855f7; 
     }
 
     ::ng-deep .p-selectbutton .p-button.p-highlight:nth-child(2) {
@@ -47,6 +47,26 @@ import { CharacterItem } from 'src/app/model/character-item.model';
     p-inputnumber {
       display: grid;
     }
+    
+    .progress-container {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Estilos para o texto fixo */
+    .progress-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      color: white;
+      font-weight: bold;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none; /* Garante que o texto não interfira na interação com a barra */
+    }
   `],
   providers: [MessageService]
 })
@@ -64,6 +84,8 @@ export class HuntComponent {
   statusHunt: boolean = false;
 
   atkInterval;
+  lifeInterval;
+  manaInterval;
 
   countMonsterKill: number = 0;
   totalExpEarned: number = 0;
@@ -94,6 +116,12 @@ export class HuntComponent {
     if (this.atkInterval) {
       clearInterval(this.atkInterval);
     }
+    if (this.lifeInterval) {
+      clearInterval(this.lifeInterval);
+    }
+    if (this.manaInterval) {
+      clearInterval(this.manaInterval);
+    }
   }
 
   loadCharacter() {
@@ -111,6 +139,16 @@ export class HuntComponent {
               this.msgs = []
               this.msgs.push({ severity: 'info', summary: 'Level 8', detail: "Escolha uma vocação no seu perfil: Knight, Paladin, Druid, Sorcerer" });
             }
+            this.lifeInterval = setInterval(() => {
+              if (this.character.life < this.character.maxLife) {
+                this.character.life += 1
+              }
+            },1000);
+            this.manaInterval = setInterval(() => {
+              if (this.character.mana < this.character.maxMana) {
+                this.character.mana += 1
+              }
+            },1000);
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -190,13 +228,6 @@ export class HuntComponent {
         this.countMonsterKill += 1
         this.totalExpEarned = this.countMonsterKill*this.monster.experience
         this.avgExpHour = ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600/1000).toFixed(1) + 'k'
-
-        if (character.life + 1 <= character.maxLife) {
-          character.life += 1
-        }
-        if (character.mana + 1 <= character.maxMana) {
-          character.mana += 1
-        }
         character.experience += this.monster.experience;
         let goldEarned = Math.round(this.getRandomInRange(this.monster.minGold, this.monster.maxGold));
         this.totalGoldEarned += goldEarned;
@@ -227,8 +258,20 @@ export class HuntComponent {
         if (character.experience >= this.expNextLevel) {
           this.characterService.increaseLevel(character.id);
           character.level += 1;
-          character.maxLife += 5;
-          character.maxMana += 5;
+          let lifeGain = 5;
+          let manaGain = 5;
+          if (character.vocationId == 2 || character.vocationId == 6) {
+            lifeGain = 15;
+          }
+          if (character.vocationId == 3 || character.vocationId == 7) {
+            lifeGain = 10;
+            manaGain = 15;
+          }
+          if (character.vocationId == 4 || character.vocationId == 5 || character.vocationId == 8 || character.vocationId == 9) {
+            manaGain = 30;
+          }
+          character.maxLife += lifeGain;
+          character.maxMana += manaGain;
           this.expNextLevel = this.calculateExpLevelFormula(character.level)
           this.expPreviousLevel = this.calculateExpLevelFormula(character.level-1)
           if (character.level >= 8 && character.vocationId === 1 && this.msgs.length == 0) {
@@ -328,7 +371,7 @@ export class HuntComponent {
   }
 
   shouldDrop(rarity: string): boolean {
-    const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.5 : 0.01
+    const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.05 : 0.01
     const randomValue = Math.random();
     return randomValue <= dropChance;
   }
