@@ -1,8 +1,7 @@
 <p-toast key="tst" [style]="{'white-space': 'pre-line'}"></p-toast>
 <p-messages [value]="msgs"></p-messages>
 <div class="grid">
-  <div class="col-12 md:col-12 pb-0">
-    
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Vida / Mana" [toggleable]="true">
       <div class="grid">
         <div class="col-12 md:col-12 lg:col-12 health-bar pb-0">
@@ -26,7 +25,7 @@
       </div>
     </p-panel>
   </div>
-  <div class="col-12 md:col-12 pb-0">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Equipamentos" [toggleable]="true" [collapsed]="true">
       <div class="grid">
         <div class="col-4 md:col-4 lg:col-2 pb-0" *ngIf="character.slot1Item">
@@ -50,7 +49,7 @@
       </div>
     </p-panel>
   </div>
-  <div class="col-12 md:col-12 pb-0">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Skills / Experiência" [toggleable]="true" [collapsed]="true">
       <div class="grid">
         <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
@@ -74,7 +73,7 @@
       </div>
     </p-panel>
   </div>
-	<div class="col-12 md:col-12 pb-5">
+	<div class="col-12 md:col-12 pb-5 pl-0 pr-0">
 		<div class="card" *ngIf="!statusHunt">
       <h5>Caçar</h5>
       <div class="grid">
@@ -105,7 +104,7 @@
           </p-dropdown>
         </div>
         <div class="col-12 md:col-12" *ngIf="selectedCreature?.creature?.items?.length > 0">
-          <p-panel header="Loot" [toggleable]="true">
+          <p-panel header="Loot" [toggleable]="true" [collapsed]="true">
             <p-table [value]="selectedCreature.creature.items">
               <ng-template pTemplate="header">
                 <tr>
@@ -138,26 +137,50 @@
           <label for="usePotions" class="block text-900 text-xl font-medium mb-2">Usar Potions? (WIP)</label>
           <p-toggleButton id="usePotions" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [disabled]="true" styleClass="w-full"></p-toggleButton>
         </div>
+        <div class="col-12 md:col-12 pb-0" *ngIf="spells?.length > 0">
+          <label for="useSpellHealingBtn" class="block text-900 text-xl font-medium mb-2">Usar Magica de Cura?</label>
+          <p-toggleButton id="useSpellHealingBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="useSpellHealing" styleClass="w-full"></p-toggleButton>
+        </div>
+        <div class="col-12 md:col-12 pb-0" *ngIf="spells?.length > 0">
+          <p-dropdown 
+            *ngIf="useSpellHealing"
+            [options]="spells" 
+            optionLabel="name" 
+            [(ngModel)]="selectedSpell"
+            placeholder="Selecione a magia"
+            styleClass="w-full"
+            id="useSpellHealingDropDown">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="selectedSpell">
+                <img src="assets/gifs/spells/{{selectedSpell.imagePath}}" alt="{{selectedSpell.spell}}" width="32" height="32"/>
+                <div>"{{ selectedSpell.spell }}" - Mana: {{selectedSpell.manaRequired}}</div>
+              </div>
+            </ng-template>
+            <ng-template let-spell pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <img src="assets/gifs/spells/{{spell.imagePath}}" alt="{{spell.spell}}" width="32" height="32"/>
+                  <div>"{{ spell.spell }}" - Mana: {{spell.manaRequired}}</div>
+                </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        <div class="col-12 md:col-12" *ngIf="spells?.length > 0">
+          <label for="spellUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de vida?</label>
+          <div>
+            <input type="text" pInputText [(ngModel)]="lifeToUseSpell" class="w-full mb-3" readonly id="spellUntil"/>
+            <p-slider id="slid1" [(ngModel)]="lifeToUseSpell" class="w-full" [min]="10" [max]="character.maxLife"/>
+          </div>
+        </div>
         <div class="col-12 md:col-12">
           <label for="huntStyle" class="block text-900 text-xl font-medium mb-2">Estilo</label>
           <p-selectButton id="huntStyle" [options]="huntStyle" [(ngModel)]="huntStyleSelected" optionLabel="name"></p-selectButton>
         </div>
         <div class="col-12 md:col-12 pb-0">
           <label for="huntUntil" class="block text-900 text-xl font-medium mb-2">Parar com quanto de vida?</label>
-          <p-inputNumber 
-            mode="decimal" 
-            [showButtons]="true" 
-            [min]="0" 
-            [max]="185" 
-            [step]="10"
-            [(ngModel)]="minLife"
-            buttonLayout="vertical" 
-            spinnerMode="vertical" 
-            decrementButtonClass="p-button-secondary"
-            incrementButtonClass="p-button-secondary" 
-            incrementButtonIcon="pi pi-plus" 
-            decrementButtonIcon="pi pi-minus">
-            </p-inputNumber>
+          <div>
+            <input type="text" pInputText [(ngModel)]="minLife" class="w-full mb-3" readonly id="huntUntil"/>
+            <p-slider id="slid2" [(ngModel)]="minLife" class="w-full" [min]="10" [max]="character.maxLife"/>
+          </div>
         </div>
         <div class="col-12 md:col-12 pb-0">
           <button label="Iniciar" pButton pRipple (click)="startHunt(character)" class="w-full" [disabled]="!selectedCreature"></button>

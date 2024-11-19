@@ -13,6 +13,21 @@ export class CharacterService {
 
   constructor(private httpClient: HttpClient) {}
 
+  getAll(): Observable<Character[]> {
+    return this.httpClient.get<Character[]>(`${this.apiUrl}/`).pipe(
+      tap((characters) => {
+        console.log(`Characters retrieved successfully`);
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          return throwError(() => new Error('Character not found.'));
+        } else {
+          return throwError(() => new Error('Error retrieving character. Please try again later.'));
+        }
+      })
+    );
+  }
+
   getCharacter(name: string): Observable<Character> {
     return this.httpClient.get<Character>(`${this.apiUrl}/${name}`).pipe(
       tap((character) => {
@@ -41,6 +56,17 @@ export class CharacterService {
 
   updateCharacterLifeManaStamina(characterId: number) {
     this.httpClient.post<void>(this.apiUrl + "/updateCharacterLifeManaStamina", { characterId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  updateCharacterLifeManaStaminaByValues(characterId: number, life: number, mana: number) {
+    this.httpClient.post<void>(this.apiUrl + "/updateCharacterLifeManaStaminaByValues", { characterId, life, mana }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },

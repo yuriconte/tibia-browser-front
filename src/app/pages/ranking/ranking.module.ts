@@ -1,10 +1,11 @@
-import { HuntRoutingModule } from './hunt-routing.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HuntComponent } from './hunt.component';
+import { RankingComponent } from './ranking.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { MessagesModule } from 'primeng/messages';
+import { TableModule } from 'primeng/table';
+import { ChartModule } from 'primeng/chart';
 import { PanelModule } from 'primeng/panel';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,21 +18,20 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { ChipModule } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageModule } from 'primeng/message';
-import { TableModule } from 'primeng/table';
-import { SliderModule } from 'primeng/slider';
+import { RankingRoutingModule } from './ranking-routing.module';
 
 @NgModule({
-  declarations: [HuntComponent],
+  declarations: [RankingComponent],
   imports: [
     PanelModule,
-    HuntRoutingModule,
+    RankingRoutingModule,
     CommonModule,
     FormsModule,
     DropdownModule,
     ButtonModule,
     MessagesModule,
-    MessageModule,
+    TableModule,
+    ChartModule,
     InputTextModule,
     RatingModule,
     ProgressBarModule,
@@ -41,9 +41,7 @@ import { SliderModule } from 'primeng/slider';
     InputNumberModule,
     ToastModule,
     ChipModule,
-    TooltipModule,
-    TableModule,
-    SliderModule
+    TooltipModule
   ]
 })
-export class HuntModule { }
+export class RankingModule { }
