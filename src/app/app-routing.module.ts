@@ -21,6 +21,7 @@ import { AccessComponent } from './pages/auth/access/access.component';
                     { path: 'train', loadChildren: () => import('./pages/train/train.module').then(m => m.TrainModule) },
                     { path: 'bestiary', loadChildren: () => import('./pages/bestiary/bestiary.module').then(m => m.BestiaryModule) },
                     { path: 'ranking', loadChildren: () => import('./pages/ranking/ranking.module').then(m => m.RankingModule) },
+                    { path: 'shop', loadChildren: () => import('./pages/shop/shop.module').then(m => m.ShopModule) },
                     { path: 'perfil', loadChildren: () => import('./pages/perfil/perfil.module').then(m => m.PerfilModule) }
                 ]
             },

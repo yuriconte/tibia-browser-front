@@ -23,6 +23,18 @@ import { Character } from 'src/app/model/character.model';
       right: 0;
       transform: translate(50%, -50%);
     }
+    
+    ::ng-deep .p-button.p-button-text:focus,
+    ::ng-deep .p-button.p-button-text.p-button-active {
+      background-color: transparent !important; /* Remove o fundo */
+      color: inherit !important; /* Mantém a cor do texto original */
+      box-shadow: none !important; /* Remove bordas ou sombreamento */
+    }
+
+    ::ng-deep .p-button.p-button-text:focus {
+      outline: none !important; /* Remove o contorno padrão */
+      background-color: transparent !important; /* Remove o fundo */
+    }
   `],
   providers: [MessageService]
 })

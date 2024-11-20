@@ -133,15 +133,82 @@
             </p-table>
           </p-panel>
         </div>
-        <div class="col-12 md:col-12">
-          <label for="usePotions" class="block text-900 text-xl font-medium mb-2">Usar Potions? (WIP)</label>
-          <p-toggleButton id="usePotions" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [disabled]="true" styleClass="w-full"></p-toggleButton>
+        <!-- LIFE POTE -->
+        <div class="col-12 md:col-12" *ngIf="potionsHealing.length > 0">
+          <label for="usePotionsBtn" class="block text-900 text-xl font-medium mb-2">Usar Potions de Cura?</label>
+          <p-toggleButton id="usePotionsBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="usePotionsHealing" styleClass="w-full"></p-toggleButton>
         </div>
+        <div class="col-12 md:col-12 pb-0" *ngIf="potionsHealing?.length > 0 && usePotionsHealing">
+          <p-dropdown 
+            *ngIf="usePotionsHealing"
+            [options]="potionsHealing" 
+            optionLabel="name" 
+            [(ngModel)]="selectedPotionHealing"
+            placeholder="Selecione a potion de cura"
+            styleClass="w-full"
+            id="usePotionHealingDropDown">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="selectedPotionHealing">
+                <img src="assets/gifs/potions/{{selectedPotionHealing.potion.imagePath}}" alt="{{selectedPotionHealing.potion.name}}" width="32" height="32"/>
+                <div>{{ selectedPotionHealing.potion.name }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-potion pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <img src="assets/gifs/potions/{{potion.potion.imagePath}}" alt="{{potion.potion.name}}" width="32" height="32"/>
+                  <div>{{ potion.potion.name }}</div>
+                </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        <div class="col-12 md:col-12" *ngIf="potionsHealing?.length > 0 && usePotionsHealing">
+          <label for="potionHealingUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de vida?</label>
+          <div>
+            <input type="text" pInputText [(ngModel)]="lifeToUsePotion" class="w-full mb-3" readonly id="potionHealingUntil"/>
+            <p-slider id="slid3" [(ngModel)]="lifeToUsePotion" class="w-full" [min]="10" [max]="character.maxLife"/>
+          </div>
+        </div>
+        <!-- MANA POTE -->
+        <div class="col-12 md:col-12" *ngIf="potionsMana.length > 0">
+          <label for="usePotionsBtn2" class="block text-900 text-xl font-medium mb-2">Usar Potions de Mana?</label>
+          <p-toggleButton id="usePotionsBtn2" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="usePotionsMana" styleClass="w-full"></p-toggleButton>
+        </div>
+        <div class="col-12 md:col-12 pb-0" *ngIf="potionsMana?.length > 0 && usePotionsMana">
+          <p-dropdown 
+            *ngIf="usePotionsMana"
+            [options]="potionsMana" 
+            optionLabel="name" 
+            [(ngModel)]="selectedPotionMana"
+            placeholder="Selecione a potion de cura"
+            styleClass="w-full"
+            id="usePotionManaDropDown">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="selectedPotionMana">
+                <img src="assets/gifs/potions/{{selectedPotionMana.potion.imagePath}}" alt="{{selectedPotionMana.potion.name}}" width="32" height="32"/>
+                <div>{{ selectedPotionMana.potion.name }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-potion pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <img src="assets/gifs/potions/{{potion.potion.imagePath}}" alt="{{potion.potion.name}}" width="32" height="32"/>
+                  <div>{{ potion.potion.name }}</div>
+                </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        <div class="col-12 md:col-12" *ngIf="potionsMana?.length > 0 && usePotionsMana">
+          <label for="potionManaUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de mana?</label>
+          <div>
+            <input type="text" pInputText [(ngModel)]="manaToUsePotion" class="w-full mb-3" readonly id="potionManaUntil"/>
+            <p-slider id="slid4" [(ngModel)]="manaToUsePotion" class="w-full" [min]="10" [max]="character.maxMana"/>
+          </div>
+        </div>
+        <!-- SPELL LIFE -->
         <div class="col-12 md:col-12 pb-0" *ngIf="spells?.length > 0">
           <label for="useSpellHealingBtn" class="block text-900 text-xl font-medium mb-2">Usar Magica de Cura?</label>
           <p-toggleButton id="useSpellHealingBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="useSpellHealing" styleClass="w-full"></p-toggleButton>
         </div>
-        <div class="col-12 md:col-12 pb-0" *ngIf="spells?.length > 0">
+        <div class="col-12 md:col-12 pb-0" *ngIf="spells?.length > 0 && useSpellHealing">
           <p-dropdown 
             *ngIf="useSpellHealing"
             [options]="spells" 
@@ -164,7 +231,7 @@
             </ng-template>
           </p-dropdown>
         </div>
-        <div class="col-12 md:col-12" *ngIf="spells?.length > 0">
+        <div class="col-12 md:col-12" *ngIf="spells?.length > 0 && useSpellHealing">
           <label for="spellUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de vida?</label>
           <div>
             <input type="text" pInputText [(ngModel)]="lifeToUseSpell" class="w-full mb-3" readonly id="spellUntil"/>

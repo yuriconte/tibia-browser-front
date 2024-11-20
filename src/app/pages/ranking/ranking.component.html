@@ -1,8 +1,11 @@
 <div class="grid">
-  <div class="col-12 md:col-12 pb-0">
-    <p-panel header="Bestiario" [toggleable]="true">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Ranking {{selectedRanking.name}}" [toggleable]="true">
       <div class="grid">
         <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0">
+          <p-dropdown [options]="rankings" optionLabel="name" [(ngModel)]="selectedRanking" (onChange)="onRankingChange($event)" styleClass="w-full"></p-dropdown>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
           <p-table [value]="characters">
             <ng-template pTemplate="header">
               <tr>
@@ -20,7 +23,13 @@
                   {{character.name}}
                 </td>
                 <td style="text-align: center;">
-                  {{character.level}}
+                  {{selectedRanking.id === 1 ? character.level : 
+                    selectedRanking.id === 2 ? character.sword : 
+                    selectedRanking.id === 3 ? character.axe : 
+                    selectedRanking.id === 4 ? character.club :
+                    selectedRanking.id === 5 ? character.distance :
+                    selectedRanking.id === 6 ? character.shielding :
+                    character.magicLevel}}
                 </td>
               </tr>
             </ng-template>

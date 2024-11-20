@@ -29,12 +29,23 @@ import { Character } from 'src/app/model/character.model';
 export class RankingComponent {
  
   characters: Character[] = [];
+  selectedRanking: any;
+  rankings: any[] = [
+    {id: 1, name: "Level"}, 
+    {id: 2, name: "Sword"}, 
+    {id: 3, name: "Axe"}, 
+    {id: 4, name: "Club"}, 
+    {id: 5, name: "Distance"}, 
+    {id: 6, name: "Shielding"},
+    {id: 7, name: "Magic Level"}
+  ]
 
   constructor(private characterService: CharacterService,
     private service: MessageService) {}
 
   ngOnInit() {
     this.loadAllCharacter();
+    this.selectedRanking = this.rankings[0]
   }
 
   loadAllCharacter() {
@@ -46,6 +57,28 @@ export class RankingComponent {
           this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter ranking." });
       }
     });
+  }
+
+  onRankingChange(event: any) {
+    this.sortCharacters();
+  }
+
+  sortCharacters() {
+    if (this.selectedRanking.name === 'Level') {
+      this.characters.sort((a, b) => b.level - a.level);
+    } else if (this.selectedRanking.name === 'Sword') {
+      this.characters.sort((a, b) => b.sword - a.sword);
+    } else if (this.selectedRanking.name === 'Axe') {
+      this.characters.sort((a, b) => b.axe - a.axe);
+    } else if (this.selectedRanking.name === 'Club') {
+      this.characters.sort((a, b) => b.club - a.club);
+    } else if (this.selectedRanking.name === 'Distance') {
+      this.characters.sort((a, b) => b.distance - a.distance);
+    } else if (this.selectedRanking.name === 'Shielding') {
+      this.characters.sort((a, b) => b.shielding - a.shielding);
+    } else if (this.selectedRanking.name === 'Magic Level') {
+      this.characters.sort((a, b) => b.magicLevel - a.magicLevel);
+    }
   }
  
 }

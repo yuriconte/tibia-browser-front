@@ -65,8 +65,8 @@ export class CharacterService {
     })
   }
 
-  updateCharacterLifeManaStaminaByValues(characterId: number, life: number, mana: number) {
-    this.httpClient.post<void>(this.apiUrl + "/updateCharacterLifeManaStaminaByValues", { characterId, life, mana }).subscribe({
+  updateCharacterLifeManaStaminaByValues(characterId: number, life: number, mana: number, potionId: number, potionId2: number) {
+    this.httpClient.post<void>(this.apiUrl + "/updateCharacterLifeManaStaminaByValues", { characterId, life, mana, potionId, potionId2 }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },
@@ -265,6 +265,17 @@ export class CharacterService {
 
   updateVocation(characterId: number, vocationId: number) {
     this.httpClient.post<void>(this.apiUrl + "/updateVocation", { characterId, vocationId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  buyPotion(characterId: number, potionId: number, buyQuantity: number, cost: number) {
+    this.httpClient.post<void>(this.apiUrl + "/buyPotion", { characterId, potionId, buyQuantity, cost }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },

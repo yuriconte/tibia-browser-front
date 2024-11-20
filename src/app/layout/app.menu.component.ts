@@ -17,24 +17,25 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Seu Personagem',
                 items: [
-                    { label: 'Caçar Online', icon: 'pi pi-fw pi-home', routerLink: ['/hunt'] },
-                    { label: 'Caçar AFK (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                    { label: 'Treino', icon: 'pi pi-fw pi-home', routerLink: ['/train'] },
-                    { label: 'Bestiario', icon: 'pi pi-fw pi-home', routerLink: ['/bestiary'] },
-                    { label: 'Quests (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                    { label: 'Mapa Global (WIP)', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
+                    { label: 'Caçar Online',  routerLink: ['/hunt'] },
+                    { label: 'Caçar AFK (WIP)',  routerLink: ['/'] },
+                    { label: 'Treino',  routerLink: ['/train'] },
+                    { label: 'Bestiario',  routerLink: ['/bestiary'] },
+                    { label: 'Loja',  routerLink: ['/shop'] },
+                    { label: 'Quests (WIP)',  routerLink: ['/'] },
+                    { label: 'Mapa Global (WIP)',  routerLink: ['/'] }
                 ]
             },
             {
                 label: 'Comunidade',
                 items: [
-                    { label: 'Rankings', icon: 'pi pi-fw pi-home', routerLink: ['/ranking'] }
+                    { label: 'Rankings',  routerLink: ['/ranking'] }
                 ]
             },
             {
                 label: 'Wiki',
                 items: [
-                    { label: 'Work In Progress', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
+                    { label: 'Work In Progress',  routerLink: ['/'] }
                 ]
             }
         ];

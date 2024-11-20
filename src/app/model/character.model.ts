@@ -1,5 +1,6 @@
 import { CharacterBestiary } from "./character-bestiary.model";
 import { CharacterItem } from "./character-item.model";
+import { CharacterPotion } from "./character-potion.model";
 import { Item } from "./item.model";
 
 export class Character {
@@ -43,4 +44,5 @@ export class Character {
     slot5Item: Item;
     slot6Item: Item;
     items: CharacterItem[];
+    potions: CharacterPotion[];
 }
