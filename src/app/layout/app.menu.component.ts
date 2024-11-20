@@ -18,12 +18,11 @@ export class AppMenuComponent implements OnInit {
                 label: 'Seu Personagem',
                 items: [
                     { label: 'Caçar Online',  routerLink: ['/hunt'] },
-                    { label: 'Caçar AFK (WIP)',  routerLink: ['/'] },
+                    { label: 'Caçar Offline',  routerLink: ['/hunt-offline'] },
                     { label: 'Treino',  routerLink: ['/train'] },
                     { label: 'Bestiario',  routerLink: ['/bestiary'] },
                     { label: 'Loja',  routerLink: ['/shop'] },
-                    { label: 'Quests (WIP)',  routerLink: ['/'] },
-                    { label: 'Mapa Global (WIP)',  routerLink: ['/'] }
+                    { label: 'Quests (WIP)',  routerLink: ['/'] }
                 ]
             },
             {
@@ -35,7 +34,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Wiki',
                 items: [
-                    { label: 'Work In Progress',  routerLink: ['/'] }
+                    { label: 'Work In Progress (WIP)',  routerLink: ['/'] }
                 ]
             }
         ];

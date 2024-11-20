@@ -1,3 +1,4 @@
+import { CreatureDamage } from "./creature-damage.model";
 import { CreatureItem } from "./creature-item.model";
 
 export class Creature {
@@ -16,4 +17,5 @@ export class Creature {
     minGold: number;
     maxGold: number;
     items: CreatureItem[];
+    damages: CreatureDamage[];
 }

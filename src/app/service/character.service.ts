@@ -284,4 +284,48 @@ export class CharacterService {
       }
     })
   }
+
+  startHuntOffline(characterId: number, huntHours, bestiaryId) {
+    this.httpClient.post<void>(this.apiUrl + "/startHuntOffline", { characterId, huntHours, bestiaryId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  cancelHuntOffline(characterId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/cancelHuntOffline", { characterId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  characterDead(characterId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/characterDead", { characterId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  sellAllItems(characterId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/sellAllItems", { characterId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
 }

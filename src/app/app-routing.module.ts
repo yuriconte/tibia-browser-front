@@ -18,6 +18,7 @@ import { AccessComponent } from './pages/auth/access/access.component';
                 canActivate: [AuthGuard],  // Aplica o guard a todas as rotas filhas
                 children: [
                     { path: 'hunt', loadChildren: () => import('./pages/hunt/hunt.module').then(m => m.HuntModule) },
+                    { path: 'hunt-offline', loadChildren: () => import('./pages/hunt-offline/hunt-offline.module').then(m => m.HuntOfflineModule) },
                     { path: 'train', loadChildren: () => import('./pages/train/train.module').then(m => m.TrainModule) },
                     { path: 'bestiary', loadChildren: () => import('./pages/bestiary/bestiary.module').then(m => m.BestiaryModule) },
                     { path: 'ranking', loadChildren: () => import('./pages/ranking/ranking.module').then(m => m.RankingModule) },

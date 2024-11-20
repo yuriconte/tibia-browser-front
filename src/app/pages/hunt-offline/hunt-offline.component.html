@@ -1,0 +1,173 @@
+<p-toast key="tst" [life]="10000"></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Informações" [toggleable]="true" [collapsed]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 pb-0">
+          <p>
+            <em>
+              Para caçar offline, você precisa desbloquear pelo menos o Tier 1 do bestiario da criatura.
+            </em>
+          </p>
+        </div>
+        <div class="col-12 md:col-12 pb-0">
+          <p>
+            <em>
+              A experiência/hora base para caçar offline é equivalente a 10% da experiência/hora obtida na caçada online.
+            </em>
+          </p>
+          <p>
+            <em>
+              Essa experiência pode ser aumentada em 5% para cada Tier de bestiário desbloqueado e mais 5% se você tiver uma Boots of Haste equipada.
+            </em>
+          </p>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="lootDrop?.length > 0">
+    <p-panel header="Loot Ganho" [toggleable]="true">
+      <p-table [value]="lootDrop">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Item</th>
+            <th>Quantidade</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <img src="assets/gifs/items/{{item.item.imagePath}}" width="30">
+            </td>
+            <td>
+              <span class="image-text ml-2">{{item.quantity}}</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-panel>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="creatures?.length > 0">
+    <p-panel header="Caçar" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0" *ngIf="!character.huntOfflineDate">
+          <p-dropdown [options]="timeOptions" optionLabel="name" [(ngModel)]="selectedTimeOption" styleClass="w-full" (onChange)="onTimeChange($event)"></p-dropdown>
+        </div>
+        <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="!character.huntOfflineDate">
+          <p-dropdown 
+            [options]="creatures" 
+            optionLabel="name" 
+            [(ngModel)]="selectedCreature"
+            placeholder="Selecione a criatura"
+            styleClass="w-full"
+            id="creature">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="selectedCreature">
+                <i class="pi pi-star-fill" style="color: #CD7F32;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier1 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier2"></i>
+                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                <p-tag severity="info" value="{{selectedCreature.expHourStr}} exp/h" *ngIf="selectedCreature.expHourStr"></p-tag>
+                <img src="assets/gifs/creatures/{{selectedCreature.bestiary.creature.imagePath}}" alt="{{selectedCreature.bestiary.creature.name}}" width="32" height="32"/>
+                <div>{{ selectedCreature.bestiary.creature.name }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-creature pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-star-fill" style="color: #CD7F32;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier1 && creature.totalKills < creature.bestiary.totalKillsTier2"></i>
+                  <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier2 && creature.totalKills < creature.bestiary.totalKillsTier3"></i>
+                  <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier2 && creature.totalKills < creature.bestiary.totalKillsTier3"></i>
+                  <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier3"></i>
+                  <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier3"></i>
+                  <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="creature.totalKills >= creature.bestiary.totalKillsTier3"></i>
+                  <p-tag severity="info" value="{{creature.expHourStr}} exp/h" *ngIf="creature.expHourStr"></p-tag>
+                  <img src="assets/gifs/creatures/{{creature.bestiary.creature.imagePath}}" alt="{{creature.bestiary.creature.name}}" width="32" height="32"/>
+                  <div>{{ creature.bestiary.creature.name }}</div>
+                </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
+          <p-panel header="Detalhes" [toggleable]="true">
+            <div class="grid">
+              <div class="col-12 md:col-12 lg:col-12 xl:col-12 exp-bar pb-0 pl-0 pr-0" *ngIf="character.huntOfflineDate">
+                <div class="progress-container">
+                  <p-progressBar [value]="progress" [showValue]="false" styleClass="w-full exp-bar" *ngIf="character.huntOfflineDate"></p-progressBar>
+                  <div class="progress-text">{{formatTime(remainingTime)}} ({{progress}}%)</div>
+                </div>
+              </div>
+              <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-5 pl-0 pr-0" style="text-align: center;">
+                <img src="assets/gifs/creatures/{{selectedCreature.bestiary.creature.imagePath}}" alt="{{selectedCreature.bestiary.creature.name}}" width="72" height="72"/>
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
+                Tier
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
+                <i class="pi pi-star-fill" style="color: #CD7F32;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier1 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier2"> 10%</i>
+                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"> 15%</i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"> 20%</i>
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
+                <img src="assets/gifs/items/Boots_of_Haste.gif" alt="BoH Equipada?" width="32" height="32"/>
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
+                {{character.slot6Item.id === 92 ? 'Equipado (+5%)' : 'Não Equipado (+0%)'}}
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
+                Exp/h Caçada Online
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
+                <p-tag severity="success" value="{{selectedCreature.expHourOrigStr}} exp/h" *ngIf="selectedCreature.expHourOrigStr"></p-tag>
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
+                Exp/h No tier atual
+              </div>
+              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
+                <p-tag severity="info" value="{{selectedCreature.expHourStr}} exp/h" *ngIf="selectedCreature.expHourStr"></p-tag>
+              </div>
+            </div>
+          </p-panel>
+        </div>
+        <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="selectedCreature?.bestiary.creature?.items?.length > 0">
+          <p-panel header="Loot" [toggleable]="true" [collapsed]="true">
+            <p-table [value]="selectedCreature.bestiary.creature.items">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Item</th>
+                  <th>Raridade</th>
+                  <th>Valor</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <img src="assets/gifs/items/{{item.item.imagePath}}" width="30">
+                  </td>
+                  <td>
+                    <p-tag severity="primary" value="Comum" *ngIf="item.rate === 'comum'"></p-tag>
+                    <p-tag severity="info" value="Incomum" *ngIf="item.rate === 'incomum'"></p-tag>
+                    <p-tag severity="warning" value="Raro" *ngIf="item.rate === 'raro'"></p-tag>
+                    <p-tag severity="danger" value="Ultra" *ngIf="item.rate === 'ultra'"></p-tag>
+                  </td>
+                  <td>
+                    <span class="image-text ml-2">{{item.item.gold}}</span>
+                    <img src="assets/gifs/items/Gold_Coin.gif" width="30" style="vertical-align: middle"/>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-panel>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
+          <p-button label="Caçar" [badge]="formatTime(remainingTime)" styleClass="w-full mb-2" *ngIf="!character.huntOfflineDate" (click)="startHunt()"></p-button>
+          <p-button label="Cancelar" styleClass="w-full p-button-danger mb-2" *ngIf="character.huntOfflineDate" (click)="cancelHunt()"></p-button>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</div>

@@ -4,6 +4,8 @@ import { Character } from 'src/app/model/character.model';
 import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
 import { Item } from 'src/app/model/item.model';
+import { Potion } from 'src/app/model/potion.model';
+import { CharacterPotion } from 'src/app/model/character-potion.model';
 
 @Component({
   selector: 'app-perfil',
@@ -67,6 +69,9 @@ export class PerfilComponent {
 
   loading: boolean = false;
 
+  lifeInterval;
+  manaInterval;
+
   constructor(private characterService: CharacterService,
     private service: MessageService,
     private authService: AuthService,
@@ -76,6 +81,15 @@ export class PerfilComponent {
     this.loadCharacter();
   }
 
+  ngOnDestroy() {
+    if (this.lifeInterval) {
+      clearInterval(this.lifeInterval);
+    }
+    if (this.manaInterval) {
+      clearInterval(this.manaInterval);
+    }
+  }
+
   loadCharacter() {
     let username = this.authService.getUser();
     if (username != null) {
@@ -83,6 +97,16 @@ export class PerfilComponent {
         next: (data) => {
             this.character = data;
             this.loading = false
+            this.lifeInterval = setInterval(() => {
+              if (this.character.life < this.character.maxLife) {
+                this.character.life += 1
+              }
+            },1000);
+            this.manaInterval = setInterval(() => {
+              if (this.character.mana < this.character.maxMana) {
+                this.character.mana += 1
+              }
+            },1000);
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -189,7 +213,6 @@ export class PerfilComponent {
       if (this.character.items[itemIndex].quantity === 0) {
           this.character.items.splice(itemIndex, 1);
       }
-      this.service.add({ key: 'tst', severity: 'success', summary: 'Parabéns', detail: 'Item vendido com sucesso' });
     } else {
       this.service.add({ key: 'tst', severity: 'danger', summary: 'Erro', detail: 'Ocorreu um erro. Atualize a página e tente novamente.' });
     }
@@ -210,5 +233,47 @@ export class PerfilComponent {
           this.showEquipDetail(item)
         }
     });
+  }
+
+  usePotion(potion: CharacterPotion) {
+    if (potion.potion.type === 'life') {
+      if (this.character.life == this.character.maxLife) {
+        this.service.add({ key: 'tst', severity: 'warning', summary: 'Atenção', detail: 'Sua vida está cheia. Não é possível usar potion agora.' });
+        return;
+      }
+      potion.quantity -= 1;
+      let healQuantity = Math.round(this.getRandomInRange(potion.potion.min, potion.potion.max))
+      if (this.character.life + healQuantity <= this.character.maxLife) {
+        this.character.life += healQuantity;
+      } else {
+        this.character.life = this.character.maxLife
+      }
+      this.characterService.updateCharacterLifeManaStaminaByValues(this.character.id, this.character.life, this.character.mana, potion.potion.id, null);
+    } else if (potion.potion.type === 'mana') {
+      if (this.character.mana == this.character.maxMana) {
+        this.service.add({ key: 'tst', severity: 'warning', summary: 'Atenção', detail: 'Sua mana está cheia. Não é possível usar potion agora.' });
+        return;
+      }
+      potion.quantity -= 1;
+      let healQuantity = Math.round(this.getRandomInRange(potion.potion.min, potion.potion.max))
+      if (this.character.mana + healQuantity <= this.character.maxMana) {
+        this.character.mana += healQuantity;
+      } else {
+        this.character.mana = this.character.maxMana
+      }
+      this.characterService.updateCharacterLifeManaStaminaByValues(this.character.id, this.character.life, this.character.mana, null, potion.potion.id);
+    }
+  }
+
+  getRandomInRange(min: number, max: number): number {
+    return Math.random() * (max - min) + min;
+  }
+
+  sellAllItems() {
+    this.characterService.sellAllItems(this.character.id);
+    this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: 'Todos os items foram vendidos com sucesso.' });
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000)
   }
 }

@@ -7,4 +7,8 @@ export class CharacterBestiary {
     bestiary: Bestiary;
     totalKills:number;
     expHour:number;
+
+    expHourNum:number;
+    expHourStr:string;
+    expHourOrigStr:string;
 }

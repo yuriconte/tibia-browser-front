@@ -45,4 +45,8 @@ export class Character {
     slot6Item: Item;
     items: CharacterItem[];
     potions: CharacterPotion[];
+
+    huntOfflineDate: Date;
+    huntOfflineBestiaryId: number;
+    huntOfflineTimeInHours: number;
 }

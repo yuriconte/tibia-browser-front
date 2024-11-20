@@ -6,11 +6,9 @@ import { AuthService } from '../auth/auth.service';
 import { Character } from 'src/app/model/character.model';
 import { Bestiary } from 'src/app/model/bestiary.model';
 import { Creature } from 'src/app/model/creature.model';
-import { Item } from 'src/app/model/item.model';
 import { CharacterItem } from 'src/app/model/character-item.model';
 import { Spell } from 'src/app/model/spell.model';
 import { SpellService } from 'src/app/service/spell.service';
-import { Potion } from 'src/app/model/potion.model';
 import { CharacterPotion } from 'src/app/model/character-potion.model';
 
 @Component({
@@ -25,17 +23,21 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
       background-color: #38bdf8; /* Azul para mana */
     }
 
+    ::ng-deep .mana-button .p-button {
+      background: #38bdf8; /* Azul para mana */
+    }
+
     ::ng-deep .exp-bar .p-progressbar .p-progressbar-value {
       background-color: #a855f7; 
     }
 
     ::ng-deep .p-selectbutton .p-button.p-highlight:nth-child(2) {
-        background-color: #fdba74; /* Cor para o segundo botão */
+        background-color: #fdba74; 
         color: #ffffff;
     }
 
     ::ng-deep .p-selectbutton .p-button.p-highlight:last-child {
-        background-color: #f87171; /* Cor para o último botão */
+        background-color: #f87171; 
         color: #ffffff;
     }
 
@@ -127,7 +129,6 @@ export class HuntComponent {
 
   ngOnInit() {
     this.loadCharacter();
-    this.loadBestiary();
     this.huntStyle = [
       { name: 'Ataque', value: 1 },
       { name: 'Balanceado', value: 0.75 },
@@ -169,12 +170,12 @@ export class HuntComponent {
             if (this.character.potions?.length > 0) {
               this.potionsHealing = this.character.potions?.filter(cpot => cpot.potion.type === 'life');
               if (this.potionsHealing?.length > 0) {
-                this.usePotionsHealing = true;
+                //this.usePotionsHealing = true;
                 this.selectedPotionHealing = this.potionsHealing[0]
               }
               this.potionsMana = this.character.potions?.filter(cpot => cpot.potion.type === 'mana');
               if (this.potionsMana?.length > 0) {
-                this.usePotionsMana = true;
+                //this.usePotionsMana = true;
                 this.selectedPotionMana = this.potionsMana[0]
               }
             }
@@ -188,6 +189,7 @@ export class HuntComponent {
                 this.character.mana += 1
               }
             },1000);
+            this.loadBestiary();
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -220,7 +222,7 @@ export class HuntComponent {
           this.spells = []
         }
         if (this.spells?.length > 0) {
-          this.useSpellHealing = true
+          //this.useSpellHealing = true
           this.selectedSpell = this.spells[0];
         }
       },
@@ -232,7 +234,9 @@ export class HuntComponent {
 
   prepareCreatures() {
     this.creatures.map((creature, index) => {
-        this.testeDificuldade(index);
+        //this.testeDificuldade(index);
+        let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
+        creature.creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
         creature.creature.items.sort((itemA, itemB) => {
           const rateOrder = { comum: 1, incomum: 2, raro: 3, ultra: 4 };
           //return rateOrder[itemA.rate] - rateOrder[itemB.rate];
@@ -277,6 +281,8 @@ export class HuntComponent {
       this.monster.life -= damage.cDamage
       if (this.useSpellHealing && this.exaustedSpellHealing == 0) {
         if (this.character.life <= this.lifeToUseSpell && this.character.mana >= this.selectedSpell.manaRequired) {
+          this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
+          this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
           this.exaustedSpellHealing = 3;
           let healQuantity = this.getHealFormulaValue();
           if (this.character.life + healQuantity <= this.character.maxLife) {
@@ -289,8 +295,10 @@ export class HuntComponent {
           return;
         }
       }
-      if (this.usePotionsHealing && !this.exaustedPotionHealing) {
+      if (this.usePotionsHealing && this.exaustedPotionHealing == 0) {
         if (this.character.life <= this.lifeToUsePotion && this.selectedPotionHealing.quantity > 0) {
+          this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
+          this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
           this.exaustedPotionHealing = 3;
           this.selectedPotionHealing.quantity -= 1;
           let healQuantity = Math.round(this.getRandomInRange(this.selectedPotionHealing.potion.min, this.selectedPotionHealing.potion.max))
@@ -308,8 +316,10 @@ export class HuntComponent {
           return;
         }
       }
-      if (this.usePotionsMana && !this.exaustedPotionMana) {
+      if (this.usePotionsMana && this.exaustedPotionMana == 0) {
         if (this.character.mana <= this.manaToUsePotion && this.selectedPotionMana.quantity > 0) {
+          this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
+          this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
           this.exaustedPotionMana = 3;
           this.selectedPotionMana.quantity -= 1;
           let healQuantity = Math.round(this.getRandomInRange(this.selectedPotionMana.potion.min, this.selectedPotionMana.potion.max))
@@ -328,15 +338,20 @@ export class HuntComponent {
         }
       }
       if (this.monster.life > 0) {
-        this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
-        this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
-        this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
+        this.exaustedSpellHealing = this.exaustedSpellHealing > 1 ? this.exaustedSpellHealing - 2 : this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
+        this.exaustedPotionHealing = this.exaustedPotionHealing > 1 ? this.exaustedPotionHealing - 2 : this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
+        this.exaustedPotionMana = this.exaustedPotionMana > 1 ? this.exaustedPotionMana - 2 : this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
         character.life -= damage.mDamage
         if (character.life <= 0) {
+          character.life = 0;
           this.statusHunt = false;
-          //TODO calculo de morte, perda de xp, level, max_vida, max_mana, skills
           this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, null, null);
+          this.characterService.characterDead(this.character.id);
           clearInterval(this.atkInterval);
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Morreu', detail: "Você morreu!" });
+          setTimeout(()=> {
+            window.location.reload();
+          }, 2000);
         } else if (character.life <= this.minLife) {
           this.statusHunt = false;
           this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, null, null);
@@ -390,6 +405,8 @@ export class HuntComponent {
           }
           character.maxLife += lifeGain;
           character.maxMana += manaGain;
+          character.life = character.maxLife;
+          character.mana= character.maxMana;;
           this.expNextLevel = this.calculateExpLevelFormula(character.level)
           this.expPreviousLevel = this.calculateExpLevelFormula(character.level-1)
           if (character.level >= 8 && character.vocationId === 1 && this.msgs.length == 0) {
@@ -403,7 +420,7 @@ export class HuntComponent {
     
   }
 
-  getDamage(character:Character, monster:Creature) {
+  getDamage(character:Character, monster:Creature, teste?:boolean) {
     /* (0.085*{D}*{X}*{Y})+({L}/5)
     X = Ataque da arma
     Y = Skills do jogador
@@ -437,8 +454,47 @@ export class HuntComponent {
     let monsterDamage = Math.round(this.getRandomInRange(0, monster.maxDamage))
 
     let characterFinalDamage = Math.round(characterDamage-(0*0)/(1*100)-(characterDamage/100)*this.getRandomInRange(monsterMinArmor, monsterMaxArmor))
-    let monsterFinalDamage = Math.round(monsterDamage-(character.totalDef*character.shielding)/(this.huntStyleSelected.value*100)-(monsterDamage/100)*this.getRandomInRange(characterMinArmor, characterMaxArmor))
 
+    //danos magicos
+    if (monster.damages?.length > 0 && !teste) {
+      const extraDamageChance = (monster.damages.length/10) + 0.2; //10% chance de causar dano extra para cada damage extra no array + 20% base
+      const randomValue = Math.random();
+      let shouldExtraDamage = randomValue <= extraDamageChance;
+      if (shouldExtraDamage) {
+        let selectedDamageIndex = Math.round(this.getRandomInRange(0, monster.damages.length-1))
+        let selectedDamage = monster.damages[selectedDamageIndex]
+        let extraDamage = Math.round(this.getRandomInRange(monster.damages[selectedDamageIndex].minDamage, monster.damages[selectedDamageIndex].minDamage))
+        if (selectedDamage.type === 'healing') {
+          if (this.monster.life + extraDamage <= this.monster.maxLife) {
+            this.monster.life += extraDamage
+          } else {
+            this.monster.life = this.monster.maxLife
+          }
+        } else if (selectedDamage.type === 'life drain') {
+          if (this.character.life - extraDamage >= 0) {
+            this.character.life -= extraDamage
+          } else {
+            this.character.life = 0;
+          }
+          if (this.monster.life + extraDamage <= this.monster.maxLife) {
+            this.monster.life += extraDamage
+          } else {
+            this.monster.life = this.monster.maxLife
+          }
+        } else if (selectedDamage.type === 'mana drain') {
+          if (this.character.mana - extraDamage >= 0) {
+            this.character.mana -= extraDamage
+          } else {
+            this.character.mana = 0;
+          }
+        } else {
+          monsterDamage += extraDamage
+        }
+      }
+
+      
+    }
+    let monsterFinalDamage = Math.round(monsterDamage-(character.totalDef*character.shielding)/(this.huntStyleSelected.value*100)-(monsterDamage/100)*this.getRandomInRange(characterMinArmor, characterMaxArmor))
     return {cDamage: characterFinalDamage >=0 ? characterFinalDamage : 0, mDamage: monsterFinalDamage >=0 ? monsterFinalDamage : 0}
   }
 
@@ -447,46 +503,46 @@ export class HuntComponent {
   }
 
 
-  testeDificuldade(index: number) {
-    const character = {...this.character}
+  // testeDificuldade(index: number) {
+  //   const character = {...this.character}
 
-    let monster = {...this.creatures[index].creature}
-    let countTimeToKill = 0;
+  //   let monster = {...this.creatures[index].creature}
+  //   let countTimeToKill = 0;
 
-    let interval = setInterval(() => {
-      countTimeToKill += 1;
-      let damage = this.getDamage(character, monster)
-      monster.life -= damage.cDamage
-      if (monster.life > 0) {
-        character.life -= damage.mDamage
-        if (character.life <= 0) {
-          clearInterval(interval);
-          this.creatures[index].creature.tagType = "danger"
-          this.creatures[index].creature.tagLabel = "Extremo"
-          this.creatures[index].disabled = true;
-          let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
-          this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
-        }
-      } else {
-        if (countTimeToKill <= 10) {
-          this.creatures[index].creature.tagType = "success"
-          this.creatures[index].creature.tagLabel = "Fácil"
-        } else if (countTimeToKill <= 30) {
-          this.creatures[index].creature.tagType = "warning"
-          this.creatures[index].creature.tagLabel = "Médio"
-        } else if (countTimeToKill <= 60) {
-          this.creatures[index].creature.tagType = "danger"
-          this.creatures[index].creature.tagLabel = "Difícil"
-        } else {
-          this.creatures[index].creature.tagType = "danger"
-          this.creatures[index].creature.tagLabel = "Muito Difícil"
-        }
-        let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
-        this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
-        clearInterval(interval);
-      }
-    }, 10);
-  }
+  //   let interval = setInterval(() => {
+  //     countTimeToKill += 1;
+  //     let damage = this.getDamage(character, monster, true)
+  //     monster.life -= damage.cDamage
+  //     if (monster.life > 0) {
+  //       character.life -= damage.mDamage
+  //       if (character.life <= 0) {
+  //         clearInterval(interval);
+  //         this.creatures[index].creature.tagType = "danger"
+  //         this.creatures[index].creature.tagLabel = "Extremo"
+  //         this.creatures[index].disabled = true;
+  //         let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
+  //         this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
+  //       }
+  //     } else {
+  //       if (countTimeToKill <= 10) {
+  //         this.creatures[index].creature.tagType = "success"
+  //         this.creatures[index].creature.tagLabel = "Fácil"
+  //       } else if (countTimeToKill <= 30) {
+  //         this.creatures[index].creature.tagType = "warning"
+  //         this.creatures[index].creature.tagLabel = "Médio"
+  //       } else if (countTimeToKill <= 60) {
+  //         this.creatures[index].creature.tagType = "danger"
+  //         this.creatures[index].creature.tagLabel = "Difícil"
+  //       } else {
+  //         this.creatures[index].creature.tagType = "danger"
+  //         this.creatures[index].creature.tagLabel = "Muito Difícil"
+  //       }
+  //       let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
+  //       this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
+  //       clearInterval(interval);
+  //     }
+  //   }, 10);
+  // }
 
   shouldDrop(rarity: string): boolean {
     const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.05 : 0.01
@@ -506,6 +562,20 @@ export class HuntComponent {
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.4)+8, (this.character.level*0.2)+(this.character.magicLevel*1.795)+11))
     }
     return 0
+  }
+
+  getDifferenceFromNowInSeconds(dateString: any): number {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = Math.abs(now.getTime() - date.getTime());
+    return Math.floor(diffInMs / 1000);
+  }
+
+  formatTime(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
 }
