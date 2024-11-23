@@ -47,6 +47,30 @@
       </p-table>
     </p-panel>
   </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Vida / Mana" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 health-bar pb-0">
+          <div class="progress-container">
+            <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">{{character.life}} / {{character.maxLife}}</div>
+          </div>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 mana-bar pb-0">
+          <div class="progress-container">
+            <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">{{character.mana}} / {{character.maxMana}}</div>
+          </div>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 exp-bar pb-0">
+          <div class="progress-container">
+            <p-progressBar [value]="(character.experience-expPreviousLevel)/(expNextLevel-expPreviousLevel)*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">Level {{character.level}} - Exp {{character.experience}} / {{expNextLevel}}</div>
+          </div>
+        </div>
+      </div>
+    </p-panel>
+  </div>
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="creatures?.length > 0">
     <p-panel header="Caçar" [toggleable]="true">
       <div class="grid">

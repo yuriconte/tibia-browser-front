@@ -1,0 +1,30 @@
+
+.outfitter-container {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.outfits {
+  display: grid;
+  grid-template-columns: repeat(19, 20px); /* 19 itens por linha com largura fixa */
+  gap: 1px; /* Espaçamento entre os itens */
+  justify-content: center;
+  margin: 2px 0;
+}
+
+.outfit {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: 1px solid #000;
+  transition: transform 0.2s ease;
+}
+
+.outfit:hover {
+  transform: scale(1.1); /* Pequeno zoom ao passar o mouse */
+}
+
+.selected-outfit {
+  margin-top: 20px;
+  margin-left: -70px;
+}

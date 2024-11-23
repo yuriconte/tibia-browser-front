@@ -22,28 +22,62 @@
 
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Informações do Personagem" [toggleable]="true">
-      <p><strong>Nome:</strong> {{ character.name }}</p>
-      <p><strong>Sex:</strong> {{ character.sex ? 'Feminino' : 'Masculino' }}</p>
-      <p><strong>Vocação:</strong> {{ character.vocationId === 1 ? 'Sem Vocação' : character.vocationId === 2 ? 'Knight' : character.vocationId === 3 ? 'Paladin' : character.vocationId === 4 ? 'Druid' : 'Sorcerer' }}</p>
-      <p><strong>Nível:</strong> {{ character.level }}</p>
-      <p><strong>Gold:</strong> {{ character.balance + (character.balance > 1000 ? ' (' + (character.balance > 1000000000 ? ((character.balance/1000000000).toFixed(2) + ' kkk') : character.balance > 1000000 ? ((character.balance/1000000).toFixed(2) + ' kk') : ((character.balance/1000).toFixed(2) + ' k')) + ')' : '')}}</p>
-    </p-panel>
-  </div>
-
-  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
-    <p-panel header="Vida / Mana" [toggleable]="true">
       <div class="grid">
-        <div class="col-12 md:col-12 lg:col-12 health-bar pb-0">
+        <div class="col-12 md:col-12 lg:col-12 font-tibia name-character pb-0 pt-0">
+          {{ character.name }}
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 health-bar p-1">
           <div class="progress-container">
             <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false"></p-progressBar>
-            <div class="progress-text">{{character.life}} / {{character.maxLife}}</div>
+            <div class="progress-text">{{character.life}} / {{character.maxLife}}  ({{(character.life/character.maxLife*100).toFixed(0)}}%)</div>
           </div>
         </div>
-        <div class="col-12 md:col-12 lg:col-12 mana-bar pb-0">
+        <div class="col-12 md:col-12 lg:col-12 mana-bar p-1">
           <div class="progress-container">
             <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
-            <div class="progress-text">{{character.mana}} / {{character.maxMana}}</div>
+            <div class="progress-text">{{character.mana}} / {{character.maxMana}} ({{(character.mana/character.maxMana*100).toFixed(0)}}%)</div>
           </div>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 exp-bar p-1">
+          <div class="progress-container">
+            <p-progressBar [value]="(character.experience-expPreviousLevel)/(expNextLevel-expPreviousLevel)*100" [showValue]="false"></p-progressBar>
+            <div class="progress-text">{{character.experience}} / {{expNextLevel}} ({{((character.experience-expPreviousLevel)/(expNextLevel-expPreviousLevel)*100).toFixed(0)}}%)</div>
+          </div>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 font-tibia name-character pb-0 pt-0">
+          <img src="assets/img/Citizen_Male.gif" width="160" height="160"/>
+        </div>
+        <div class="col-6 md:col-6 lg:col-6 font-tibia sex-character pb-2 pt-0">
+          <div class="grid">
+            <div class="col-12 md:col-12 lg:col-12 font-tibia sex-character pb-2">
+              {{ character.sex ? 'Feminino' : 'Masculino' }}
+            </div>
+            <div class="col-12 md:col-12 lg:col-12 font-tibia vocation-character pb-0 pt-0">
+              {{ character.vocationId === 1 ? 'Sem Vocação' : character.vocationId === 2 ? 'Knight' : character.vocationId === 3 ? 'Paladin' : character.vocationId === 4 ? 'Druid' : 'Sorcerer' }}
+            </div>
+          </div>
+        </div>
+        <div class="col-6 md:col-6 lg:col-6 font-tibia name-character pb-2 pt-1">
+          <p-badge value="{{character.level}}" size="xlarge" severity="primary"></p-badge>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 pb-2">
+          <div class="grid">
+            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+              <span class="text-500"><img src="assets/gifs/items/Crystal_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
+              <span class="image-text ml-2">{{ getCoins(character.balance).crystal }}</span>
+            </div>
+            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+              <span class="text-500"><img src="assets/gifs/items/Platinum_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
+              <span class="image-text ml-2">{{ getCoins(character.balance).platinum }}</span>
+            </div>
+            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
+              <span class="image-text ml-2">{{ getCoins(character.balance).gold }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-12 lg:col-12 pb-2 vocation-character" style="text-align:center">
+          {{ character.balance > 1000 ? (character.balance > 1000000000 ? ((character.balance/1000000000).toFixed(2) + ' kkk') : character.balance > 1000000 ? ((character.balance/1000000).toFixed(2) + ' kk') : ((character.balance/1000).toFixed(2) + ' k')) : ''}}
         </div>
       </div>
     </p-panel>
@@ -81,7 +115,7 @@
           <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot1Item">
             Helmet
           </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot1Item)" *ngIf="character.slot1Item">
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot1Item)" *ngIf="character.slot1Item" [disabled]="character.huntOfflineDate">
             <span class="flex align-items-center font-bold">
               <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" style="width: 2rem" >
             </span>
@@ -91,7 +125,7 @@
           <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot2Item">
             Weapon
           </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot2Item)" *ngIf="character.slot2Item">
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot2Item)" *ngIf="character.slot2Item" [disabled]="character.huntOfflineDate">
             <span class="flex align-items-center font-bold">
               <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" style="width: 2rem" >
             </span>
@@ -101,7 +135,7 @@
           <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot3Item">
             Armor
           </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot3Item)" *ngIf="character.slot3Item">
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot3Item)" *ngIf="character.slot3Item" [disabled]="character.huntOfflineDate">
             <span class="flex align-items-center font-bold">
               <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" style="width: 2rem" >
             </span>
@@ -111,19 +145,32 @@
           <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot4Item">
             Shield
           </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot4Item)" *ngIf="character.slot4Item">
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot4Item)" *ngIf="character.slot4Item" [disabled]="character.huntOfflineDate">
             <span class="flex align-items-center font-bold">
               <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" style="width: 2rem" >
             </span>
           </button>
         </div>
-        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <!-- Anel -->
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
           <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot5Item">
             Legs
           </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot5Item)" *ngIf="character.slot5Item">
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot5Item)" *ngIf="character.slot5Item" [disabled]="character.huntOfflineDate">
             <span class="flex align-items-center font-bold">
               <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" style="width: 2rem" >
+            </span>
+          </button>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
+          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slotAmmo">
+            Ammunation
+          </p-button>
+          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slotAmmo)" *ngIf="character.slotAmmo" [disabled]="character.huntOfflineDate">
+            <span class="flex align-items-center font-bold">
+              <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" style="width: 2rem" >
             </span>
           </button>
         </div>
@@ -138,6 +185,42 @@
           </button>
         </div>
       </div>
+    </p-panel>
+  </div>
+
+  <div class="col-12 md:col-12 pb-5 pl-0 pr-0" *ngIf="character.potions">
+    <p-panel header="Potions" [toggleable]="true">
+      <p-table [value]="character.potions">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Valor</th>
+            <th>Quant.</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-potion>
+          <tr>
+            <td class="pl-1 pr-1">
+              <span class="image-text ml-2">{{potion.quantity*potion.potion.gold}}</span>
+              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
+            </td>
+            <td class="pl-1 pr-1">
+              <p-button styleClass="custom-button p-button-info" badge="{{potion.quantity}}">
+                <span class="flex align-items-center font-bold">
+                  <img src="assets/gifs/potions/{{potion.potion.imagePath}}" style="width: 2rem" >
+                </span>
+              </p-button>
+            </td>
+            <td class="pl-1 pr-1">
+              <p-button styleClass="custom-button p-button-primary" (click)="usePotion(potion)">
+                <span class="flex align-items-center font-bold">
+                  Usar
+                </span>
+              </p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </p-panel>
   </div>
 
@@ -174,42 +257,6 @@
               <p-button styleClass="custom-button p-button-primary w-full" (click)="sellItem(item.item)">
                 <span class="flex align-items-center font-bold pl-2">
                   Vender
-                </span>
-              </p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-panel>
-  </div>
-
-  <div class="col-12 md:col-12 pb-5 pl-0 pr-0" *ngIf="character.potions">
-    <p-panel header="Potions" [toggleable]="true">
-      <p-table [value]="character.potions">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Valor</th>
-            <th>Quant.</th>
-            <th></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-potion>
-          <tr>
-            <td class="pl-1 pr-1">
-              <span class="image-text ml-2">{{potion.quantity*potion.potion.gold}}</span>
-              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
-            </td>
-            <td class="pl-1 pr-1">
-              <p-button styleClass="custom-button p-button-info" badge="{{potion.quantity}}">
-                <span class="flex align-items-center font-bold">
-                  <img src="assets/gifs/potions/{{potion.potion.imagePath}}" style="width: 2rem" >
-                </span>
-              </p-button>
-            </td>
-            <td class="pl-1 pr-1">
-              <p-button styleClass="custom-button p-button-primary" (click)="usePotion(potion)">
-                <span class="flex align-items-center font-bold">
-                  Usar
                 </span>
               </p-button>
             </td>

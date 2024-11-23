@@ -36,6 +36,8 @@ export class ShopComponent {
   potions: Potion[];
   wands: Item[];
   rods: Item[];
+  arrows: Item[];
+  bolts: Item[];
 
   constructor(private characterService: CharacterService,
     private potionService: PotionService,
@@ -56,6 +58,8 @@ export class ShopComponent {
             this.loadPotions();
             this.loadWands();
             this.loadRods();
+            this.loadArrows();
+            this.loadBolts();
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -102,7 +106,7 @@ export class ShopComponent {
   loadWands() {
     this.itemService.getWands().subscribe({
       next: (data) => {
-          this.wands = data;//.filter(potion => (potion.vocationIds.split(',').includes(this.character.vocationId.toString()) && potion.levelRequired <= this.character.level));
+          this.wands = data;
           this.prepareItems(this.wands);
       },
       error: () => {
@@ -114,7 +118,7 @@ export class ShopComponent {
   loadRods() {
     this.itemService.getRods().subscribe({
       next: (data) => {
-          this.rods = data;//.filter(potion => (potion.vocationIds.split(',').includes(this.character.vocationId.toString()) && potion.levelRequired <= this.character.level));
+          this.rods = data;
           this.prepareItems(this.rods);
       },
       error: () => {
@@ -139,6 +143,30 @@ export class ShopComponent {
     this.service.add({ key: 'tst', severity: 'success', summary: 'Parabéns', detail: 'Item comprado com sucesso' });
     this.prepareItems(this.wands);
     this.prepareItems(this.rods);
+  }
+
+  loadArrows() {
+    this.itemService.getArrows().subscribe({
+      next: (data) => {
+          this.arrows = data;
+          this.prepareItems(this.arrows);
+      },
+      error: () => {
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter arrows." });
+      }
+    });
+  }
+
+  loadBolts() {
+    this.itemService.getBolts().subscribe({
+      next: (data) => {
+          this.bolts = data;
+          this.prepareItems(this.bolts);
+      },
+      error: () => {
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter arrows." });
+      }
+    });
   }
  
 }

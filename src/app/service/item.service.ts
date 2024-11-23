@@ -29,6 +29,36 @@ export class ItemService {
     );
   }
 
+  getArrows(): Observable<Item[]> {
+    return this.httpClient.get<Item[]>(`${this.apiUrl}/arrows`).pipe(
+      tap((potion) => {
+        console.log(`Arrows retrieved successfully`);
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          return throwError(() => new Error('Arrows not found.'));
+        } else {
+          return throwError(() => new Error('Error retrieving arrows. Please try again later.'));
+        }
+      })
+    );
+  }
+
+  getBolts(): Observable<Item[]> {
+    return this.httpClient.get<Item[]>(`${this.apiUrl}/bolts`).pipe(
+      tap((potion) => {
+        console.log(`Bolts retrieved successfully`);
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          return throwError(() => new Error('Bolts not found.'));
+        } else {
+          return throwError(() => new Error('Error retrieving bolts. Please try again later.'));
+        }
+      })
+    );
+  }
+
   getRods(): Observable<Item[]> {
     return this.httpClient.get<Item[]>(`${this.apiUrl}/rods`).pipe(
       tap((potion) => {

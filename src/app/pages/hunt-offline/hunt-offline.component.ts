@@ -34,6 +34,17 @@ import { CharacterItem } from 'src/app/model/character-item.model';
       align-items: center;
       pointer-events: none; /* Garante que o texto não interfira na interação com a barra */
     }
+       ::ng-deep .health-bar .p-progressbar .p-progressbar-value {
+      background-color: #f87171; /* Vermelho para saúde */
+    }
+
+    ::ng-deep .mana-bar .p-progressbar .p-progressbar-value {
+      background-color: #38bdf8; /* Azul para mana */
+    }
+
+    ::ng-deep .exp-bar .p-progressbar .p-progressbar-value {
+      background-color: #a855f7; 
+    }
   `],
   providers: [MessageService]
 })
@@ -58,6 +69,7 @@ export class HuntOfflineComponent {
 
   lootDrop: CharacterItem[] = [];
   expNextLevel:number = 0;
+  expPreviousLevel:number = 0;
 
   constructor(private characterService: CharacterService,
     private service: MessageService,
@@ -81,6 +93,7 @@ export class HuntOfflineComponent {
         next: (data) => {
             this.character = data;
             this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
+            this.expPreviousLevel = this.calculateExpLevelFormula(this.character.level-1)
             this.creatures = this.character.bestiary?.filter(b => b.totalKills >= b.bestiary.totalKillsTier1) || []
             if (this.creatures?.length > 0) {
               this.creatures.map((creature, index) => {

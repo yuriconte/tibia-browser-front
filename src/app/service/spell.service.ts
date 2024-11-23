@@ -27,4 +27,34 @@ export class SpellService {
       })
     );
   }
+
+  getHeal(): Observable<Spell[]> {
+    return this.httpClient.get<Spell[]>(`${this.apiUrl}/heal`).pipe(
+      tap((spell) => {
+        console.log(`Spells retrieved successfully`);
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          return throwError(() => new Error('Spells not found.'));
+        } else {
+          return throwError(() => new Error('Error retrieving Spells. Please try again later.'));
+        }
+      })
+    );
+  }
+
+  getStrike(): Observable<Spell[]> {
+    return this.httpClient.get<Spell[]>(`${this.apiUrl}/strike`).pipe(
+      tap((spell) => {
+        console.log(`Spells retrieved successfully`);
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          return throwError(() => new Error('Spells not found.'));
+        } else {
+          return throwError(() => new Error('Error retrieving Spells. Please try again later.'));
+        }
+      })
+    );
+  }
 }

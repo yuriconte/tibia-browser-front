@@ -4,7 +4,6 @@ import { Character } from 'src/app/model/character.model';
 import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
 import { Item } from 'src/app/model/item.model';
-import { Potion } from 'src/app/model/potion.model';
 import { CharacterPotion } from 'src/app/model/character-potion.model';
 
 @Component({
@@ -16,6 +15,30 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
       margin: auto;
       font-family: 'Verdana', sans-serif;
       font-size: 14px;
+    }
+
+    .font-tibia {
+      font-family: var(--font-family-tibia);
+    }
+
+    .name-character {
+      text-align: center;
+      font-size: 30px;
+    }
+
+    .sex-character {
+      text-align: left;
+      font-size: 20px;
+    }
+
+    .coin {
+      text-align: left;
+      font-size: 16px;
+    }
+
+    .vocation-character {
+      text-align: left;
+      font-size: 30px;
     }
 
     ::ng-deep .health-bar .p-progressbar .p-progressbar-value {
@@ -33,6 +56,14 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
     :host ::ng-deep .custom-button {
         padding: 0.5rem 1.5rem !important;
         height: 50px;
+    }
+
+    ::ng-deep .p-badge.p-badge-xl {
+      font-size: 1.5rem;
+      min-width: 6rem;
+      height: 3rem;
+      line-height: 3rem;
+      color: white;
     }
 
     .progress-container {
@@ -61,8 +92,6 @@ export class PerfilComponent {
 
   character: Character = new Character;
   items: MenuItem[] = [];
-
-  characterName = 'Knight of Rookgaard';
   
   showItemDetailSelected: Item;
   showItemDetail: boolean = false;
@@ -71,6 +100,9 @@ export class PerfilComponent {
 
   lifeInterval;
   manaInterval;
+
+  expNextLevel:number = 0;
+  expPreviousLevel:number = 0;
 
   constructor(private characterService: CharacterService,
     private service: MessageService,
@@ -90,6 +122,16 @@ export class PerfilComponent {
     }
   }
 
+  getCoins(balance: number): { crystal: number; platinum: number; gold: number } {
+    const crystal = Math.floor(balance / 10000); // 1 Cristal = 10.000
+    const remainderAfterCrystal = balance % 10000;
+  
+    const platinum = Math.floor(remainderAfterCrystal / 100); // 1 Platina = 100
+    const gold = remainderAfterCrystal % 100; // Restante são ouros
+  
+    return { crystal, platinum, gold };
+  }
+
   loadCharacter() {
     let username = this.authService.getUser();
     if (username != null) {
@@ -107,6 +149,8 @@ export class PerfilComponent {
                 this.character.mana += 1
               }
             },1000);
+            this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
+            this.expPreviousLevel = this.calculateExpLevelFormula(this.character.level-1)
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -115,6 +159,11 @@ export class PerfilComponent {
     } else {
       this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
     }
+  }
+
+  calculateExpLevelFormula(x: number): number {
+    x += 1;
+    return (50 * Math.pow(x - 1, 3) - 150 * Math.pow(x - 1, 2) + 400 * (x - 1)) / 3;
   }
 
   confirmVocation(event: Event, vocation:number) {
@@ -185,6 +234,11 @@ export class PerfilComponent {
       case 6:
         if (this.character.slot6Item) {
           this.deequip({...this.character.slot6Item}, false)
+        }
+        break;
+      case 7:
+        if (this.character.slotAmmo) {
+          this.deequip({...this.character.slotAmmo}, false)
         }
         break;
       default:

@@ -24,6 +24,7 @@ import { AccessComponent } from './pages/auth/access/access.component';
                     { path: 'shop', loadChildren: () => import('./pages/shop/shop.module').then(m => m.ShopModule) },
                     { path: 'ranking', loadChildren: () => import('./pages/ranking/ranking.module').then(m => m.RankingModule) },
                     { path: 'death', loadChildren: () => import('./pages/deaths/death.module').then(m => m.DeathModule) },
+                    { path: 'outfitter', loadChildren: () => import('./pages/outfitter/outfitter.module').then(m => m.OutfitterModule) },
                     { path: 'perfil', loadChildren: () => import('./pages/perfil/perfil.module').then(m => m.PerfilModule) }
                 ]
             },

@@ -22,7 +22,8 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Treino',  routerLink: ['/train'] },
                     { label: 'Bestiario',  routerLink: ['/bestiary'] },
                     { label: 'Loja',  routerLink: ['/shop'] },
-                    { label: 'Quests (WIP)',  routerLink: ['/'] }
+                    { label: 'Quests (WIP)',  routerLink: ['/'] },
+                    { label: 'Outfit (Teste)',  routerLink: ['/outfitter'] },
                 ]
             },
             {

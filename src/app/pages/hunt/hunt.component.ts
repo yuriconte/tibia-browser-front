@@ -102,10 +102,15 @@ export class HuntComponent {
   monster: Creature;
   lootDrop: CharacterItem[] = [];
 
-  spells: Spell[] = [];
+  spellsHeal: Spell[] = [];
   useSpellHealing: boolean = false;
-  selectedSpell: Spell = null;
+  selectedSpellHeal: Spell = null;
   lifeToUseSpell: number = 100;
+
+  spellsStrike: Spell[] = [];
+  useSpellStrike: boolean = false;
+  selectedSpellStrike: Spell = null;
+  manaToUseSpell: number = 100;
 
   potionsHealing: CharacterPotion[] = [];
   usePotionsHealing: boolean = false;
@@ -118,6 +123,7 @@ export class HuntComponent {
   manaToUsePotion: number = 10;
 
   exaustedSpellHealing: number = 0;
+  exaustedSpellStrike: number = 0;
   exaustedPotionHealing: number = 0;
   exaustedPotionMana: number = 0;
 
@@ -156,10 +162,17 @@ export class HuntComponent {
         next: (data) => {
             this.character = data
             if (this.character.level >= 8 && this.character.vocationId > 1) {
-              this.loadSpells();
+              this.loadSpellsHeal();
+              this.loadSpellsStrike();
             }
             this.character.totalArmor = (this.character.slot1Item?.armor || 0) + (this.character.slot3Item?.armor || 0) + (this.character.slot5Item?.armor || 0) + (this.character.slot6Item?.armor || 0)
-            this.character.totalAtk = (this.character.slot2Item?.atk || 0);
+            
+            if (this.character.slot2Item?.type === 'arrow' || this.character.slot2Item?.type === 'bolt') {
+              this.character.totalAtk = this.character.slot2Item?.type === this.character.slotAmmo?.type ? this.character.slotAmmo?.atk || 0 : 0;
+            } else {
+              this.character.totalAtk = (this.character.slot2Item?.atk || 0);
+            }
+
             this.character.totalDef = (this.character.slot2Item?.def || 0) + (this.character.slot4Item?.def || 0);
             this.character.magicDamage = this.character.slot2Item?.type === "wand" || this.character.slot2Item?.type === "rod";
             this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
@@ -171,12 +184,10 @@ export class HuntComponent {
             if (this.character.potions?.length > 0) {
               this.potionsHealing = this.character.potions?.filter(cpot => cpot.potion.type === 'life');
               if (this.potionsHealing?.length > 0) {
-                //this.usePotionsHealing = true;
                 this.selectedPotionHealing = this.potionsHealing[0]
               }
               this.potionsMana = this.character.potions?.filter(cpot => cpot.potion.type === 'mana');
               if (this.potionsMana?.length > 0) {
-                //this.usePotionsMana = true;
                 this.selectedPotionMana = this.potionsMana[0]
               }
             }
@@ -214,17 +225,34 @@ export class HuntComponent {
     });
   }
 
-  loadSpells() {
-    this.spellService.getAll().subscribe({
+  loadSpellsHeal() {
+    this.spellService.getHeal().subscribe({
       next: (data) => {
         if (data) {
-          this.spells = data.filter(spell => (spell.vocationIds.split(',').includes(this.character.vocationId.toString()) && spell.levelRequired <= this.character.level));
+          this.spellsHeal = data.filter(spell => (spell.vocationIds.split(',').includes(this.character.vocationId.toString()) && spell.levelRequired <= this.character.level));
         } else {
-          this.spells = []
+          this.spellsHeal = []
         }
-        if (this.spells?.length > 0) {
-          //this.useSpellHealing = true
-          this.selectedSpell = this.spells[0];
+        if (this.spellsHeal?.length > 0) {
+          this.selectedSpellHeal = this.spellsHeal[0];
+        }
+      },
+      error: () => {
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
+      }
+    });
+  }
+
+  loadSpellsStrike() {
+    this.spellService.getStrike().subscribe({
+      next: (data) => {
+        if (data) {
+          this.spellsStrike = data.filter(spell => (spell.vocationIds.split(',').includes(this.character.vocationId.toString()) && spell.levelRequired <= this.character.level));
+        } else {
+          this.spellsStrike = []
+        }
+        if (this.spellsStrike?.length > 0) {
+          this.selectedSpellStrike = this.spellsStrike[0];
         }
       },
       error: () => {
@@ -279,7 +307,6 @@ export class HuntComponent {
     this.atkInterval = setInterval(() => {
       countTimeToKill += 1;
       let damage = this.getDamage(character, this.monster)
-      //this.monster.life -= damage.cDamage
       if (this.character.magicDamage) {
         let manaCost = this.character.slot2Item?.manaRequired
         if (this.character.mana - manaCost >= 0) {
@@ -289,10 +316,32 @@ export class HuntComponent {
       } else {
         this.monster.life -= damage.cDamage
       }
+      if (this.monster.life <= 0) {
+        this.monster.life = 0;
+      } else {
+        if (this.useSpellStrike && this.exaustedSpellStrike == 0) {
+          if (this.character.mana >= this.manaToUseSpell && this.character.mana >= this.selectedSpellStrike.manaRequired) {
+            this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
+            this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
+            this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
+            this.exaustedSpellStrike = 3;
+            let spellDamage = this.getSpellStrikeFormulaValue();
+            if (this.monster.life - spellDamage <= 0) {
+              this.monster.life = 0;
+            } else {
+              this.monster.life -= spellDamage
+            }
+            this.character.mana -= this.selectedSpellStrike.manaRequired
+            this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, null, null);
+            return;
+          }
+        }
+      }
       if (this.useSpellHealing && this.exaustedSpellHealing == 0) {
-        if (this.character.life <= this.lifeToUseSpell && this.character.mana >= this.selectedSpell.manaRequired) {
+        if (this.character.life <= this.lifeToUseSpell && this.character.mana >= this.selectedSpellHeal.manaRequired) {
           this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
           this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
+          this.exaustedSpellStrike = this.exaustedSpellStrike > 0 ? this.exaustedSpellStrike - 1 : 0;
           this.exaustedSpellHealing = 3;
           let healQuantity = this.getHealFormulaValue();
           if (this.character.life + healQuantity <= this.character.maxLife) {
@@ -300,7 +349,7 @@ export class HuntComponent {
           } else {
             this.character.life = this.character.maxLife
           }
-          this.character.mana -= this.selectedSpell.manaRequired
+          this.character.mana -= this.selectedSpellHeal.manaRequired
           this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, null, null);
           return;
         }
@@ -309,6 +358,7 @@ export class HuntComponent {
         if (this.character.life <= this.lifeToUsePotion && this.selectedPotionHealing.quantity > 0) {
           this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
           this.exaustedPotionMana = this.exaustedPotionMana > 0 ? this.exaustedPotionMana - 1 : 0;
+          this.exaustedSpellStrike = this.exaustedSpellStrike > 0 ? this.exaustedSpellStrike - 1 : 0;
           this.exaustedPotionHealing = 3;
           this.selectedPotionHealing.quantity -= 1;
           let healQuantity = Math.round(this.getRandomInRange(this.selectedPotionHealing.potion.min, this.selectedPotionHealing.potion.max))
@@ -330,6 +380,7 @@ export class HuntComponent {
         if (this.character.mana <= this.manaToUsePotion && this.selectedPotionMana.quantity > 0) {
           this.exaustedSpellHealing = this.exaustedSpellHealing > 0 ? this.exaustedSpellHealing - 1 : 0;
           this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
+          this.exaustedSpellStrike = this.exaustedSpellStrike > 0 ? this.exaustedSpellStrike - 1 : 0;
           this.exaustedPotionMana = 3;
           this.selectedPotionMana.quantity -= 1;
           let healQuantity = Math.round(this.getRandomInRange(this.selectedPotionMana.potion.min, this.selectedPotionMana.potion.max))
@@ -440,8 +491,9 @@ export class HuntComponent {
 
     let characterMaxDamage = 0;
     if (!this.character.magicDamage) {
-      let skill = character.slot2Item?.type == 'sword' ? character.sword : character.slot2Item?.type == 'axe' ? character.axe : character.slot2Item?.type == 'club' ? character.club : character.slot2Item?.type == 'distance' ? character.distance : 10
-      characterMaxDamage = Math.round((0.085*this.huntStyleSelected.value*character.totalAtk*skill)+(character.level/5)) 
+      let skill = character.slot2Item?.type == 'sword' ? character.sword : character.slot2Item?.type == 'axe' ? character.axe : character.slot2Item?.type == 'club' ? character.club : character.slot2Item?.type == 'distance' ? character.distance : character.slot2Item?.type == 'arrow' ? character.distance : character.slot2Item?.type == 'bolt' ? character.distance : 10
+      let factor = this.character.slot2Item?.type === 'distance' || this.character.slot2Item?.type === 'arrow' || this.character.slot2Item?.type === 'bolt' ? 0.090 : 0.085
+      characterMaxDamage = Math.round((factor*this.huntStyleSelected.value*character.totalAtk*skill)+(character.level/5)) 
     } else {
       characterMaxDamage = this.character.totalAtk
     }
@@ -472,7 +524,7 @@ export class HuntComponent {
 
     //danos magicos
     if (monster.damages?.length > 0 && !teste) {
-      const extraDamageChance = (monster.damages.length/10) + 0.2; //10% chance de causar dano extra para cada damage extra no array + 20% base
+      const extraDamageChance = (monster.damages.length/10) + 0.3; //10% chance de causar dano extra para cada damage extra no array + 30% base
       const randomValue = Math.random();
       let shouldExtraDamage = randomValue <= extraDamageChance;
       if (shouldExtraDamage) {
@@ -516,48 +568,6 @@ export class HuntComponent {
     return Math.random() * (max - min) + min;
   }
 
-
-  // testeDificuldade(index: number) {
-  //   const character = {...this.character}
-
-  //   let monster = {...this.creatures[index].creature}
-  //   let countTimeToKill = 0;
-
-  //   let interval = setInterval(() => {
-  //     countTimeToKill += 1;
-  //     let damage = this.getDamage(character, monster, true)
-  //     monster.life -= damage.cDamage
-  //     if (monster.life > 0) {
-  //       character.life -= damage.mDamage
-  //       if (character.life <= 0) {
-  //         clearInterval(interval);
-  //         this.creatures[index].creature.tagType = "danger"
-  //         this.creatures[index].creature.tagLabel = "Extremo"
-  //         this.creatures[index].disabled = true;
-  //         let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
-  //         this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
-  //       }
-  //     } else {
-  //       if (countTimeToKill <= 10) {
-  //         this.creatures[index].creature.tagType = "success"
-  //         this.creatures[index].creature.tagLabel = "Fácil"
-  //       } else if (countTimeToKill <= 30) {
-  //         this.creatures[index].creature.tagType = "warning"
-  //         this.creatures[index].creature.tagLabel = "Médio"
-  //       } else if (countTimeToKill <= 60) {
-  //         this.creatures[index].creature.tagType = "danger"
-  //         this.creatures[index].creature.tagLabel = "Difícil"
-  //       } else {
-  //         this.creatures[index].creature.tagType = "danger"
-  //         this.creatures[index].creature.tagLabel = "Muito Difícil"
-  //       }
-  //       let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
-  //       this.creatures[index].creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
-  //       clearInterval(interval);
-  //     }
-  //   }, 10);
-  // }
-
   shouldDrop(rarity: string): boolean {
     const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.05 : 0.01
     const randomValue = Math.random();
@@ -565,15 +575,33 @@ export class HuntComponent {
   }
 
   getHealFormulaValue() {
-    if (this.selectedSpell.spell === 'exura ico') {
+    if (this.selectedSpellHeal.spell === 'exura ico') {
       // Cura máxima: (lvl*0.2)+(mlvl*7.95)+51
       // Cura mínima: (lvl*0.2)+(mlvl*4)+25
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*4)+25, (this.character.level*0.2)+(this.character.magicLevel*7.95)+51))
     }
-    if (this.selectedSpell.spell === 'exura') {
+    if (this.selectedSpellHeal.spell === 'exura') {
       // Cura máxima: (lvl*0.2)+(mlvl*1.795)+11
       // Cura mínima: (lvl*0.2)+(mlvl*1.4)+8
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.4)+8, (this.character.level*0.2)+(this.character.magicLevel*1.795)+11))
+    }
+    return 0
+  }
+
+  getSpellStrikeFormulaValue() {
+    if (this.selectedSpellStrike.spell === 'exori san') {
+      // Dano máximo: (lvl*0.2)+(mlvl*3)+18
+      // Dano mínimo: (lvl*0.2)+(mlvl*1.79)+11
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.79)+11, (this.character.level*0.2)+(this.character.magicLevel*3)+18))
+    } else if (this.selectedSpellStrike.spell === 'exori ico') {
+      // Dano máximo: (lvl*0.2)+(1.1*(skill+atk))
+      // Dano mínimo: (lvl*0.2)+(0.5*(skill+atk))
+      let skill = this.character.slot2Item?.type == 'sword' ? this.character.sword : this.character.slot2Item?.type == 'axe' ? this.character.axe : this.character.slot2Item?.type == 'club' ? this.character.club : this.character.slot2Item?.type == 'distance' ? this.character.distance : this.character.slot2Item?.type == 'arrow' ? this.character.distance : this.character.slot2Item?.type == 'bolt' ? this.character.distance : 10
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(0.5*(skill+this.character.totalAtk)), (this.character.level*0.2)+(1.1*(skill+this.character.totalAtk))))
+    } else {
+      // Dano máximo: (lvl*0.2)+(mlvl*2.203)+13
+      // Dano mínimo: (lvl*0.2)+(mlvl*1.403)+8
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.403)+8, (this.character.level*0.2)+(this.character.magicLevel*2.203)+13))
     }
     return 0
   }

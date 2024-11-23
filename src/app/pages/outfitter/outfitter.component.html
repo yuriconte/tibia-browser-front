@@ -1,0 +1,13 @@
+
+<div class="outfitter-container">
+  <h1>Outfitter</h1>
+  <div class="outfits">
+    <div *ngFor="let color of outfitColors" class="outfit" 
+         [style.backgroundColor]="color"
+         (click)="selectOutfit(color, 'Outfit ' + color.toString(16))">
+    </div>
+  </div>
+  <div class="selected-outfit">
+    <img src="assets/outfits/{{outfit}}" width="128" height="128">
+  </div>
+</div>

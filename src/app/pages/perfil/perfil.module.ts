@@ -13,6 +13,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BadgeModule } from 'primeng/badge';
 
 @NgModule({
     imports: [
@@ -29,7 +30,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
         ToastModule,
         TableModule,
         DialogModule,
-        ProgressSpinnerModule
+        ProgressSpinnerModule,
+        BadgeModule
     ],
     declarations: [PerfilComponent]
 })

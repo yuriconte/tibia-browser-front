@@ -44,6 +44,7 @@ export class Character {
     slot4Item: Item;
     slot5Item: Item;
     slot6Item: Item;
+    slotAmmo: Item;
     items: CharacterItem[];
     potions: CharacterPotion[];
 
