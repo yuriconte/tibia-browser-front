@@ -34,4 +34,60 @@
       </div>
     </p-panel>
   </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Wands" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
+          <p-table [value]="wands">
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td style="text-align: center;">
+                  <img src="assets/gifs/items/{{item.imagePath}}" width="32">
+                </td>
+                <td style="text-align: center;">
+                  <span class="image-text ml-2">{{item.gold}}</span>
+                  <img src="assets/gifs/items/Gold_Coin.gif" width="32" style="vertical-align: middle"/>
+                </td>
+                <td style="text-align: center;">
+                  <p-button styleClass="custom-button p-button-primary" (click)="buyItem(item)" [disabled]="!item.buyable">
+                    <span class="flex align-items-center font-bold">
+                      Comprar
+                    </span>
+                  </p-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Rods" [toggleable]="true">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
+          <p-table [value]="rods">
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td style="text-align: center;">
+                  <img src="assets/gifs/items/{{item.imagePath}}" width="32">
+                </td>
+                <td style="text-align: center;">
+                  <span class="image-text ml-2">{{item.gold}}</span>
+                  <img src="assets/gifs/items/Gold_Coin.gif" width="32" style="vertical-align: middle"/>
+                </td>
+                <td style="text-align: center;">
+                  <p-button styleClass="custom-button p-button-primary" (click)="buyItem(item)" [disabled]="!item.buyable">
+                    <span class="flex align-items-center font-bold">
+                      Comprar
+                    </span>
+                  </p-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-panel>
+  </div>
 </div>

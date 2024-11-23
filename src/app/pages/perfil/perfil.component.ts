@@ -271,9 +271,10 @@ export class PerfilComponent {
 
   sellAllItems() {
     this.characterService.sellAllItems(this.character.id);
+    this.character.items = []
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: 'Todos os items foram vendidos com sucesso.' });
     setTimeout(() => {
       window.location.reload();
-    }, 1000)
+    }, 3000)
   }
 }

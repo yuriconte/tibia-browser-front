@@ -29,6 +29,7 @@ export class Character {
     totalArmor: number;
     totalAtk: number;
     totalDef: number;
+    magicDamage: boolean;
 
     swordTrainDate: Date;
     clubTrainDate: Date;

@@ -28,7 +28,8 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Comunidade',
                 items: [
-                    { label: 'Rankings',  routerLink: ['/ranking'] }
+                    { label: 'Rankings',  routerLink: ['/ranking'] },
+                    { label: 'Últimas Mortes',  routerLink: ['/death'] }
                 ]
             },
             {

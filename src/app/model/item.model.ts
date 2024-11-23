@@ -8,4 +8,8 @@ export class Item {
     atk: number;
     gold: number;
     imagePath: string;
+    levelRequired: number;
+    manaRequired: number;
+
+    buyable: boolean;
 }

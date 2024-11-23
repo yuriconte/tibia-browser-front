@@ -285,6 +285,17 @@ export class CharacterService {
     })
   }
 
+  buyItem(characterId: number, itemId: number, cost: number) {
+    this.httpClient.post<void>(this.apiUrl + "/buyItem", { characterId, itemId, cost }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
   startHuntOffline(characterId: number, huntHours, bestiaryId) {
     this.httpClient.post<void>(this.apiUrl + "/startHuntOffline", { characterId, huntHours, bestiaryId }).subscribe({
       next: () => {
@@ -307,8 +318,8 @@ export class CharacterService {
     })
   }
 
-  characterDead(characterId: number) {
-    this.httpClient.post<void>(this.apiUrl + "/characterDead", { characterId }).subscribe({
+  characterDead(characterId: number, monsterId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/characterDead", { characterId, monsterId }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },

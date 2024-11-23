@@ -161,6 +161,7 @@ export class HuntComponent {
             this.character.totalArmor = (this.character.slot1Item?.armor || 0) + (this.character.slot3Item?.armor || 0) + (this.character.slot5Item?.armor || 0) + (this.character.slot6Item?.armor || 0)
             this.character.totalAtk = (this.character.slot2Item?.atk || 0);
             this.character.totalDef = (this.character.slot2Item?.def || 0) + (this.character.slot4Item?.def || 0);
+            this.character.magicDamage = this.character.slot2Item?.type === "wand" || this.character.slot2Item?.type === "rod";
             this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
             this.expPreviousLevel = this.calculateExpLevelFormula(this.character.level-1)
             if (this.character.level >= 8 && this.character.vocationId === 1) {
@@ -278,7 +279,16 @@ export class HuntComponent {
     this.atkInterval = setInterval(() => {
       countTimeToKill += 1;
       let damage = this.getDamage(character, this.monster)
-      this.monster.life -= damage.cDamage
+      //this.monster.life -= damage.cDamage
+      if (this.character.magicDamage) {
+        let manaCost = this.character.slot2Item?.manaRequired
+        if (this.character.mana - manaCost >= 0) {
+          this.character.mana -= manaCost;
+          this.monster.life -= damage.cDamage
+        }
+      } else {
+        this.monster.life -= damage.cDamage
+      }
       if (this.useSpellHealing && this.exaustedSpellHealing == 0) {
         if (this.character.life <= this.lifeToUseSpell && this.character.mana >= this.selectedSpell.manaRequired) {
           this.exaustedPotionHealing = this.exaustedPotionHealing > 0 ? this.exaustedPotionHealing - 1 : 0;
@@ -346,7 +356,7 @@ export class HuntComponent {
           character.life = 0;
           this.statusHunt = false;
           this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, null, null);
-          this.characterService.characterDead(this.character.id);
+          this.characterService.characterDead(this.character.id, this.monster.id);
           clearInterval(this.atkInterval);
           this.service.add({ key: 'tst', severity: 'error', summary: 'Morreu', detail: "Você morreu!" });
           setTimeout(()=> {
@@ -427,10 +437,14 @@ export class HuntComponent {
     L = Level do jogador
     D = Fator de dano (Full ATK = 1, Balanced = 0.75, Full Def = 0.5)
     */
-  
-    let skill = character.slot2Item?.type == 'sword' ? character.sword : character.slot2Item?.type == 'axe' ? character.axe : character.slot2Item?.type == 'club' ? character.club : character.slot2Item?.type == 'distance' ? character.distance : 10
 
-    let characterMaxDamage = Math.round((0.085*this.huntStyleSelected.value*character.totalAtk*skill)+(character.level/5)) 
+    let characterMaxDamage = 0;
+    if (!this.character.magicDamage) {
+      let skill = character.slot2Item?.type == 'sword' ? character.sword : character.slot2Item?.type == 'axe' ? character.axe : character.slot2Item?.type == 'club' ? character.club : character.slot2Item?.type == 'distance' ? character.distance : 10
+      characterMaxDamage = Math.round((0.085*this.huntStyleSelected.value*character.totalAtk*skill)+(character.level/5)) 
+    } else {
+      characterMaxDamage = this.character.totalAtk
+    }
 
     /* Armadura mínima (ArmaduraTotal * 0.475)
       Armadura Máxima ((ArmaduraTotal * 0.95) - 1)
@@ -450,10 +464,11 @@ export class HuntComponent {
       E = fator de defesa  (Full ATK = 1, Balanced = 0.75, Full Def = 0.5)
       */
     
-    let characterDamage = Math.round(this.getRandomInRange(0, characterMaxDamage))
+    let characterDamage = this.character.magicDamage ? characterMaxDamage : Math.round(this.getRandomInRange(0, characterMaxDamage))
     let monsterDamage = Math.round(this.getRandomInRange(0, monster.maxDamage))
 
-    let characterFinalDamage = Math.round(characterDamage-(0*0)/(1*100)-(characterDamage/100)*this.getRandomInRange(monsterMinArmor, monsterMaxArmor))
+    let characterFinalDamage = this.character.magicDamage ? characterDamage : Math.round(characterDamage-(0*0)/(1*100)-(characterDamage/100)*this.getRandomInRange(monsterMinArmor, monsterMaxArmor))
+    let monsterFinalDamage = Math.round(monsterDamage-(character.totalDef*character.shielding)/(this.huntStyleSelected.value*100)-(monsterDamage/100)*this.getRandomInRange(characterMinArmor, characterMaxArmor))
 
     //danos magicos
     if (monster.damages?.length > 0 && !teste) {
@@ -488,13 +503,12 @@ export class HuntComponent {
             this.character.mana = 0;
           }
         } else {
-          monsterDamage += extraDamage
+          monsterFinalDamage += extraDamage
         }
       }
 
       
     }
-    let monsterFinalDamage = Math.round(monsterDamage-(character.totalDef*character.shielding)/(this.huntStyleSelected.value*100)-(monsterDamage/100)*this.getRandomInRange(characterMinArmor, characterMaxArmor))
     return {cDamage: characterFinalDamage >=0 ? characterFinalDamage : 0, mDamage: monsterFinalDamage >=0 ? monsterFinalDamage : 0}
   }
 

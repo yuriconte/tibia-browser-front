@@ -5,6 +5,8 @@ import { AuthService } from '../auth/auth.service';
 import { Character } from 'src/app/model/character.model';
 import { PotionService } from 'src/app/service/potion.service';
 import { Potion } from 'src/app/model/potion.model';
+import { Item } from 'src/app/model/item.model';
+import { ItemService } from 'src/app/service/item.service';
 
 @Component({
   selector: 'app-shop',
@@ -32,9 +34,12 @@ export class ShopComponent {
  
   character: Character;
   potions: Potion[];
+  wands: Item[];
+  rods: Item[];
 
   constructor(private characterService: CharacterService,
     private potionService: PotionService,
+    private itemService: ItemService,
     private authService: AuthService,
     private service: MessageService) {}
 
@@ -49,6 +54,8 @@ export class ShopComponent {
         next: (data) => {
             this.character = data;
             this.loadPotions();
+            this.loadWands();
+            this.loadRods();
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -90,6 +97,48 @@ export class ShopComponent {
     this.character.balance -= potion.buyQuantity*potion.gold;
     this.service.add({ key: 'tst', severity: 'success', summary: 'Parabéns', detail: 'Potions compradas com sucesso' });
     this.preparePotions();
+  }
+
+  loadWands() {
+    this.itemService.getWands().subscribe({
+      next: (data) => {
+          this.wands = data;//.filter(potion => (potion.vocationIds.split(',').includes(this.character.vocationId.toString()) && potion.levelRequired <= this.character.level));
+          this.prepareItems(this.wands);
+      },
+      error: () => {
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter wands." });
+      }
+    });
+  }
+
+  loadRods() {
+    this.itemService.getRods().subscribe({
+      next: (data) => {
+          this.rods = data;//.filter(potion => (potion.vocationIds.split(',').includes(this.character.vocationId.toString()) && potion.levelRequired <= this.character.level));
+          this.prepareItems(this.rods);
+      },
+      error: () => {
+          this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter rods." });
+      }
+    });
+  }
+
+  private prepareItems(items: Item[]) {
+    items.forEach(item => {
+      if (this.character.balance >= item.gold) {
+        item.buyable = true
+      } else {
+        item.buyable = false
+      }
+    });
+  }
+
+  buyItem(item: Item) {
+    this.characterService.buyItem(this.character.id, item.id, item.gold);
+    this.character.balance -= item.gold;
+    this.service.add({ key: 'tst', severity: 'success', summary: 'Parabéns', detail: 'Item comprado com sucesso' });
+    this.prepareItems(this.wands);
+    this.prepareItems(this.rods);
   }
  
 }

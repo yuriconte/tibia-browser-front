@@ -86,7 +86,7 @@ export class HuntOfflineComponent {
               this.creatures.map((creature, index) => {
                 let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].bestiaryId)?.expHour || 0;
                 creature.expHourOrigStr = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
-                let expHourBonus = this.character.slot6Item.id === 92 ? expHour*0.05 : 0
+                let expHourBonus = this.character.slot6Item?.id === 92 ? expHour*0.05 : 0
                 if (creature.totalKills >= creature.bestiary.totalKillsTier3) {
                   expHour = expHour*0.2
                 } else if (creature.totalKills >= creature.bestiary.totalKillsTier2) {
@@ -189,8 +189,14 @@ export class HuntOfflineComponent {
     this.remainingTime = this.selectedTimeOption?.value*60*60 || 60*60;
     let goldEarned = (this.selectedCreature.bestiary.creature.maxGold*this.character.huntOfflineTimeInHours*2);
     this.characterService.updateCharacter(this.character.id, this.character.huntOfflineBestiaryId, expEarned, this.character.life, this.character.mana, this.selectedCreature.expHour, goldEarned, itemLooted);
-    if (this.character.experience >= this.expNextLevel) {
+    // if (this.character.experience + expEarned >= this.expNextLevel) {
+    //   this.characterService.increaseLevel(this.character.id);
+    // }
+    // this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
+    while (this.character.experience + expEarned >= this.expNextLevel) {
       this.characterService.increaseLevel(this.character.id);
+      this.character.level++;
+      this.expNextLevel = this.calculateExpLevelFormula(this.character.level);
     }
     this.character.huntOfflineDate = null;
     this.character.huntOfflineTimeInHours = null;
