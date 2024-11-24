@@ -1,0 +1,54 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Rookgaard" [toggleable]="true">
+      <div class="grid">
+        <div class="card p-1 m-2" *ngFor="let quest of questsRook" [ngClass]="{'completed': quest.completed}">
+          <div class="col-12 md:col-12 lg:col-12 xl:col-12">
+            <div class="grid" *ngIf="!quest.completed">
+              <div class="col-1 md:col-1 lg:col-1 xl:col-1" *ngFor="let creature of quest.creatures">
+                <div class="image-container">
+                  <img src="assets/gifs/creatures/{{creature.creature.imagePath}}" width="32" height="32" />
+                  <span class="status-icon" [ngClass]="{'check': creature.creature.killed, 'ban': !creature.creature.killed}"></span>
+                </div>
+              </div>
+            </div>
+            <p-button label="{{quest.name}}" badge="{{quest.levelRequired}}" [styleClass]="character.questDate ? 'w-full p-button-primary mb-2' : 'w-full p-button-secondary mb-2'"
+                (click)="showQuestDetail(quest)" [disabled]="quest.levelRequired > character.level || quest.completed || (character.questId > 0 && character.questId != quest.id) || quest.disabled">
+              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
+              <span class="image-text ml-2" style="font-weight: bold;">{{ quest.goldRequired }}</span>
+            </p-button>
+            <p-button label="Iniciar" [badge]="formatTime(calcRemainingTime(quest))" styleClass="w-full mb-2" *ngIf="character.questId != quest.id && !quest.completed" (click)="startQuest(quest)" 
+              [disabled]="quest.levelRequired > character.level || quest.completed || (character.questId > 0 && character.questId != quest.id) || quest.disabled"></p-button>
+            <p-button label="Completada" [disabled]="true" styleClass="w-full mb-2" *ngIf="quest.completed"></p-button>
+            <p-button label="Cancelar" [badge]="formatTime(calcRemainingTime(quest))" styleClass="w-full p-button-danger mb-2" *ngIf="character.questDate && character.questId == quest.id" (click)="cancelQuest()"></p-button>
+            <p-progressBar [value]="progress" [showValue]="true" styleClass="w-full exp-bar"  *ngIf="character.questDate && character.questId == quest.id"></p-progressBar>
+          </div>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+    <p-panel header="Mainland" [toggleable]="true">
+      <div class="grid">
+        
+      </div>
+    </p-panel>
+  </div>
+</div>
+<p-dialog header="Detalhes da Quest" [(visible)]="showDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}">
+  <p><strong>Nome:</strong> {{ selectedQuest?.name }}</p>
+  <p><strong>Level Necessário:</strong> {{ selectedQuest?.levelRequired }}</p>
+  <p><strong>Custo para Iniciar:</strong> {{ selectedQuest?.goldRequired }}</p>
+  <p><strong>Recompensa de Ouro:</strong> {{ selectedQuest?.goldReward }}</p>
+  <p><strong>Recompensa de Experiência:</strong> {{ selectedQuest?.expReward }}</p>
+  <p *ngIf="selectedQuest?.rewards?.length > 0"><strong>Recompensa de Itens:</strong></p>
+  <div class="grid" *ngIf="selectedQuest?.rewards?.length > 0">
+    <div class="col-2 md:col-2 lg:col-2 xl:col-2" *ngFor="let item of selectedQuest.rewards">
+      <img src="assets/gifs/items/{{item.item.imagePath}}" width="32" height="32"/>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton icon="pi pi-check" (click)="showDetail=false" label="Ok" class="p-button-outlined"></button>
+  </ng-template>
+</p-dialog>

@@ -201,11 +201,7 @@ export class HuntOfflineComponent {
     }
     this.remainingTime = this.selectedTimeOption?.value*60*60 || 60*60;
     let goldEarned = (this.selectedCreature.bestiary.creature.maxGold*this.character.huntOfflineTimeInHours*2);
-    this.characterService.updateCharacter(this.character.id, this.character.huntOfflineBestiaryId, expEarned, this.character.life, this.character.mana, this.selectedCreature.expHour, goldEarned, itemLooted);
-    // if (this.character.experience + expEarned >= this.expNextLevel) {
-    //   this.characterService.increaseLevel(this.character.id);
-    // }
-    // this.expNextLevel = this.calculateExpLevelFormula(this.character.level)
+    this.characterService.updateCharacter(this.character.id, null, this.character.huntOfflineBestiaryId, expEarned, this.character.life, this.character.mana, this.selectedCreature.expHour, goldEarned, itemLooted);
     while (this.character.experience + expEarned >= this.expNextLevel) {
       this.characterService.increaseLevel(this.character.id);
       this.character.level++;

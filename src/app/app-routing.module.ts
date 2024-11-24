@@ -20,6 +20,7 @@ import { AccessComponent } from './pages/auth/access/access.component';
                     { path: 'hunt', loadChildren: () => import('./pages/hunt/hunt.module').then(m => m.HuntModule) },
                     { path: 'hunt-offline', loadChildren: () => import('./pages/hunt-offline/hunt-offline.module').then(m => m.HuntOfflineModule) },
                     { path: 'train', loadChildren: () => import('./pages/train/train.module').then(m => m.TrainModule) },
+                    { path: 'quest', loadChildren: () => import('./pages/quest/quest.module').then(m => m.QuestModule) },
                     { path: 'bestiary', loadChildren: () => import('./pages/bestiary/bestiary.module').then(m => m.BestiaryModule) },
                     { path: 'shop', loadChildren: () => import('./pages/shop/shop.module').then(m => m.ShopModule) },
                     { path: 'ranking', loadChildren: () => import('./pages/ranking/ranking.module').then(m => m.RankingModule) },

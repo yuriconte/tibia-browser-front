@@ -83,16 +83,15 @@ export class HuntComponent {
   selectedCreature: Bestiary | null = null;
   character: Character = new Character;
   
-  minLife: number;
   huntStyle: any[] = [];
   huntStyleSelected: any;
-
+  
   statusHunt: boolean = false;
-
+  
   atkInterval;
   lifeInterval;
   manaInterval;
-
+  
   countMonsterKill: number = 0;
   totalExpEarned: number = 0;
   totalGoldEarned: number = 0;
@@ -101,6 +100,8 @@ export class HuntComponent {
   expPreviousLevel:number = 0;
   monster: Creature;
   lootDrop: CharacterItem[] = [];
+  
+  minLife: number;
 
   spellsHeal: Spell[] = [];
   useSpellHealing: boolean = false;
@@ -181,6 +182,10 @@ export class HuntComponent {
               this.msgs = []
               this.msgs.push({ severity: 'info', summary: 'Level 8', detail: "Escolha uma vocação no seu perfil: Knight, Paladin, Druid, Sorcerer" });
             }
+            if (this.character.level >= 20 && this.character.vocationId > 2 && this.character.vocationId < 6) {
+              this.msgs = []
+              this.msgs.push({ severity: 'info', summary: 'Level 20', detail: "Você pode ser promovido por 20k no seu perfil." });
+            }
             if (this.character.potions?.length > 0) {
               this.potionsHealing = this.character.potions?.filter(cpot => cpot.potion.type === 'life');
               if (this.potionsHealing?.length > 0) {
@@ -254,6 +259,9 @@ export class HuntComponent {
         if (this.spellsStrike?.length > 0) {
           this.selectedSpellStrike = this.spellsStrike[0];
         }
+        setTimeout(()=> {
+          this.loadLocalStorage();
+        }, 500)
       },
       error: () => {
           this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -288,8 +296,75 @@ export class HuntComponent {
     clearInterval(this.atkInterval); 
   }
 
+  loadLocalStorage() {
+    const savedSettings = localStorage.getItem(this.character.name + 'Settings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      if (this.character.maxLife >= settings.minLife) {
+        this.minLife = settings.minLife || 0;
+      }
+      if (this.spellsHeal?.length > 0) {
+        this.useSpellHealing = settings.useSpellHealing;
+        if (settings.selectedSpellHeal?.id && this.spellsHeal.some(spell => spell.id === settings.selectedSpellHeal.id)) {
+          this.selectedSpellHeal = settings.selectedSpellHeal;
+        }
+        if (this.character.maxLife >= settings.lifeToUseSpell) {
+          this.lifeToUseSpell = settings.lifeToUseSpell;
+        }
+      }
+      if (this.spellsStrike?.length > 0) {
+        this.useSpellStrike = settings.useSpellStrike;
+        if (settings.selectedSpellStrike?.id && this.spellsStrike.some(spell => spell.id === settings.selectedSpellStrike.id)) {
+          this.selectedSpellStrike = settings.selectedSpellStrike;
+        }
+        if (this.character.maxMana >= settings.manaToUseSpell) {
+          this.manaToUseSpell = settings.manaToUseSpell;
+        }
+      }
+      if (this.potionsHealing?.length > 0) {
+        this.usePotionsHealing = settings.usePotionsHealing;
+        if (settings.selectedPotionHealing?.potion?.id && this.potionsHealing.some(potion => potion.potion.id === settings.selectedPotionHealing.potion.id)) {
+          this.selectedPotionHealing = settings.selectedPotionHealing;
+        }
+        if (this.character.maxLife >= settings.lifeToUsePotion) {
+          this.lifeToUsePotion = settings.lifeToUsePotion;
+        }
+      }
+      if (this.potionsMana?.length > 0) {
+        this.usePotionsMana = settings.usePotionsMana;
+        if (settings.selectedPotionMana?.potion?.id && this.potionsMana.some(potion => potion.potion.id === settings.selectedPotionMana.potion.id)) {
+          this.selectedPotionMana = settings.selectedPotionMana;
+        }
+        if (this.character.maxMana >= settings.manaToUsePotion) {
+          this.manaToUsePotion = settings.manaToUsePotion;
+        }
+      }
+    }
+  }
+
+  saveLocalStorage() {
+    const settings = {
+      minLife: this.minLife,
+      useSpellHealing: this.useSpellHealing,
+      selectedSpellHeal: this.selectedSpellHeal,
+      lifeToUseSpell: this.lifeToUseSpell,
+      useSpellStrike: this.useSpellStrike,
+      selectedSpellStrike: this.selectedSpellStrike,
+      manaToUseSpell: this.manaToUseSpell,
+      usePotionsHealing: this.usePotionsHealing,
+      selectedPotionHealing: this.selectedPotionHealing,
+      lifeToUsePotion: this.lifeToUsePotion,
+      usePotionsMana: this.usePotionsMana,
+      selectedPotionMana: this.selectedPotionMana,
+      manaToUsePotion: this.manaToUsePotion,
+    };
+    localStorage.setItem(this.character.name + 'Settings', JSON.stringify(settings));
+  }
+
   startHunt() {
     this.statusHunt = true;
+
+    this.saveLocalStorage();
 
     if (!this.minLife) {
       this.minLife = 10
@@ -448,7 +523,7 @@ export class HuntComponent {
             }
           })
         }
-        this.characterService.updateCharacter(character.id, bestiaryId, this.monster.experience, this.character.life, this.character.mana, ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600), goldEarned, itemLooted);
+        this.characterService.updateCharacter(character.id, null, bestiaryId, this.monster.experience, this.character.life, this.character.mana, ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600), goldEarned, itemLooted);
         if (character.experience >= this.expNextLevel) {
           this.characterService.increaseLevel(character.id);
           character.level += 1;

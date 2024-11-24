@@ -18,4 +18,6 @@ export class Creature {
     maxGold: number;
     items: CreatureItem[];
     damages: CreatureDamage[];
+    
+    killed: boolean;
 }

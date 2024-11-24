@@ -1,6 +1,7 @@
 import { CharacterBestiary } from "./character-bestiary.model";
 import { CharacterItem } from "./character-item.model";
 import { CharacterPotion } from "./character-potion.model";
+import { CharacterQuest } from "./character-quest.model";
 import { Item } from "./item.model";
 
 export class Character {
@@ -51,4 +52,10 @@ export class Character {
     huntOfflineDate: Date;
     huntOfflineBestiaryId: number;
     huntOfflineTimeInHours: number;
+
+    quests: CharacterQuest[];
+
+    questDate: Date;
+    questId: number;
+    questTimeInHours: number;
 }

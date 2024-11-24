@@ -20,9 +20,9 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Caçar Online',  routerLink: ['/hunt'] },
                     { label: 'Caçar Offline',  routerLink: ['/hunt-offline'] },
                     { label: 'Treino',  routerLink: ['/train'] },
+                    { label: 'Quests',  routerLink: ['/quest'] },
                     { label: 'Bestiario',  routerLink: ['/bestiary'] },
                     { label: 'Loja',  routerLink: ['/shop'] },
-                    { label: 'Quests (WIP)',  routerLink: ['/'] },
                     { label: 'Outfit (Teste)',  routerLink: ['/outfitter'] },
                 ]
             },

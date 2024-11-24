@@ -104,6 +104,8 @@ export class PerfilComponent {
   expNextLevel:number = 0;
   expPreviousLevel:number = 0;
 
+  labelPromotion:string = "";
+
   constructor(private characterService: CharacterService,
     private service: MessageService,
     private authService: AuthService,
@@ -138,6 +140,9 @@ export class PerfilComponent {
       this.characterService.getCharacter(username).subscribe({
         next: (data) => {
             this.character = data;
+            if (this.character.level >= 20 && this.character.vocationId > 1 && this.character.vocationId < 6) {
+              this.labelPromotion = this.character.vocationId == 2 ? 'Elike Knight' : this.character.vocationId == 3 ? 'Royal Paladin' : this.character.vocationId == 4 ? 'Elder Druid' : 'Master Sorcerer'
+            }
             this.loading = false
             this.lifeInterval = setInterval(() => {
               if (this.character.life < this.character.maxLife) {
@@ -330,5 +335,22 @@ export class PerfilComponent {
     setTimeout(() => {
       window.location.reload();
     }, 3000)
+  }
+
+  confirmPromotion(event: Event) {
+    this.confirmationService.confirm({
+        key: 'confirm2',
+        target: event.target || new EventTarget,
+        message: 'Tem certeza que deseja se tornar um ' + this.labelPromotion + ' ao custo de 20k?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sim',
+        rejectLabel: 'Não',
+        accept: () => {
+          this.character.vocationId = this.character.vocationId == 2 ? 6 : this.character.vocationId == 3 ? 7 : this.character.vocationId == 4 ? 8 : 9;
+          this.character.balance -= 20000
+          this.characterService.updateVocation(this.character.id, this.character.vocationId);
+          this.service.add({ key: 'tst', severity: 'info', summary: 'Parabéns', detail: 'Agora você é um ' + this.labelPromotion });
+        },
+    });
   }
 }

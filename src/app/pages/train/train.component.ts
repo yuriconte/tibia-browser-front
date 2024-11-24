@@ -347,7 +347,7 @@ export class TrainComponent {
     x = skill atual, 
     y = fator (pally 1.1, pally 1.4, mage/rook 2)
     */
-    let y = this.character.vocationId === 3 ? 1.1 : this.character.vocationId === 2 ? 1.4 : 2
+    let y = this.character.vocationId === 3 || this.character.vocationId === 7 ? 1.1 : this.character.vocationId === 2 ||  this.character.vocationId === 6 ? 1.4 : 2
     let result = Math.round(50 * Math.pow(y, x - 10))
     return result >= 0 ? result : 0
   }
@@ -357,7 +357,7 @@ export class TrainComponent {
     x = skill atual, 
     y = fator (kina 1.1, pally 1.2, mage/rook 2)
     */
-    let y = this.character.vocationId === 2 ? 1.1 : this.character.vocationId === 3 ? 1.2 : 2
+    let y = this.character.vocationId === 2 ||  this.character.vocationId === 6 ? 1.1 : this.character.vocationId === 3 || this.character.vocationId === 7 ? 1.2 : 2
     let result = Math.round(50 * Math.pow(y, x - 10))
     return result >= 0 ? result : 0
   }
@@ -368,17 +368,17 @@ export class TrainComponent {
     f = fator (mage 1.1, pally 1.4, kina 3)
     */
     x +=1
-    let f = this.character.vocationId === 4 || this.character.vocationId === 5 ? 1.1 : this.character.vocationId === 3 ? 1.4 : 3
+    let f = this.character.vocationId === 4 || this.character.vocationId === 5 || this.character.vocationId === 8 || this.character.vocationId === 9 ? 1.1 : this.character.vocationId === 3 ? 1.4 : 3
     let result = Math.round(17 * Math.pow(f, x));
     return result >= 0 ? result : 0
   }
 
-  formatTime(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
+  // formatTime(seconds: number): string {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const minutes = Math.floor((seconds % 3600) / 60);
+  //   const remainingSeconds = seconds % 60;
+  //   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  // }
 
   getDifferenceFromNowInSeconds(dateString: any): number {
     const date = new Date(dateString);
@@ -386,5 +386,45 @@ export class TrainComponent {
     const diffInMs = Math.abs(now.getTime() - date.getTime());
     return Math.floor(diffInMs / 1000);
   }
+
+  formatTime(seconds: number): string {
+    if (seconds < 0) {
+      return "Conluído";
+    }
+  
+    const secondsInMinute = 60;
+    const secondsInHour = 3600;
+    const secondsInDay = 86400;
+    const secondsInWeek = 604800;
+    const secondsInMonth = 2592000; // Aproximadamente 30 dias
+  
+    if (seconds >= (secondsInMonth*12)) {
+      const years = Math.floor(seconds / (secondsInMonth*12));
+      const remainingSeconds = seconds % (secondsInMonth*12);
+      const months = Math.floor(remainingSeconds / secondsInMonth);
+      return `${years}A ${months}M`;
+    } else if (seconds >= secondsInMonth) {
+      const months = Math.floor(seconds / secondsInMonth);
+      const remainingSeconds = seconds % secondsInMonth;
+      const days = Math.floor(remainingSeconds / secondsInDay);
+      return `${months}M  ${days}D`;
+    } else if (seconds >= secondsInWeek) {
+      const weeks = Math.floor(seconds / secondsInWeek);
+      const remainingSeconds = seconds % secondsInWeek;
+      const days = Math.floor(remainingSeconds / secondsInDay);
+      return `${weeks}S  ${days}D`;
+    } else if (seconds >= secondsInDay) {
+      const days = Math.floor(seconds / secondsInDay);
+      const remainingSeconds = seconds % secondsInDay;
+      const hours = Math.floor(remainingSeconds / secondsInHour);
+      return `${days}D  ${hours.toString().padStart(2, '0')}h`;
+    } else {
+      const hours = Math.floor(seconds / secondsInHour);
+      const minutes = Math.floor((seconds % secondsInHour) / secondsInMinute);
+      const remainingSeconds = seconds % secondsInMinute;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+  }
+  
  
 }

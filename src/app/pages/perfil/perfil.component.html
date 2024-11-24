@@ -20,6 +20,16 @@
     </p-panel>
   </div>
 
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="character.level >= 20 && character.vocationId > 1 && character.vocationId < 6">
+    <p-panel header="Promoção">
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0">
+          <button (click)="confirmPromotion($event)" pButton label="{{labelPromotion}} - 20k" class="p-button-secondary w-full" [disabled]="character.balance < 20000"></button>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Informações do Personagem" [toggleable]="true">
       <div class="grid">
@@ -53,7 +63,15 @@
               {{ character.sex ? 'Feminino' : 'Masculino' }}
             </div>
             <div class="col-12 md:col-12 lg:col-12 font-tibia vocation-character pb-0 pt-0">
-              {{ character.vocationId === 1 ? 'Sem Vocação' : character.vocationId === 2 ? 'Knight' : character.vocationId === 3 ? 'Paladin' : character.vocationId === 4 ? 'Druid' : 'Sorcerer' }}
+              {{ character.vocationId === 1 ? 'Sem Vocação' : 
+              character.vocationId === 2 ? 'Knight' : 
+              character.vocationId === 3 ? 'Paladin' : 
+              character.vocationId === 4 ? 'Druid' :
+              character.vocationId === 5 ? 'Sorcerer' :
+              character.vocationId === 6 ? 'Elite Knight' : 
+              character.vocationId === 7 ? 'Royal Paladin' : 
+              character.vocationId === 8 ? 'Elder Druid' :
+              'Master Sorcerer'}}
             </div>
           </div>
         </div>
