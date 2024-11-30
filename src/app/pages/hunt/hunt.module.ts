@@ -20,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
 import { SliderModule } from 'primeng/slider';
+import { BadgeModule } from 'primeng/badge';
 
 @NgModule({
   declarations: [HuntComponent],
@@ -43,7 +44,8 @@ import { SliderModule } from 'primeng/slider';
     ChipModule,
     TooltipModule,
     TableModule,
-    SliderModule
+    SliderModule,
+    BadgeModule
   ]
 })
 export class HuntModule { }

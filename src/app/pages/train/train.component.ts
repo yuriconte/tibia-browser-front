@@ -113,10 +113,10 @@ export class TrainComponent {
               this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
             }
             if (this.character.shieldingTrainDate) {
-              this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding) - this.getDifferenceFromNowInSeconds(this.character.shieldingTrainDate);
+              this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding) - this.getDifferenceFromNowInSeconds(this.character.shieldingTrainDate);
               this.initShieldingTraining()
             } else {
-              this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding);
+              this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding);
             }
             if (this.character.magicLevelTrainDate) {
               this.remainingMagicLevelTime = this.calcRemaingTimeML(this.character.magicLevel) - this.getDifferenceFromNowInSeconds(this.character.magicLevelTrainDate);
@@ -249,7 +249,7 @@ export class TrainComponent {
   /* ------------------------------- SHIELDING ----------------------------------- */
   startShieldingTraining() {
     this.character.shieldingTrainDate = new Date();
-    this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding);
+    this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding);
     this.characterService.startShielding(this.character.id)
     this.initShieldingTraining()
   }
@@ -257,7 +257,7 @@ export class TrainComponent {
   initShieldingTraining() {
     this.timerShieldingInterval = setInterval(() => {
       this.remainingShieldingTime--;
-      let totalTime = this.calcRemaingTime(this.character.shielding);
+      let totalTime = this.calcRemaingTimeShield(this.character.shielding);
       this.progressShielding = (((totalTime - this.remainingShieldingTime) / totalTime) * 100).toFixed(0);
       if (this.remainingShieldingTime <= 0) {
         this.finishShieldingTraining();
@@ -269,7 +269,7 @@ export class TrainComponent {
     this.character.shieldingTrainDate = null;
     this.character.shielding += 1;
     clearInterval(this.timerShieldingInterval);
-    this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding);
+    this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding);
     this.characterService.increaseShielding(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Shielding subiu para " + this.character.shielding + "!"});
   }
@@ -336,7 +336,7 @@ export class TrainComponent {
     this.remainingAxeTime = this.calcRemaingTime(this.character.axe);
     this.remainingClubTime = this.calcRemaingTime(this.character.club);
     this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
-    this.remainingShieldingTime = this.calcRemaingTime(this.character.shielding);
+    this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding);
     this.remainingMagicLevelTime = this.calcRemaingTimeML(this.character.magicLevel);
     this.characterService.cancelSkill(this.character.id)
   }
@@ -362,13 +362,23 @@ export class TrainComponent {
     return result >= 0 ? result : 0
   }
 
+  calcRemaingTimeShield(x:number) {
+    /* 50*(y^(x-10))
+    x = skill atual, 
+    y = fator (kina 1.1, pally 1.2, mage/rook 2)
+    */
+    let y = this.character.vocationId === 2 ||  this.character.vocationId === 6 || this.character.vocationId === 3 || this.character.vocationId === 7 ? 1.1 : 2
+    let result = Math.round(50 * Math.pow(y, x - 10))
+    return result >= 0 ? result : 0
+  }
+
   calcRemaingTimeML(x:number) {
     /* 1600*(f^x) 
     x = ml atual, 
     f = fator (mage 1.1, pally 1.4, kina 3)
     */
     x +=1
-    let f = this.character.vocationId === 4 || this.character.vocationId === 5 || this.character.vocationId === 8 || this.character.vocationId === 9 ? 1.1 : this.character.vocationId === 3 ? 1.4 : 3
+    let f = this.character.vocationId === 4 || this.character.vocationId === 5 || this.character.vocationId === 8 || this.character.vocationId === 9 ? 1.1 : this.character.vocationId === 3 || this.character.vocationId === 7 ? 1.4 : 3
     let result = Math.round(17 * Math.pow(f, x));
     return result >= 0 ? result : 0
   }

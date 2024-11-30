@@ -176,7 +176,8 @@ export class HuntOfflineComponent {
     let expEarned = Math.round(this.selectedCreature.expHourNum*this.character.huntOfflineTimeInHours);
     // calculo loot ganho
     let itemLooted: number[] = [];
-    for(let i = 0; i < (this.character.huntOfflineTimeInHours*2); i++) {
+    let countTryLoot = this.selectedCreature.totalKills >= this.selectedCreature.bestiary.totalKillsTier3 ? 6 :this.selectedCreature.totalKills >= this.selectedCreature.bestiary.totalKillsTier2 ? 4 : 2
+    for(let i = 0; i < (this.character.huntOfflineTimeInHours*countTryLoot); i++) {
       if (this.selectedCreature.bestiary.creature.items) {
         this.selectedCreature.bestiary.creature.items.forEach(item => {
           let drop = this.shouldDrop(item.rate)
@@ -216,7 +217,7 @@ export class HuntOfflineComponent {
   }
 
   shouldDrop(rarity: string): boolean {
-    const dropChance = rarity === 'comum' ? 0.20 : rarity === 'incomum' ? 0.10 : rarity === 'raro' ? 0.05 : 0.01
+    const dropChance = rarity === 'comum' ? 0.10 : rarity === 'incomum' ? 0.05 : rarity === 'raro' ? 0.01 : 0.001
     const randomValue = Math.random();
     return randomValue <= dropChance;
   }

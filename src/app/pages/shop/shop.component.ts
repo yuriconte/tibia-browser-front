@@ -148,7 +148,7 @@ export class ShopComponent {
   loadArrows() {
     this.itemService.getArrows().subscribe({
       next: (data) => {
-          this.arrows = data;
+          this.arrows = data?.filter(item => item.name != 'Bow');
           this.prepareItems(this.arrows);
       },
       error: () => {
@@ -160,7 +160,7 @@ export class ShopComponent {
   loadBolts() {
     this.itemService.getBolts().subscribe({
       next: (data) => {
-          this.bolts = data;
+          this.bolts = data?.filter(item => item.name != 'Crossbow' && item.name != 'Arbalest');
           this.prepareItems(this.bolts);
       },
       error: () => {

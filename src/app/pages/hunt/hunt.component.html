@@ -2,7 +2,15 @@
 <p-messages [value]="msgs"></p-messages>
 <div class="grid" *ngIf="!character.huntOfflineDate">
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
-    <p-panel header="Vida / Mana" [toggleable]="true">
+    <p-panel [toggleable]="true">
+      <ng-template pTemplate="header">
+        <div class="header-content">
+          <strong>
+            Vida / Mana / Exp
+          </strong>
+          <p-badge value="{{character.level}}" size="large" severity="primary" class="ml-5"></p-badge>
+        </div>
+      </ng-template>
       <div class="grid">
         <div class="col-12 md:col-12 lg:col-12 health-bar pb-0">
           <div class="progress-container">
@@ -19,7 +27,7 @@
         <div class="col-12 md:col-12 lg:col-12 exp-bar pb-0">
           <div class="progress-container">
             <p-progressBar [value]="(character.experience-expPreviousLevel)/(expNextLevel-expPreviousLevel)*100" [showValue]="false"></p-progressBar>
-            <div class="progress-text">Level {{character.level}} - Exp {{character.experience}} / {{expNextLevel}}</div>
+            <div class="progress-text">{{character.experience}} / {{expNextLevel}} {{calculateTimeToNextLevel() != undefined ? ' (' + calculateTimeToNextLevel() + ')' : ''}}</div>
           </div>
         </div>
       </div>
@@ -87,7 +95,7 @@
     </p-panel>
   </div>
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="!statusHunt">
-    <p-panel header="Skills / Experiência" [toggleable]="true" [collapsed]="true">
+    <p-panel header="Skills" [toggleable]="true" [collapsed]="true">
       <div class="grid">
         <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
           <p-button label="Sword" badge="{{character.sword}}" styleClass="w-full p-button-secondary"></p-button>
@@ -117,25 +125,71 @@
         <div class="col-12 md:col-12 pl-0 pr-0">
           <p-dropdown 
             [options]="creatures" 
-            optionLabel="name" 
+            optionLabel="creature.name" 
             [(ngModel)]="selectedCreature"
             placeholder="Selecione a criatura"
             styleClass="w-full"
+            [filter]="true"
+            filterBy="creature.name"
+            [autofocusFilter]="false"
             id="creature">
             <ng-template pTemplate="selectedItem">
-              <div class="flex align-items-center gap-2" *ngIf="selectedCreature">
-                <!-- <p-tag severity="{{selectedCreature.creature.tagType}}" value="{{selectedCreature.creature.tagLabel}}" [rounded]="true"></p-tag> -->
-                <p-tag severity="info" value="{{selectedCreature.creature.expHour}} exp/h" *ngIf="selectedCreature.creature.expHour"></p-tag>
-                <img src="assets/gifs/creatures/{{selectedCreature.creature.imagePath}}" alt="{{selectedCreature.creature.name}}" width="32" height="32"/>
-                <div>{{ selectedCreature.creature.name }}</div>
+              <div class="flex align-items-center p-0 font-tibia" *ngIf="selectedCreature">
+                <div class="grid">
+                  <div class="col-9 md:col-9 pb-1 pl-3" style="text-align: center;">
+                    <div>{{ selectedCreature.creature.name }}</div>
+                  </div>
+                  <div class="col-3 md:col-3 pb-1" style="text-align: center;"></div>
+                  <div class="col-9 md:col-9">
+                    <div class="grid">
+                      <div class="col-12 md:col-12 pb-0 pt-1">
+                        <p-tag severity="success" value="{{selectedCreature.creature.expHour}} exp/h" *ngIf="selectedCreature.creature.expHour" class="w-full"></p-tag>
+                        <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!selectedCreature.creature.expHour" class="w-full inactive"></p-tag>
+                      </div>
+                      <div class="col-12 md:col-12 pb-0 pt-1">
+                        <p-tag severity="danger" value="❤️ Vida: {{selectedCreature.creature.life}}"></p-tag>
+                      </div>
+                      <div class="col-12 md:col-12 pb-0 pt-1 exp">
+                        <p-tag severity="help" value="⭐ Exp: {{selectedCreature.creature.experience}}"></p-tag>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3 md:col-3 p-0">
+                    <img src="assets/gifs/creatures/{{selectedCreature.creature.imagePath}}" alt="{{selectedCreature.creature.name}}" width="64" height="64"/>
+                  </div>
+                </div>
               </div>
             </ng-template>
             <ng-template let-creature pTemplate="item">
-                <div class="flex align-items-center gap-2">
-                  <!-- <p-tag severity="{{creature.creature.tagType}}" value="{{creature.creature.tagLabel}}" [rounded]="true"></p-tag> -->
+                <!-- <div class="flex align-items-center gap-2">
                   <p-tag severity="info" value="{{creature.creature.expHour}} exp/h" *ngIf="creature.creature.expHour"></p-tag>
                   <img src="assets/gifs/creatures/{{creature.creature.imagePath}}" alt="{{creature.creature.name}}" width="32" height="32"/>
                   <div>{{ creature.creature.name }}</div>
+                </div> -->
+                <div class="flex align-items-center p-0 font-tibia">
+                  <div class="grid">
+                    <div class="col-9 md:col-9 pb-1 pl-3" style="text-align: center;">
+                      <div>{{ creature.creature.name }}</div>
+                    </div>
+                    <div class="col-3 md:col-3 pb-1" style="text-align: center;"></div>
+                    <div class="col-9 md:col-9">
+                      <div class="grid">
+                        <div class="col-12 md:col-12 pb-0 pt-1">
+                          <p-tag severity="success" value="{{creature.creature.expHour}} exp/h" *ngIf="creature.creature.expHour" class="w-full"></p-tag>
+                          <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!creature.creature.expHour" class="w-full inactive"></p-tag>
+                        </div>
+                        <div class="col-12 md:col-12 pb-0 pt-1">
+                          <p-tag severity="danger" value="❤️ Vida: {{creature.creature.life}}"></p-tag>
+                        </div>
+                        <div class="col-12 md:col-12 pb-0 pt-1 exp">
+                          <p-tag severity="help" value="⭐ Exp: {{creature.creature.experience}}"></p-tag>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-3 md:col-3 p-0">
+                      <img src="assets/gifs/creatures/{{creature.creature.imagePath}}" alt="{{creature.creature.name}}" width="64" height="64"/>
+                    </div>
+                  </div>
                 </div>
             </ng-template>
           </p-dropdown>
@@ -424,6 +478,28 @@
             <span class="text-green-500 font-medium pl-3">{{totalGoldEarned}} </span>
             <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
           </div>
+        </div>
+        <div class="col-12 md:col-12" *ngIf="stats?.length > 0">
+          <p-panel header="Estatística Round a Round" [toggleable]="true">
+            <p-table [value]="stats">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-stat>
+                <tr>
+                  <td>
+                    <span class="image-text ml-2">{{stat.label}}</span>
+                  </td>
+                  <td>
+                    <span class="image-text ml-2">{{stat.value}}</span>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-panel>
         </div>
         <div class="col-12 md:col-12" *ngIf="lootDrop?.length > 0">
           <p-panel header="Loot" [toggleable]="true">
