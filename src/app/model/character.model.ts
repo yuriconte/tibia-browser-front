@@ -58,4 +58,8 @@ export class Character {
     questDate: Date;
     questId: number;
     questTimeInHours: number;
+
+    arena1: number;
+    arena2: number;
+    arena3: number;
 }

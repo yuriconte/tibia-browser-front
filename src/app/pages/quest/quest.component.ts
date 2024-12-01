@@ -210,7 +210,7 @@ export class QuestComponent {
     }
     this.remainingTime = 0;
     let goldEarned = quest.goldReward || 0;
-    this.characterService.updateCharacter(this.character.id, quest.id, null, expEarned, this.character.life, this.character.mana, null, goldEarned, itemLooted);
+    this.characterService.updateCharacter(this.character.id, quest.id, null, expEarned, this.character.life, this.character.mana, null, goldEarned, itemLooted, null);
     while (this.character.experience + expEarned >= this.expNextLevel) {
       this.characterService.increaseLevel(this.character.id);
       this.character.level++;

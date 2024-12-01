@@ -106,11 +106,22 @@ export class HuntComponent {
 
   creatures: Bestiary[] = [];
   selectedCreature: Bestiary | null = null;
+  creaturesAll: Bestiary[] = [];
+
   character: Character = new Character;
   
   huntStyle: any[] = [];
   huntStyleSelected: any;
   
+  huntType: any[] = [];
+  huntTypeSelected: any;
+
+  arenaType: any[] = [];
+  arenaTypeSelected: any;
+
+  bossType: any[] = [];
+  bossTypeSelected: any;
+
   statusHunt: boolean = false;
 
   stats: any[] = [
@@ -169,13 +180,31 @@ export class HuntComponent {
     private authService: AuthService) {}
 
   ngOnInit() {
-    this.loadCharacter();
     this.huntStyle = [
       { name: 'Ataque', value: 1 },
       { name: 'Balanceado', value: 0.75 },
       { name: 'Defesa', value: 0.5 }
     ];
     this.huntStyleSelected = this.huntStyle[0];
+    this.huntType = [
+      { name: 'Caçar', value: 1 },
+      { name: 'Arena', value: 2 },
+      { name: 'Boss', value: 3 },
+    ];
+    this.huntTypeSelected = this.huntType[0];
+    this.arenaType = [
+      { name: 'Greenhorn', value: 1, cost: 1000 },
+      { name: 'Scrapper', value: 2, cost: 5000 },
+      { name: 'Warlord', value: 3, cost: 10000 },
+    ];
+    this.arenaTypeSelected = this.arenaType[0];
+    this.bossType = [
+      { name: 'Diário', value: 1 },
+      { name: 'Invasão', value: 2 },
+      { name: 'Mundial', value: 3 },
+    ];
+    this.bossTypeSelected = this.bossType[0];
+    this.loadCharacter();
   }
 
   ngOnDestroy() {
@@ -196,6 +225,30 @@ export class HuntComponent {
       this.characterService.getCharacter(username).subscribe({
         next: (data) => {
             this.character = data
+            if (this.character.arena1 === 1) {
+              this.arenaType[0].disabled = true
+              this.arenaTypeSelected = this.arenaType[1]
+            }
+            if (this.character.arena2 === 1) {
+              this.arenaType[1].disabled = true
+              if (this.character.arena1 === 1) {
+                this.arenaTypeSelected = this.arenaType[2]
+              } else {
+                this.arenaTypeSelected = this.arenaType[0]
+              }
+            }
+            if (this.character.arena3 === 1) {
+              this.arenaType[2].disabled = true
+              if (this.character.arena1 === 1) {
+                this.arenaTypeSelected = this.arenaType[2]
+              } else {
+                this.arenaTypeSelected = this.arenaType[0]
+              }
+            }
+            if (this.character.arena1 === 1 && this.character.arena2 === 1 && this.character.arena3 === 1) {
+              this.huntType[1].disabled = true
+            }
+
             if (this.character.level >= 8 && this.character.vocationId > 1) {
               this.loadSpellsHeal();
               this.loadSpellsStrike();
@@ -221,7 +274,7 @@ export class HuntComponent {
               this.msgs.push({ severity: 'info', summary: 'Level 20', detail: "Você pode ser promovido por 20k no seu perfil." });
             }
             if (this.character.potions?.length > 0) {
-              this.potionsHealing = this.character.potions?.filter(cpot => cpot.potion.type === 'life');
+              this.potionsHealing = this.character.potions?.filter(cpot => cpot.potion.type === 'life' || cpot.potion.type === 'life_mana');
               if (this.potionsHealing?.length > 0) {
                 this.selectedPotionHealing = this.potionsHealing[0]
               }
@@ -251,10 +304,98 @@ export class HuntComponent {
     }
   }
 
+  changeHuntType(event: any): void {
+    if (!event.value) {
+      this.huntTypeSelected = this.huntType[0];
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 1)] 
+      this.selectedCreature = this.creatures[0];
+      this.prepareCreatures();
+      return;
+    }
+    if (event.value.value == 1) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 1)] 
+      this.prepareCreatures();
+    } else if (event.value.value == 2) {
+      //this.arenaTypeSelected = this.arenaType[0];
+      if (this.character.arena1 === 1) {
+        this.arenaTypeSelected = this.arenaType[1]
+        this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 2)] 
+      } else {
+        this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 1)] 
+      }
+      if (this.character.arena2 === 1) {
+        if (this.character.arena1 === 1) {
+          this.arenaTypeSelected = this.arenaType[2]
+          this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 3)] 
+        } else {
+          this.arenaTypeSelected = this.arenaType[0]
+          this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 1)] 
+        }
+      }
+      if (this.character.arena3 === 1) {
+        if (this.character.arena1 === 1) {
+          this.arenaTypeSelected = this.arenaType[1]
+          this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 2)] 
+        } else {
+          this.arenaTypeSelected = this.arenaType[0]
+          this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 1)] 
+        }
+      }      
+      this.creatures.map((creature, index) => {
+        creature.disabled = true
+      });
+    } else if (event.value.value == 3) {
+      this.bossTypeSelected = this.bossType[0]
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 3 && creature.creature.bossType === 1)] 
+    }
+    this.selectedCreature = this.creatures[0];
+  }
+
+  changeArenaType(event: any): void {
+    if (!event.value) {
+      this.arenaTypeSelected = this.arenaType[0];
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 1)] 
+      this.creatures.map((creature, index) => {
+        creature.disabled = true
+      });
+      this.selectedCreature = this.creatures[0];
+      return;
+    }
+    if (event.value.value == 1) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 1)] 
+    } else if (event.value.value == 2) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 2)] 
+    } else if (event.value.value == 3) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 2 && creature.creature.arenaType === 3)] 
+    }
+    this.creatures.map((creature, index) => {
+      creature.disabled = true
+    });
+    this.selectedCreature = this.creatures[0];
+  }
+
+  changeBossType(event: any): void {
+    if (!event.value) {
+      this.bossTypeSelected = this.bossType[0];
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 3 && creature.creature.bossType === 1)] 
+      this.selectedCreature = this.creatures[0];
+      return;
+    }
+    if (event.value.value == 1) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 3 && creature.creature.bossType === 1)] 
+    } else if (event.value.value == 2) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 3 && creature.creature.bossType === 2)] 
+    } else if (event.value.value == 3) {
+      this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 3 && creature.creature.bossType === 3)] 
+    }
+    this.selectedCreature = this.creatures[0];
+  }
+
   loadBestiary() {
     this.bestiaryService.getAll().subscribe({
       next: (data) => {
-        this.creatures = data || []
+        this.creaturesAll = data || []
+        this.creatures = [...this.creaturesAll] 
         this.selectedCreature = this.creatures[0];
         this.prepareCreatures();
       },
@@ -305,18 +446,18 @@ export class HuntComponent {
 
   prepareCreatures() {
     this.creatures.map((creature, index) => {
-        //this.testeDificuldade(index);
+      if (creature.id > 0) {
         let expHour = this.character.bestiary?.find(b => b.bestiaryId === this.creatures[index].id)?.expHour || 0;
         creature.creature.expHour = expHour > 0 ? (expHour > 1000000 ? (expHour/1000000).toFixed(1) + 'kk' : expHour > 1000 ? (expHour/1000).toFixed(1) + 'k' : expHour.toFixed(1)) : null
         creature.creature.items.sort((itemA, itemB) => {
           const rateOrder = { comum: 1, incomum: 2, raro: 3, ultra: 4 };
-          //return rateOrder[itemA.rate] - rateOrder[itemB.rate];
           const rateComparison = rateOrder[itemA.rate] - rateOrder[itemB.rate];
           if (rateComparison === 0) {
             return itemA.item.gold - itemB.item.gold;
           }
           return rateComparison;
         });
+      }
     });
   }
 
@@ -402,8 +543,6 @@ export class HuntComponent {
   startHunt() {
     this.statusHunt = true;
 
-    this.saveLocalStorage();
-
     if (!this.minLife) {
       this.minLife = 10
     }
@@ -413,6 +552,13 @@ export class HuntComponent {
     this.monster = { ...this.selectedCreature.creature }
     this.monster.maxLife = this.monster.life
     let bestiaryId = this.selectedCreature.id
+
+    if (this.huntTypeSelected?.value == 1) {
+      this.saveLocalStorage();
+    }
+    if (this.huntTypeSelected?.value == 2) {
+      bestiaryId = null;
+    }
 
     this.countMonsterKill = 0;
     let countTimeToKill = 0;
@@ -504,6 +650,17 @@ export class HuntComponent {
           } else {
             this.stats.push({label: 'Potion Cura', value: healQuantity})
           }
+
+          //spirit potion, healav mana metade do que heala vida
+          if (this.selectedPotionHealing.potion.type === 'life_mana') {
+            let healQuantity = Math.round(this.getRandomInRange(this.selectedPotionHealing.potion.min/2, this.selectedPotionHealing.potion.max/2))
+            if (this.character.mana + healQuantity <= this.character.maxMana) {
+              this.character.mana += healQuantity;
+            } else {
+              this.character.mana = this.character.maxMana
+            }
+          }
+
           this.characterService.updateCharacterLifeManaStaminaByValues(character.id, this.character.life, this.character.mana, this.selectedPotionHealing.potion.id, null);
           if (this.selectedPotionHealing.quantity <= 0) {
             this.usePotionsHealing = false;
@@ -597,7 +754,34 @@ export class HuntComponent {
             }
           })
         }
-        this.characterService.updateCharacter(character.id, null, bestiaryId, this.monster.experience, this.character.life, this.character.mana, ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600), goldEarned, itemLooted);
+        if (this.huntTypeSelected?.value == 2 && this.countMonsterKill <= 1) {
+          goldEarned = this.arenaTypeSelected.cost*-1
+          this.character.balance += goldEarned
+        }
+        let arenaId = null;
+        if (this.huntTypeSelected?.value == 2) {
+          if (this.countMonsterKill === 10) {
+            arenaId = this.arenaTypeSelected.value
+            switch (this.arenaTypeSelected.value) {
+              case 1:
+                itemLooted.push(225)
+                itemLooted.push(226)
+                itemLooted.push(227)
+                break;
+              case 2:
+                itemLooted.push(230)
+                itemLooted.push(231)
+                itemLooted.push(232)
+                break;
+              case 3:
+                itemLooted.push(233)
+                itemLooted.push(234)
+                itemLooted.push(235)
+                break;
+            }
+          }
+        }
+        this.characterService.updateCharacter(character.id, null, bestiaryId, this.monster.experience, this.character.life, this.character.mana, ((this.countMonsterKill*this.monster.experience)/countTimeToKill*3600), goldEarned, itemLooted, arenaId);
         if (character.experience >= this.expNextLevel) {
           this.characterService.increaseLevel(character.id);
           character.level += 1;
@@ -622,6 +806,18 @@ export class HuntComponent {
           if (character.level >= 8 && character.vocationId === 1 && this.msgs.length == 0) {
             this.msgs.push({ severity: 'info', summary: 'Level 8', detail: "Escolha uma vocação no seu perfil: Knight, Paladin, Druid, Sorcerer" });
           }
+        }
+        if (this.huntTypeSelected?.value == 2) {
+          if (this.countMonsterKill === 10) {
+            this.countMonsterKill = 9
+            this.service.add({ key: "tst", severity: 'success', summary: 'Sucesso', detail: "Arena concluída! Recompensa enviada para o seu depot" });
+            this.statusHunt = false;
+            clearInterval(this.atkInterval);
+            setTimeout(()=> {
+              window.location.reload();
+            }, 2000);
+          }
+          this.selectedCreature = this.creatures[this.countMonsterKill]
         }
         this.monster = { ...this.selectedCreature.creature }
         this.monster.maxLife = this.monster.life
@@ -753,10 +949,35 @@ export class HuntComponent {
       // Cura mínima: (lvl*0.2)+(mlvl*4)+25
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*4)+25, (this.character.level*0.2)+(this.character.magicLevel*7.95)+51))
     }
+    if (this.selectedSpellHeal.spell === 'exura gran ico') {
+      // Cura máxima: (lvl*0.2)+(mlvl*80)+98
+      // Cura mínima: (lvl*0.2)+(mlvl*64.5)+73
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*64.5)+73, (this.character.level*0.2)+(this.character.magicLevel*80)+98))
+    }
     if (this.selectedSpellHeal.spell === 'exura') {
       // Cura máxima: (lvl*0.2)+(mlvl*1.795)+11
       // Cura mínima: (lvl*0.2)+(mlvl*1.4)+8
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.4)+8, (this.character.level*0.2)+(this.character.magicLevel*1.795)+11))
+    }
+    if (this.selectedSpellHeal.spell === 'exura gran') {
+      // Cura máxima: (lvl*0.2)+(mlvl*5.59)+35
+      // Cura mínima: (lvl*0.2)+(mlvl*3.184)+20
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*3.184)+20, (this.character.level*0.2)+(this.character.magicLevel*5.59)+35))
+    }
+    if (this.selectedSpellHeal.spell === 'exura vita') {
+      // Cura máxima: (lvl*0.2)+(mlvl*12.79)+79
+      // Cura mínima: (lvl*0.2)+(mlvl*7.22)+44
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*7.22)+44, (this.character.level*0.2)+(this.character.magicLevel*12.79)+79))
+    }
+    if (this.selectedSpellHeal.spell === 'exura san') {
+      // Cura máxima: (lvl*0.2)+(mlvl*12.7)+70
+      // Cura mínima: (lvl*0.2)+(mlvl*7.5)+40
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*7.5)+40, (this.character.level*0.2)+(this.character.magicLevel*12.7)+70))
+    }
+    if (this.selectedSpellHeal.spell === 'exura gran san') {
+      // Cura máxima: (lvl*0.2)+(mlvl*30)+97
+      // Cura mínima: (lvl*0.2)+(mlvl*20.5)+71
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*20.5)+71, (this.character.level*0.2)+(this.character.magicLevel*30)+97))
     }
     return 0
   }
@@ -766,17 +987,54 @@ export class HuntComponent {
       // Dano máximo: (lvl*0.2)+(mlvl*3)+18
       // Dano mínimo: (lvl*0.2)+(mlvl*1.79)+11
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.79)+11, (this.character.level*0.2)+(this.character.magicLevel*3)+18))
-    } else if (this.selectedSpellStrike.spell === 'exori ico') {
+    } 
+    if (this.selectedSpellStrike.spell === 'exevo mas san') {
+      // Dano máximo: (lvl*0.2)+(mlvl*6)+36
+      // Dano mínimo: (lvl*0.2)+(mlvl*4)+22
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*4)+22, (this.character.level*0.2)+(this.character.magicLevel*6)+36))
+    } 
+    if (this.selectedSpellStrike.spell === 'exori ico') {
       // Dano máximo: (lvl*0.2)+(1.1*(skill+atk))
       // Dano mínimo: (lvl*0.2)+(0.5*(skill+atk))
       let skill = this.character.slot2Item?.type == 'sword' ? this.character.sword : this.character.slot2Item?.type == 'axe' ? this.character.axe : this.character.slot2Item?.type == 'club' ? this.character.club : this.character.slot2Item?.type == 'distance' ? this.character.distance : this.character.slot2Item?.type == 'arrow' ? this.character.distance : this.character.slot2Item?.type == 'bolt' ? this.character.distance : 10
       return Math.round(this.getRandomInRange((this.character.level*0.2)+(0.5*(skill+this.character.totalAtk)), (this.character.level*0.2)+(1.1*(skill+this.character.totalAtk))))
-    } else {
-      // Dano máximo: (lvl*0.2)+(mlvl*2.203)+13
-      // Dano mínimo: (lvl*0.2)+(mlvl*1.403)+8
-      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.403)+8, (this.character.level*0.2)+(this.character.magicLevel*2.203)+13))
     }
-    return 0
+    if (this.selectedSpellStrike.spell === 'exori') {
+      // Dano máximo: (lvl*0.2)+(1.5*(skill+atk))
+      // Dano mínimo: (lvl*0.2)+(0.5*(skill+atk))
+      let skill = this.character.slot2Item?.type == 'sword' ? this.character.sword : this.character.slot2Item?.type == 'axe' ? this.character.axe : this.character.slot2Item?.type == 'club' ? this.character.club : this.character.slot2Item?.type == 'distance' ? this.character.distance : this.character.slot2Item?.type == 'arrow' ? this.character.distance : this.character.slot2Item?.type == 'bolt' ? this.character.distance : 10
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(0.5*(skill+this.character.totalAtk)), (this.character.level*0.2)+(1.5*(skill+this.character.totalAtk))))
+    }
+    if (this.selectedSpellStrike.spell === 'exori gran') {
+      // Dano máximo: (lvl*0.2)+(3*(skill+atk))
+      // Dano mínimo: (lvl*0.2)+(1.1*(skill+atk))
+      let skill = this.character.slot2Item?.type == 'sword' ? this.character.sword : this.character.slot2Item?.type == 'axe' ? this.character.axe : this.character.slot2Item?.type == 'club' ? this.character.club : this.character.slot2Item?.type == 'distance' ? this.character.distance : this.character.slot2Item?.type == 'arrow' ? this.character.distance : this.character.slot2Item?.type == 'bolt' ? this.character.distance : 10
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(1.1*(skill+this.character.totalAtk)), (this.character.level*0.2)+(3*(skill+this.character.totalAtk))))
+    }
+    if (this.selectedSpellStrike.spell === 'exevo gran mas vis') {
+      // Dano máximo: (lvl*0.2)+(mlvl*12)+65
+      // Dano mínimo: (lvl*0.2)+(mlvl*5)+40
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*5)+40, (this.character.level*0.2)+(this.character.magicLevel*12)+65))
+    }
+    if (this.selectedSpellStrike.spell === 'exevo gran mas flam') {
+      // Dano máximo: (lvl*0.2)+(mlvl*14)+130
+      // Dano mínimo: (lvl*0.2)+(mlvl*7)+80
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*7)+80, (this.character.level*0.2)+(this.character.magicLevel*14)+130))
+    }
+    if (this.selectedSpellStrike.spell === 'exevo gran mas tera') {
+      // Dano máximo: (lvl*0.2)+(mlvl*10)+65
+      // Dano mínimo: (lvl*0.2)+(mlvl*5)+40
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*5)+40, (this.character.level*0.2)+(this.character.magicLevel*10)+65))
+    }
+    if (this.selectedSpellStrike.spell === 'exevo gran mas frigo') {
+      // Dano máximo: (lvl*0.2)+(mlvl*12)+130
+      // Dano mínimo: (lvl*0.2)+(mlvl*6)+80
+      return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*6)+80, (this.character.level*0.2)+(this.character.magicLevel*12)+130))
+    }
+    // exoris frigo, flam, vis e tera
+    // Dano máximo: (lvl*0.2)+(mlvl*2.203)+13
+    // Dano mínimo: (lvl*0.2)+(mlvl*1.403)+8
+    return Math.round(this.getRandomInRange((this.character.level*0.2)+(this.character.magicLevel*1.403)+8, (this.character.level*0.2)+(this.character.magicLevel*2.203)+13))
   }
 
   getDifferenceFromNowInSeconds(dateString: any): number {

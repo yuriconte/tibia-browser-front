@@ -16,6 +16,9 @@ export class Creature {
     imgPath: string;
     minGold: number;
     maxGold: number;
+    type: number;
+    arenaType: number;
+    bossType: number;
     items: CreatureItem[];
     damages: CreatureDamage[];
     

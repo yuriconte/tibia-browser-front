@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../app.constants';
 import { Character } from '../model/character.model';
+import { aR } from '@fullcalendar/core/internal-common';
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +44,8 @@ export class CharacterService {
     );
   }
 
-  updateCharacter(characterId: number, questId: number, bestiaryId: number, experience: number, life: number, mana: number, expHour: number, increaseBalance: number, itemLooted: number[]) {
-    this.httpClient.post<void>(`${this.apiUrl}/updateCharacter`, { characterId, questId, bestiaryId, experience, life, mana, expHour, increaseBalance, itemLooted }).subscribe({
+  updateCharacter(characterId: number, questId: number, bestiaryId: number, experience: number, life: number, mana: number, expHour: number, increaseBalance: number, itemLooted: number[], arenaId: number) {
+    this.httpClient.post<void>(`${this.apiUrl}/updateCharacter`, { characterId, questId, bestiaryId, experience, life, mana, expHour, increaseBalance, itemLooted, arenaId }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },
