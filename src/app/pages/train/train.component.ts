@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
@@ -11,6 +11,32 @@ import { Character } from 'src/app/model/character.model';
     ::ng-deep .exp-bar .p-progressbar-value {
       background-color: #94a3b8; 
     }
+
+    .layout-main {
+      margin-left: 1rem !important;
+      margin-right: 1rem !important;
+    }
+
+    .progress-knob {
+      flex: 1;
+    }
+
+    ::ng-deep .p-card-title {
+      font-family: var(--font-family-tibia);
+    }
+
+    ::ng-deep .skill-value .p-tag {
+      font-size: 1.1rem;
+      position: relative;
+      top: -36px;
+      float: right;
+      width: 10rem;
+    }
+
+    ::ng-deep .card-highlight .p-card {
+      background: #2dd4bf29;
+    }
+
   `],
   providers: [MessageService]
 })
@@ -48,6 +74,15 @@ export class TrainComponent {
   timerMagicLevelInterval: any;
   progressMagicLevel: string;
 
+  skills: any[] = [];
+
+  @ViewChild('magicLevelCard') magicLevelCard!: ElementRef;
+  @ViewChild('shieldingCard') shieldingCard!: ElementRef;
+  @ViewChild('distanceCard') distanceCard!: ElementRef;
+  @ViewChild('clubCard') clubCard!: ElementRef;
+  @ViewChild('axeCard') axeCard!: ElementRef;
+  @ViewChild('swordCard') swordCard!: ElementRef;
+
   constructor(private characterService: CharacterService,
     private service: MessageService,
     private authService: AuthService) {}
@@ -80,6 +115,10 @@ export class TrainComponent {
     if (this.timerMagicLevelInterval) {
       clearInterval(this.timerMagicLevelInterval);
     }
+  }
+
+  ngAfterViewInit() {
+    this.scrollToTrainingCard();
   }
 
   loadCharacter() {
@@ -124,6 +163,7 @@ export class TrainComponent {
             } else {
               this.remainingMagicLevelTime = this.calcRemaingTimeML(this.character.magicLevel);
             }
+            this.scrollToTrainingCard()
         },
         error: () => {
             this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
@@ -133,6 +173,33 @@ export class TrainComponent {
       this.service.add({ key: 'tst', severity: 'error', summary: 'Erro', detail: "Erro ao obter dados do personagem." });
     }
   }
+
+  scrollToTrainingCard() {
+    if (this.character.magicLevelTrainDate && this.magicLevelCard) {
+      this.magicLevelCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (this.character.shieldingTrainDate && this.shieldingCard) {
+      this.shieldingCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (this.character.distanceTrainDate && this.distanceCard) {
+      this.distanceCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (this.character.clubTrainDate && this.clubCard) {
+      this.clubCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (this.character.axeTrainDate && this.axeCard) {
+      this.axeCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (this.character.swordTrainDate && this.swordCard) {
+      this.swordCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // prepareSkills() {
+  //   this.skills = [
+  //     { name: 'Sword Fighting', key: 'sword', trainDateKey: 'swordTrainDate', startFunctionKey: () => this.startSwordTraining(), remainingTimeKey: 'remainingSwordTime', progressKey: 'progressSword' },
+  //     { name: 'Axe Fighting', key: 'axe', trainDateKey: 'axeTrainDate', startFunctionKey: () => this.startAxeTraining(), remainingTimeKey: 'remainingAxeTime', progressKey: 'progressAxe' },
+  //     { name: 'Club Fighting', key: 'club', trainDateKey: 'clubTrainDate', startFunctionKey: () => this.startClubTraining(), remainingTimeKey: 'remainingClubTime', progressKey: 'progressClub' },
+  //     { name: 'Distance Fighting', key: 'distance', trainDateKey: 'distanceTrainDate', startFunctionKey: () => this.startDistanceTraining(), remainingTimeKey: 'remainingDistanceTime', progressKey: 'progressDistance' },
+  //     { name: 'Shielding', key: 'shielding', trainDateKey: 'shieldingTrainDate', startFunctionKey: () => this.startShieldingTraining(), remainingTimeKey: 'remainingShieldingTime', progressKey: 'progressShielding' },
+  //     { name: 'Magic Level', key: 'magicLevel', trainDateKey: 'magicLevelTrainDate', startFunctionKey: () => this.startMagicLevelTraining(), remainingTimeKey: 'remainingMagicLevelTime', progressKey: 'progressMagicLevel' },
+  //   ]
+  // }
 
   /* ------------------------------- SWORD ----------------------------------- */
   startSwordTraining() {
@@ -160,6 +227,7 @@ export class TrainComponent {
     this.remainingSwordTime = this.calcRemaingTime(this.character.sword);
     this.characterService.increaseSword(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Sword subiu para " + this.character.sword + "!"});
+    this.progressSword = '0'
   }
 
   /* ------------------------------- AXE ----------------------------------- */
@@ -188,6 +256,7 @@ export class TrainComponent {
     this.remainingAxeTime = this.calcRemaingTime(this.character.axe);
     this.characterService.increaseAxe(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Axe subiu para " + this.character.axe + "!"});
+    this.progressAxe = '0'
   }
 
   /* ------------------------------- CLUB ----------------------------------- */
@@ -216,6 +285,7 @@ export class TrainComponent {
     this.remainingClubTime = this.calcRemaingTime(this.character.club);
     this.characterService.increaseClub(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Club subiu para " + this.character.club + "!"});
+    this.progressClub = '0'
   }
 
   /* ------------------------------- DISTANCE ----------------------------------- */
@@ -244,6 +314,7 @@ export class TrainComponent {
     this.remainingDistanceTime = this.calcRemaingTimeDistace(this.character.distance);
     this.characterService.increaseDistance(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Distance subiu para " + this.character.distance + "!"});
+    this.progressDistance = '0'
   }
 
   /* ------------------------------- SHIELDING ----------------------------------- */
@@ -272,6 +343,7 @@ export class TrainComponent {
     this.remainingShieldingTime = this.calcRemaingTimeShield(this.character.shielding);
     this.characterService.increaseShielding(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Sua skill de Shielding subiu para " + this.character.shielding + "!"});
+    this.progressShielding = '0'
   }
 
   /* ------------------------------- MAGIC LEVEL ----------------------------------- */
@@ -300,6 +372,7 @@ export class TrainComponent {
     this.remainingMagicLevelTime = this.calcRemaingTimeML(this.character.magicLevel);
     this.characterService.increaseMagicLevel(this.character.id)
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: "Seu Magic Level subiu para " + this.character.magicLevel + "!"});
+    this.progressMagicLevel = '0'
   }
 
   cancelTraining() {
@@ -309,6 +382,12 @@ export class TrainComponent {
     this.character.distanceTrainDate = null;
     this.character.shieldingTrainDate = null;
     this.character.magicLevelTrainDate = null;
+    this.progressSword = '0'
+    this.progressAxe = '0'
+    this.progressClub = '0'
+    this.progressDistance = '0'
+    this.progressShielding = '0'
+    this.progressMagicLevel = '0'
     if (this.timerSwordInterval) {
       clearInterval(this.timerSwordInterval);
     }

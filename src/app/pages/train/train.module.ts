@@ -18,7 +18,10 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { ChipModule } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
+import { CardModule } from 'primeng/card';
 import { TrainRoutingModule } from './train-routing.module';
+import { KnobModule } from 'primeng/knob';
+import { BadgeModule } from 'primeng/badge';
 
 @NgModule({
   declarations: [TrainComponent],
@@ -41,7 +44,10 @@ import { TrainRoutingModule } from './train-routing.module';
     InputNumberModule,
     ToastModule,
     ChipModule,
-    TooltipModule
+    TooltipModule,
+    CardModule,
+    KnobModule,
+    BadgeModule
   ]
 })
 export class TrainModule { }

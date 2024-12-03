@@ -395,7 +395,7 @@ export class HuntComponent {
     this.bestiaryService.getAll().subscribe({
       next: (data) => {
         this.creaturesAll = data || []
-        this.creatures = [...this.creaturesAll] 
+        this.creatures = [...this.creaturesAll.filter(creature => creature.creature.type === 1)] 
         this.selectedCreature = this.creatures[0];
         this.prepareCreatures();
       },

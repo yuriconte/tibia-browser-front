@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
@@ -16,8 +16,8 @@ import { Quest } from 'src/app/model/quest.model';
     
     .image-container {
       position: relative; /* Define como referência para os elementos posicionados dentro */
-      width: 32px;
-      height: 32px;
+      width: 64px;
+      height: 64px;
     }
 
     .image-container img {
@@ -48,6 +48,43 @@ import { Quest } from 'src/app/model/quest.model';
       background: #5eead42e;
     }
 
+
+    .layout-main {
+      margin-left: 1rem !important;
+      margin-right: 1rem !important;
+    }
+
+    .progress-knob {
+      flex: 1;
+    }
+
+    ::ng-deep .p-card-title {
+      font-family: var(--font-family-tibia);
+    }
+
+    ::ng-deep .skill-value .p-tag {
+      position: relative;
+      top: -31px;
+      float: right;
+    }
+
+    ::ng-deep .card-highlight .p-card {
+      background: #2dd4bf29;
+    }
+
+    ::ng-deep .info .p-tag {
+      width: 100%;
+      text-align: center;
+    }
+
+    ::ng-deep .p-card .p-card-content {
+      padding-bottom: 0
+    }
+
+    ::ng-deep .p-card .p-card-footer {
+      padding-top: 0
+    }
+
   `],
   providers: [MessageService]
 })
@@ -60,6 +97,7 @@ export class QuestComponent {
   progress: string;
 
   questsRook: Quest[] = [];
+  quests: Quest[] = [];
   questsMain: Quest[] = [];
 
   showDetail: boolean = false;
@@ -68,6 +106,11 @@ export class QuestComponent {
   expNextLevel:number = 0;
   expPreviousLevel:number = 0;
 
+  responsiveOptions: any[];
+  responsiveCreaturesOptions: any[];
+
+  @ViewChildren('questElement') questElements!: QueryList<ElementRef>;
+
   constructor(private characterService: CharacterService,
     private questService: QuestService,
     private service: MessageService,
@@ -75,11 +118,59 @@ export class QuestComponent {
 
   ngOnInit() {
     this.loadCharacter();
+    this.responsiveOptions = [
+      {
+          breakpoint: '1199px',
+          numVisible: 4,
+          numScroll: 1
+      },
+      {
+          breakpoint: '991px',
+          numVisible: 3,
+          numScroll: 1
+      },
+      {
+          breakpoint: '767px',
+          numVisible: 1,
+          numScroll: 1
+      }
+    ];
+    this.responsiveCreaturesOptions = [
+      {
+          breakpoint: '1199px',
+          numVisible: 5,
+          numScroll: 1
+      },
+      {
+          breakpoint: '991px',
+          numVisible: 3,
+          numScroll: 1
+      },
+      {
+          breakpoint: '767px',
+          numVisible: 3,
+          numScroll: 1
+      }
+    ];
   }
 
   ngOnDestroy() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
+    }
+  }
+
+  ngAfterViewInit() {
+    this.scrollToActiveQuest();
+  }
+
+  scrollToActiveQuest() {
+    const activeQuest = this.questElements.find((element, index) => 
+      this.quests[index].id === this.character.questId
+    );
+
+    if (activeQuest) {
+      activeQuest.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 
@@ -115,11 +206,14 @@ export class QuestComponent {
     }
   }
 
+  calcTotalTime(quest: Quest) {
+    return (quest.timeInHours*3600)
+  }
+
   loadQuests() {
     this.questService.getAll().subscribe({
       next: (data) => {
-          this.questsRook = data.filter(quest => (quest.levelRequired <= 8));
-          this.questsMain = data.filter(quest => (quest.levelRequired > 8));
+          this.quests = data;
           this.prepareQuests();
           if (this.character.questDate) {
             this.remainingTime = (this.character.questTimeInHours*3600) - this.getDifferenceFromNowInSeconds(this.character.questDate);
@@ -136,11 +230,13 @@ export class QuestComponent {
   }
 
   prepareQuests() {
-    this.questsRook.forEach(quest => {
+    this.quests.forEach(quest => {
       if (this.character.quests?.length > 0) {
+        quest.progress = '0'
         this.character.quests?.forEach(questCompleted => {
           if (questCompleted.quest.id === quest.id) {
             quest.completed = true;
+            quest.progress = '100'
             return;
           }
         })
@@ -157,27 +253,9 @@ export class QuestComponent {
       })
       quest.disabled = quest.creatures?.length > 0 ? quest.creatures.length !== countKilled : false;
     });
-    this.questsMain.forEach(quest => {
-      if (this.character.quests?.length > 0) {
-        this.character.quests?.forEach(questCompleted => {
-          if (questCompleted.quest.id === quest.id) {
-            quest.completed = true;
-            return;
-          }
-        })
-      }
-      let countKilled = 0;
-      quest.creatures?.forEach(creature => {
-        this.character.bestiary?.forEach(bestiary => {
-          if (bestiary?.bestiary?.creature?.id === creature?.creature?.id) {
-            creature.creature.killed = true;
-            countKilled += 1;
-            return;
-          }
-        })
-      })
-      quest.disabled = quest.creatures?.length > 0 ? quest.creatures.length !== countKilled : false;
-    });
+    setTimeout(()=> {
+      this.scrollToActiveQuest();
+    }, 1000)
   }
 
   startQuest(quest: Quest) {
@@ -192,8 +270,8 @@ export class QuestComponent {
   initQuest(quest: Quest) {
     this.timerInterval = setInterval(() => {
       this.remainingTime--;
-      let totalTime = this.calcRemainingTime(quest);
-      this.progress = (((totalTime - this.remainingTime) / totalTime) * 100).toFixed(0);
+      let totalTime = this.calcTotalTime(quest);
+      quest.progress = (((totalTime - this.remainingTime) / totalTime) * 100).toFixed(0);
       if (this.remainingTime <= 0) {
         this.finishQuest(quest);
       }
@@ -201,6 +279,7 @@ export class QuestComponent {
   }
 
   finishQuest(quest: Quest) {
+    quest.completed = true
     let expEarned = quest.expReward || 0;
     let itemLooted: number[] = [];
     if (quest.rewards) {

@@ -1,5 +1,193 @@
 <p-toast key="tst"></p-toast>
-<div class="grid">
+<div class="grid w-full p-0 m-0">
+  <!-- SWORD -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #swordCard>
+    <p-card header="Sword" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.swordTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🗡️ {{character.sword}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressSword" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingSwordTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Sword).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startSwordTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.swordTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <!-- AXE -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #axeCard>
+    <p-card header="Axe" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.axeTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🪓 {{character.axe}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressAxe" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingAxeTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Axe).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startAxeTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.axeTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <!-- CLUB -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #clubCard>
+    <p-card header="Club" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.clubTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🔨 {{character.club}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressClub" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingClubTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Club).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startClubTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.clubTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <!-- DISTANCE -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #distanceCard>
+    <p-card header="Distance" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.distanceTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🏹 {{character.distance}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressDistance" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingDistanceTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Distance).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startDistanceTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.distanceTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <!-- SHIELDING -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #shieldingCard>
+    <p-card header="Shielding" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.shieldingTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🛡️ {{character.shielding}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressShielding" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingShieldingTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Shield).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startShieldingTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.shieldingTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <!-- MAGIC LEVEL -->
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" #magicLevelCard>
+    <p-card header="Magic Level" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.magicLevelTrainDate }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="🪄 {{character.magicLevel}}" class="skill-value"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="progressMagicLevel" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(remainingMagicLevelTime)" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <img src="assets/gifs/estatues/Skill_Trainer_(Magic).gif" width="80" height="70"/>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 ">
+            <p-button label="Iniciar Treino" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startMagicLevelTraining()" [disabled]="character.swordTrainDate || character.axeTrainDate || character.clubTrainDate || character.distanceTrainDate || character.shieldingTrainDate || character.magicLevelTrainDate"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="!character.magicLevelTrainDate" (click)="cancelTraining()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
+<!-- <div class="grid">
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Skills" [toggleable]="true">
       <div class="grid">
@@ -42,4 +230,4 @@
       </div>
     </p-panel>
   </div>
-</div>
+</div> -->

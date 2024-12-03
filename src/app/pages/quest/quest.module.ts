@@ -20,6 +20,10 @@ import { ChipModule } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
 import { QuestRoutingModule } from './quest-routing.module';
 import { DialogModule } from 'primeng/dialog';
+import { CardModule } from 'primeng/card';
+import { KnobModule } from 'primeng/knob';
+import { BadgeModule } from 'primeng/badge';
+import { CarouselModule } from 'primeng/carousel';
 
 @NgModule({
   declarations: [QuestComponent],
@@ -43,7 +47,11 @@ import { DialogModule } from 'primeng/dialog';
     ToastModule,
     ChipModule,
     TooltipModule,
-    DialogModule
+    DialogModule,
+    CardModule,
+    KnobModule,
+    BadgeModule,
+    CarouselModule
   ]
 })
 export class QuestModule { }

@@ -1,5 +1,82 @@
 <p-toast key="tst"></p-toast>
-<div class="grid">
+<div class="grid w-full p-0 m-0">
+  <div class="col-12 md:col-6 lg:col-4 pt-0 m-0 pb-3 pl-2 pr-2" *ngFor="let quest of quests" #questElement>
+    <p-card header="{{quest.name}}" styleClass="pl-0 pr-0" [ngClass]="{ 'card-highlight': character.questId == quest.id }">
+      <ng-template pTemplate="subtitle">
+        <p-tag value="Detalhes" class="skill-value" (click)="showQuestDetail(quest)"></p-tag>
+      </ng-template>
+      <div class="grid w-full ml-0">
+        <div class="col-6 md:col-6 pt-0 pb-0" style="text-align: center;">
+          <p-knob 
+              [(ngModel)]="quest.progress" 
+              [size]="80" 
+              [step]="1" 
+              [min]="0" 
+              [max]="100" 
+              valueTemplate="{value}%"
+              [readonly]="true">
+          </p-knob> 
+          <p-badge [value]="formatTime(calcRemainingTime(quest))" badgeSize="xlarge" severity="primary" [ngStyle]="{position: 'relative', top: '-22px'}"/>
+        </div>
+        <div class="col-6 md:col-6 pt-0 pb-0 pl-0" style="text-align: center;">
+          <div class="grid">
+            <div class="col-12 md:col-12 pb-0 pt-1">
+              <p-tag value="Recompensas" class="info"></p-tag>
+            </div>
+            <div class="col-12 md:col-12 pb-0 pt-3">
+              <p-carousel 
+                  [value]="quest.rewards" 
+                  [numVisible]="3" 
+                  [numScroll]="3" 
+                  [circular]="false" 
+                  [responsiveOptions]="responsiveOptions"
+                  autoplayInterval="2000">
+                  <ng-template let-item pTemplate="item">
+                    <img src="assets/gifs/items/{{item.item.imagePath}}" width="32" height="32"/>
+                  </ng-template>
+              </p-carousel>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-12 pb-0 pt-0">
+          <p-tag value="Requisitos" class="info"></p-tag>
+        </div>
+        <div class="col-4 md:col-4 pb-0 pt-1 pr-0">
+          <p-tag value="Level: {{quest.levelRequired}}" class="info"></p-tag>
+        </div>
+        <div class="col-4 md:col-4 pb-0 pt-1 pl-1 pr-1">
+          <p-tag value="Custo: {{quest.goldRequired}}" class="info"></p-tag>
+        </div>
+        <div class="col-4 md:col-4 pb-0 pt-1 pl-0">
+          <p-tag value="Matar:" class="info"></p-tag>
+        </div>
+        <div class="col-12 md:col-12 pb-0 pt-3">
+          <p-carousel 
+              [value]="quest.creatures" 
+              [numVisible]="6" 
+              [numScroll]="3" 
+              [circular]="false" 
+              [responsiveOptions]="responsiveCreaturesOptions"
+              autoplayInterval="2000">
+              <ng-template let-creature pTemplate="item">
+                <div class="image-container">
+                  <img src="assets/gifs/creatures/{{creature.creature.imagePath}}" width="64" height="64"/>
+                  <span class="status-icon" [ngClass]="{'check': creature.creature.killed, 'ban': !creature.creature.killed}"></span>
+                </div>
+              </ng-template>
+          </p-carousel>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+          <div class="flex gap-3 mt-0 " *ngIf="!quest.completed">
+            <p-button label="Iniciar Quest" icon="pi pi-play" class="w-full" styleClass="w-full pl-2 pr-2" (click)="startQuest(quest)" [disabled]="quest.levelRequired > character.level || quest.completed || character.questId > 0 || quest.disabled"/>
+            <p-button label="Cancelar" icon="pi pi-stop" severity="secondary" class="w-full" styleClass="w-full p-button-danger pl-2 pr-2" [disabled]="character.questId != quest.id" (click)="cancelQuest()"/>
+          </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
+<!-- <div class="grid">
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Rookgaard" [toggleable]="true">
       <div class="grid">
@@ -56,7 +133,7 @@
       </div>
     </p-panel>
   </div>
-</div>
+</div> -->
 <p-dialog header="Detalhes da Quest" [(visible)]="showDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}">
   <p><strong>Nome:</strong> {{ selectedQuest?.name }}</p>
   <p><strong>Level Necessário:</strong> {{ selectedQuest?.levelRequired }}</p>

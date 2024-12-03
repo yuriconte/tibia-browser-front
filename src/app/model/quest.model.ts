@@ -14,4 +14,5 @@ export class Quest {
 
     completed: boolean;
     disabled: boolean;
+    progress: string;
 }
