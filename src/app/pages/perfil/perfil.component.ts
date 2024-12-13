@@ -85,6 +85,29 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
       align-items: center;
       pointer-events: none; /* Garante que o texto não interfira na interação com a barra */
     }
+
+    ::ng-deep .equip .p-card .p-card-body .p-card-content {
+      padding: 0;
+      height: 40px;
+      text-align: center;
+    }
+
+    ::ng-deep .equip .p-card {
+      background: #283443
+    }
+
+    ::ng-deep .p-card .p-card-body {
+      padding: 0.5rem
+    }
+
+    ::ng-deep .p-card .p-card-title {
+      font-family: 'Martel';
+      font-size: 0.8rem;
+      font-weight: 100;
+      text-align: center;
+      height: 30px;
+      align-content: center;
+    }
   `],
   providers: [ConfirmationService, MessageService]
 })
@@ -95,6 +118,8 @@ export class PerfilComponent {
   
   showItemDetailSelected: Item;
   showItemDetail: boolean = false;
+  selectedSkillLabel: string = '';
+  selectedSkillValue: number = 10;
 
   loading: boolean = false;
 
@@ -140,6 +165,36 @@ export class PerfilComponent {
       this.characterService.getCharacter(username).subscribe({
         next: (data) => {
             this.character = data;
+            if (this.character.slot2Item) {
+              switch(this.character.slot2Item.type) {
+                case 'sword':
+                  this.selectedSkillLabel = 'Sword Fighting'
+                  this.selectedSkillValue = this.character.sword;    
+                  break;
+                case 'axe':
+                    this.selectedSkillLabel = 'Axe Fighting'
+                    this.selectedSkillValue = this.character.axe;    
+                    break;
+                case 'club':
+                  this.selectedSkillLabel = 'Club Fighting'
+                  this.selectedSkillValue = this.character.club;    
+                  break;
+                case 'distance':
+                case 'bolt':
+                case 'arrow':
+                  this.selectedSkillLabel = 'Distance Fighting'
+                  this.selectedSkillValue = this.character.distance;    
+                  break;
+                case 'rod':
+                case 'wand':
+                  this.selectedSkillLabel = 'Magic Level'
+                  this.selectedSkillValue = this.character.magicLevel;    
+                  break;
+              }
+            } else {
+              this.selectedSkillLabel = 'Arma não equipada'
+              this.selectedSkillValue = 10;
+            }
             if (this.character.level >= 20 && this.character.vocationId > 1 && this.character.vocationId < 6) {
               this.labelPromotion = this.character.vocationId == 2 ? 'Elike Knight' : this.character.vocationId == 3 ? 'Royal Paladin' : this.character.vocationId == 4 ? 'Elder Druid' : 'Master Sorcerer'
             }

@@ -21,6 +21,13 @@ export class Creature {
     bossType: number;
     items: CreatureItem[];
     damages: CreatureDamage[];
+    physicalResistance: number;
+    fireResistance: number;
+    earthResistance: number;
+    energyResistance: number;
+    iceResistance: number;
+    deathResistance: number;
+    holyResistance: number;
     
     killed: boolean;
 }

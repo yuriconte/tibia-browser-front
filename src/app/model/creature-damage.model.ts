@@ -4,4 +4,7 @@ export class CreatureDamage {
     type: string;
     minDamage: number;
     maxDamage: number;
+    name: string;
+    imagePath: string;
+    element: string;
 }

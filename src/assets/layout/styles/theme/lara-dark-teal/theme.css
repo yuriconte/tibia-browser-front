@@ -6227,6 +6227,12 @@
     background-color: #f87171;
     color: #450a0a;
   }
+
+  .p-tag.p-tag-help {
+    background-color: #a855f7;
+    color: white;
+  }
+
   .p-tag .p-tag-icon {
     margin-right: 0.25rem;
     font-size: 0.75rem;

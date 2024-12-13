@@ -18,6 +18,7 @@ export class AppMenuComponent implements OnInit {
                 label: 'Seu Personagem',
                 items: [
                     { label: 'Caçar Online',  routerLink: ['/hunt'] },
+                    { label: 'Caçar Online V2 (Teste)',  routerLink: ['/hunt-v2'] },
                     { label: 'Caçar Offline',  routerLink: ['/hunt-offline'] },
                     { label: 'Treino',  routerLink: ['/train'] },
                     { label: 'Quests',  routerLink: ['/quest'] },

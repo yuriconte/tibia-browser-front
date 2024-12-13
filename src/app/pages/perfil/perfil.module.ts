@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BadgeModule } from 'primeng/badge';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
     imports: [
@@ -31,7 +32,8 @@ import { BadgeModule } from 'primeng/badge';
         TableModule,
         DialogModule,
         ProgressSpinnerModule,
-        BadgeModule
+        BadgeModule,
+        CardModule
     ],
     declarations: [PerfilComponent]
 })

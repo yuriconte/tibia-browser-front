@@ -1,0 +1,539 @@
+<p-toast key="tst" [style]="{'white-space': 'pre-line'}"></p-toast>
+<p-messages [value]="msgs"></p-messages>
+<div *ngIf="!character.huntOfflineDate">
+  <div class="grid">
+    <div class="col-12 md:col-12 lg:col-12 health-bar pb-0 pt-0">
+      <div class="progress-container" style="position: relative;">
+        <p-progressBar [value]="character.life / character.maxLife * 100" [showValue]="false"></p-progressBar>
+        <div class="progress-text">{{ character.life }} / {{ character.maxLife }}</div>
+        <div class="status-icons">
+          <img src="assets/gifs/effects/Poisoned_Icon.gif" alt="Envenenado" class="status-icon" />
+          <img src="assets/gifs/effects/Burning_Icon.gif" alt="Queimando" class="status-icon" />
+        </div>
+      </div>
+    </div>
+    <div class="col-12 md:col-12 lg:col-12 mana-bar pb-0 pt-2">
+      <div class="progress-container">
+        <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false"></p-progressBar>
+        <div class="progress-text">{{character.mana}} / {{character.maxMana}}</div>
+      </div>
+    </div>
+    <div class="col-12 md:col-12 lg:col-12 exp-bar pb-3 pt-2">
+      <div class="progress-container">
+        <p-progressBar [value]="(character.experience-expPreviousLevel)/(expNextLevel-expPreviousLevel)*100" [showValue]="false"></p-progressBar>
+        <div class="progress-text">{{character.experience}} / {{expNextLevel}} {{calculateTimeToNextLevel() != undefined ? ' (' + calculateTimeToNextLevel() + ')' : ''}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid w-full p-0 m-0">
+    <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-0" *ngIf="!statusHunt">
+      <p-selectButton id="huntType" [options]="huntType" [(ngModel)]="huntTypeSelected" optionLabel="name" [allowEmpty]="false" (onChange)="changeHuntType($event)"></p-selectButton>
+    </div>
+    <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-0" *ngIf="huntTypeSelected.value == 2 && !statusHunt">
+      <p-selectButton id="arenaType" [options]="arenaType" [(ngModel)]="arenaTypeSelected" optionLabel="name" [allowEmpty]="false" (onChange)="changeArenaType($event)"></p-selectButton>
+    </div>
+    <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-0" *ngIf="huntTypeSelected.value == 3 && !statusHunt">
+      <p-selectButton id="bossType" [options]="bossType" [(ngModel)]="bossTypeSelected" optionLabel="name" [allowEmpty]="false" (onChange)="changeBossType($event)"></p-selectButton>
+    </div>
+    <div class="pt-0 m-0 pt-3 pb-3 pl-0 pr-2" [ngClass]="{
+                                                        'col-4 md:col-4 lg:col-4': huntTypeSelected.value == 1,
+                                                        'col-6 md:col-6 lg:col-6': huntTypeSelected.value > 1
+                                                        }">
+      <p-card header="{{character.name}}" styleClass="pl-0 pr-0">
+        <div class="grid w-full ml-0">
+          <div class="col-12 md:col-12 lg:col-12 health-bar p-0 mt-3">
+            <div class="progress-container">
+              <p-progressBar [value]="character.life/character.maxLife*100" [showValue]="false" class="status-bar"></p-progressBar>
+              <div class="progress-text-2">{{character.life}} / {{character.maxLife}}</div>
+            </div>
+          </div>
+          <div class="col-12 md:col-12 lg:col-12 mana-bar p-0">
+            <div class="progress-container">
+              <p-progressBar [value]="character.mana/character.maxMana*100" [showValue]="false" class="status-bar"></p-progressBar>
+              <div class="progress-text-2">{{character.mana}} / {{character.maxMana}}</div>
+            </div>
+          </div>
+          <div class="col-12 md:col-12 p-0" style="text-align: center; position: relative;">
+            <img src="assets/img/Citizen_Male.gif" width="96" height="96"/>
+            <img src="assets/gifs/effects/Death_Effect.gif" width="40" height="40" class="effect" />
+            <img src="assets/gifs/effects/Fire_Effect.gif" width="40" height="40" class="effect" />
+          </div>
+        </div>
+        <ng-template pTemplate="footer">
+          <p-tag value="Detalhes" class="config" (click)="showCharacterDetail = true;" *ngIf="!statusHunt"></p-tag>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <div class="m-0 pb-3" *ngFor="let index of creaturesPositions" [ngClass]="{
+                                                                                            'col-4 md:col-4 lg:col-4 pr-2': huntTypeSelected.value == 1,
+                                                                                            'col-6 md:col-6 lg:col-6 pr-0': huntTypeSelected.value > 1,
+                                                                                            'pr-0': huntTypeSelected.value == 1 && (index == 1 || index == 4),
+                                                                                            'pr-2': huntTypeSelected.value == 1 && (index == 0 || index == 2 || index == 3),
+                                                                                            'pl-0': huntTypeSelected.value == 1 && index == 2,
+                                                                                            'pl-2': huntTypeSelected.value == 1 && (index == 0 || index == 1 || index == 3 || index == 4),
+                                                                                            'pt-0': huntTypeSelected.value == 1 && (index == 2 || index == 3 || index == 4),
+                                                                                            }">
+      <p-card header="{{selectedCreatures[index]?.creature.name || 'Selecione a Criatura'}}" styleClass="pl-0 pr-0">
+        <div class="grid w-full ml-0">
+          <div class="col-12 md:col-12 lg:col-12 health-bar p-0 mt-3" style="height: 15px;">
+            <div class="progress-container" *ngIf="!monsters[index]">
+              <p-progressBar [value]="selectedCreatures[index].creature.life/selectedCreatures[index].creature.maxLife*100" [showValue]="false" class="status-bar" *ngIf="selectedCreatures[index]?.creature"></p-progressBar>
+              <div class="progress-text-2" *ngIf="selectedCreatures[index]?.creature">{{selectedCreatures[index].creature.life}} / {{selectedCreatures[index].creature.maxLife}}</div>
+            </div>
+            <div class="progress-container" *ngIf="monsters[index]">
+              <p-progressBar [value]="monsters[index].life/monsters[index].maxLife*100" [showValue]="false" class="status-bar"></p-progressBar>
+              <div class="progress-text-2">{{monsters[index].life}} / {{monsters[index].maxLife}}</div>
+            </div>
+          </div>
+          <div class="col-12 md:col-12 lg:col-12 health-bar p-0" style="height: 15px;">
+            <p-tag severity="{{index == 0 ? 'success' : 'info'}}" value="{{selectedCreatures[index].creature.expHour}} exp/h" *ngIf="selectedCreatures[index]?.creature && selectedCreatures[index].creature.expHour && !selectedCreatures[index].disabled" class="w-full" [ngStyle]="{height: '15px', display: 'flex'}"></p-tag>
+            <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="selectedCreatures[index]?.creature && !selectedCreatures[index].creature.expHour && !selectedCreatures[index].disabled" class="w-full inactive"></p-tag>
+            <p-tag severity="secondary" value="Arena" *ngIf="selectedCreatures[index]?.creature && selectedCreatures[index].disabled" class="w-full inactive"></p-tag>
+          </div>
+          
+          <div class="col-12 md:col-12 p-0" style="text-align: center; position: relative;">
+            <div class="image-container" style="position: relative; display: inline-block;">
+              <img src="assets/gifs/estatues/Weretiger_Statue.gif" width="96" height="96" style="opacity: 0.2" *ngIf="!selectedCreatures[index]?.creature"/>
+              <img src="assets/gifs/creatures/{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="selectedCreatures[index]?.creature && (!monsters[index] || monsters[index].life > 0)"/>
+              <img src="assets/gifs/creatures/Dead_{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="monsters[index] && monsters[index].life <= 0"/>
+              <span pBadge value="{{countMonsterKill[index]}}" severity="warning" class="badge-overlay-creatures" *ngIf="countMonsterKill[index] > 0"></span>
+            </div>
+          </div>
+          
+        </div>
+        <ng-template pTemplate="footer">
+          <p-tag value="Configurar" (click)="showCreature = true; showCreatureIndex = index" *ngIf="!statusHunt"></p-tag>
+        </ng-template>
+      </p-card>
+    </div>
+    <!-- TODO mostrar loots ganhos -->
+    <div class="col-12 md:col-12 pb-0 pl-0 pr-0 pt-2">
+      <button label="Iniciar Caçada" pButton pRipple (click)="startHunt(character)" class="w-full" style="color:white" [disabled]="!selectedCreatures[0]" *ngIf="huntTypeSelected?.value !== 2 && !statusHunt"></button>
+      <p-button label="Iniciar Arena" (click)="startHunt(character)" styleClass="w-full" [ngStyle]="{color:'white'}" [disabled]="!selectedCreatures[0] || character.balance < arenaTypeSelected?.cost" *ngIf="huntTypeSelected?.value === 2 && !statusHunt">
+          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 100 && arenaTypeSelected?.cost < 10000"><img src="assets/gifs/items/Platinum_Coin.gif" width="28" height="28" style="vertical-align: middle"/></span>
+          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 10000"><img src="assets/gifs/items/Crystal_Coin.gif" width="28" height="28" style="vertical-align: middle"/></span>
+          <span class="image-text ml-2" style="font-weight: bold;">{{arenaTypeSelected?.cost < 100 ? arenaTypeSelected?.cost : arenaTypeSelected?.cost >= 100 && arenaTypeSelected?.cost < 10000 ? (arenaTypeSelected?.cost/100).toFixed(0) : (arenaTypeSelected?.cost/10000).toFixed(0)}}</span>
+      </p-button>
+      <button label="Cancelar" pButton pRipple class="w-full p-button-danger" (click)="cancelHunt()" *ngIf="statusHunt"></button>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Selecionar Criatura" [(visible)]="showCreature" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
+  <div class="col-12 md:col-12 pl-0 pr-0">
+    <p-dropdown 
+      [options]="creatures" 
+      optionLabel="creature.name" 
+      [(ngModel)]="selectedCreatures[showCreatureIndex]"
+      placeholder="Selecione a criatura"
+      styleClass="w-full"
+      [filter]="true"
+      filterBy="creature.name"
+      [autofocusFilter]="false"
+      appendTo="body"
+      id="creature">
+      <ng-template pTemplate="selectedItem">
+        <div class="flex align-items-center p-0 font-tibia" *ngIf="selectedCreatures[showCreatureIndex]">
+          <div class="grid">
+            <div class="col-9 md:col-9 pb-1 pl-3" style="text-align: center;">
+              <div>{{ selectedCreatures[showCreatureIndex].creature.name }}</div>
+            </div>
+            <div class="col-3 md:col-3 pb-1" style="text-align: center;"></div>
+            <div class="col-9 md:col-9">
+              <div class="grid">
+                <div class="col-12 md:col-12 pb-0 pt-1" *ngIf="showCreatureIndex === 0">
+                  <p-tag severity="success" value="{{selectedCreatures[showCreatureIndex].creature.expHour}} exp/h" *ngIf="selectedCreatures[showCreatureIndex].creature.expHour" class="w-full"></p-tag>
+                  <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!selectedCreatures[showCreatureIndex].creature.expHour && !selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
+                  <p-tag severity="secondary" value="Arena" *ngIf="selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
+                </div>
+                <div class="col-12 md:col-12 pb-0 pt-1">
+                  <p-tag severity="danger" value="❤️ Vida: {{selectedCreatures[showCreatureIndex].creature.life}}"></p-tag>
+                </div>
+                <div class="col-12 md:col-12 pb-0 pt-1 exp">
+                  <p-tag [style]="{ background: '#a855f7' }" value="⭐ Exp: {{selectedCreatures[showCreatureIndex].creature.experience}} 💰 Gold: 0 à {{selectedCreatures[showCreatureIndex].creature.maxGold}}"></p-tag>
+                </div>
+              </div>
+            </div>
+            <div class="col-3 md:col-3 p-0">
+              <img src="assets/gifs/creatures/{{selectedCreatures[showCreatureIndex].creature.imagePath}}" alt="{{selectedCreatures[showCreatureIndex].creature.name}}" width="64" height="64"/>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template let-creature pTemplate="item">
+        <div class="creature">
+          <p-card header="{{ creature.creature.name }}" styleClass="p-0">
+            <div class="grid">
+              <div class="col-9 md:col-9">
+                <div class="grid">
+                  <div class="col-12 md:col-12 pb-0 pt-1"  *ngIf="showCreatureIndex === 0">
+                    <p-tag severity="success" value="{{creature.creature.expHour}} exp/h" *ngIf="creature.creature.expHour" class="w-full"></p-tag>
+                    <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!creature.creature.expHour && !creature.disabled" class="w-full inactive"></p-tag>
+                    <p-tag severity="secondary" value="Arena" *ngIf="creature.disabled" class="w-full inactive"></p-tag>
+                  </div>
+                  <div class="col-12 md:col-12 pb-0 pt-1">
+                    <p-tag severity="danger" value="❤️ Vida: {{creature.creature.life}} ⚔️ Dano Básico: {{creature.creature.maxDamage > 0 ? 'até ' + creature.creature.maxDamage : 0}}"></p-tag>
+                  </div>
+                  <div class="col-12 md:col-12 pb-0 pt-1">
+                    <p-tag [style]="{ background: '#a855f7' }" value="⭐ Exp: {{creature.creature.experience}} 💰 Gold: {{creature.creature.maxGold > 0 ? 'até ' + creature.creature.maxGold : 0}}"></p-tag>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3 md:col-3 p-0">
+                <img src="assets/gifs/creatures/{{creature.creature.imagePath}}" alt="{{creature.creature.name}}" width="64" height="64"/>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-dropdown>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pt-3" *ngIf="selectedCreatures[showCreatureIndex] && selectedCreatures[showCreatureIndex].creature?.items?.length > 0">
+    <p-carousel 
+        [value]="selectedCreatures[showCreatureIndex].creature.items" 
+        [numVisible]="6" 
+        [numScroll]="3" 
+        [circular]="false" 
+        [responsiveOptions]="responsiveCreaturesOptions"
+        autoplayInterval="5000">
+        <ng-template let-item pTemplate="item">
+          <div class="border-round m-2 text-center p-2" style="border: 1px solid var(--surface-d);">
+            <div>
+              <img src="assets/gifs/items/{{item.item.imagePath}}" width="32" height="32" (click)="showEquipDetail(item.item)"/>
+            </div>
+            <div>
+                <h6 class="mb-1" style="font-size: 0.8rem; height: 27px; align-content: center;">{{item.item.name}}</h6>
+                <img src="assets/gifs/items/Gold_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold < 100"/>
+                <img src="assets/gifs/items/Platinum_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold >= 100 && item.item.gold < 10000"/>
+                <img src="assets/gifs/items/Crystal_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold >= 10000"/>
+                <h6 class="mt-0 mb-3 image-text" style="font-size: 0.7rem;">{{item.item.gold < 100 ? item.item.gold : item.item.gold >= 100 && item.item.gold < 10000 ? (item.item.gold/100).toFixed(0) : (item.item.gold/10000).toFixed(0)}}</h6>
+                <!-- <h6 class="mt-0 mb-3 image-text" style="font-size: 0.7rem;">{{item.item.gold}}</h6> -->
+                <p-tag severity="primary" value="Comum" *ngIf="item.rate === 'comum'"></p-tag>
+                <p-tag severity="info" value="Incomum" *ngIf="item.rate === 'incomum'"></p-tag>
+                <p-tag severity="warning" value="Raro" *ngIf="item.rate === 'raro'"></p-tag>
+                <p-tag severity="danger" value="Ultra" *ngIf="item.rate === 'ultra'"></p-tag>
+            </div>
+          </div>
+        </ng-template>
+    </p-carousel>
+  </div>
+  <div class="col-12 md:col-12 pb-0 pt-3" *ngIf="selectedCreatures[showCreatureIndex] && selectedCreatures[showCreatureIndex].creature?.damages?.length > 0">
+    <p-carousel 
+        [value]="selectedCreatures[showCreatureIndex].creature.damages" 
+        [numVisible]="6" 
+        [numScroll]="3" 
+        [circular]="false" 
+        [responsiveOptions]="responsiveCreaturesOptions"
+        autoplayInterval="5000">
+        <ng-template let-damage pTemplate="item">
+          <div class="border-round m-2 text-center p-2" style="border: 1px solid var(--surface-d);">
+            <div>
+              <img src="assets/gifs/effects/Fire_Effect.gif" width="32" height="32"/>
+            </div>
+            <div>
+              <h6 class="mb-1" style="font-size: 0.8rem; height: 27px; align-content: center;">{{damage.type}}</h6>
+              <h6 class="mt-0 mb-3 image-text" style="font-size: 0.7rem;">{{damage.minDamage}} à {{damage.maxDamage}}</h6>
+              <p-tag severity="danger" value="Fogo"></p-tag>
+            </div>
+          </div>
+        </ng-template>
+    </p-carousel>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton icon="pi pi-check" (click)="showCreature=false" label="Ok" class="p-button-outlined"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Detalhes do Personagem" [(visible)]="showCharacterDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
+  <p-accordion [multiple]="false">
+    <p-accordionTab header="Equipamentos" class="line-height-3 m-0">
+      <div class="grid">
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotAmulet?.name || 'Sem Amuleto'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotAmulet.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slotAmulet)" *ngIf="character.slotAmulet"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot1Item?.name || 'Sem Helmo'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot1Item)" *ngIf="character.slot1Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Level" styleClass="p-0">
+            <p-badge value="{{character.level}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot2Item?.name || 'Sem Arma'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot2Item)" *ngIf="character.slot2Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot3Item?.name || 'Sem Armadura'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot3Item)" *ngIf="character.slot3Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot4Item?.name || 'Sem Escudo'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot4Item)" *ngIf="character.slot4Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotRing?.name || 'Sem Anel'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotRing.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slotRing)" *ngIf="character.slotRing"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot5Item?.name || 'Sem Calça'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot5Item)" *ngIf="character.slot5Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotAmmo?.name || 'Sem Municão'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slotAmmo)" *ngIf="character.slotAmmo"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{selectedSkillLabel}}" styleClass="p-0">
+            <p-badge value="{{selectedSkillValue}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot6Item?.name || 'Sem Bota'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" width="32" height="32" (click)="showEquipDetail(character.slot6Item)" *ngIf="character.slot6Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Shielding" styleClass="p-0">
+            <p-badge value="{{character.shielding}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+      </div>
+    </p-accordionTab>
+    <p-accordionTab header="Potions" class="line-height-3 m-0" *ngIf="character.potions">
+      <div class="grid">
+        <div class="col-6 md:col-6 lg:col-6 p-1 equip" *ngFor="let potion of character.potions">
+          <p-card header="{{potion.potion.name}}" styleClass="p-0">
+            <div class="image-container" style="position: relative; display: inline-block;">
+              <img src="assets/gifs/potions/{{potion.potion.imagePath}}" width="32" height="32"/>
+              <span pBadge value="{{potion.quantity}}" severity="primary" class="badge-overlay"></span>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-accordionTab>
+    <p-accordionTab header="Skills" class="line-height-3 m-0">
+      <div class="grid">
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Sword" styleClass="p-0">
+            <p-badge value="{{character.sword}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Axe" styleClass="p-0">
+            <p-badge value="{{character.axe}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Club" styleClass="p-0">
+            <p-badge value="{{character.club}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Distance" styleClass="p-0">
+            <p-badge value="{{character.distance}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Shielding" styleClass="p-0">
+            <p-badge value="{{character.shielding}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Magic Level" styleClass="p-0">
+            <p-badge value="{{character.magicLevel}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+      </div>
+    </p-accordionTab>
+    <p-accordionTab header="Configurações / Macro" class="line-height-3 m-0">
+      <!-- LIFE POTE -->
+      <div class="col-12 md:col-12" *ngIf="potionsHealing.length > 0">
+        <label for="usePotionsBtn" class="block text-900 text-xl font-medium mb-2">Usar Potions de Cura?</label>
+        <p-toggleButton id="usePotionsBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="usePotionsHealing" styleClass="w-full"></p-toggleButton>
+      </div>
+      <div class="col-12 md:col-12 pb-0" *ngIf="potionsHealing?.length > 0 && usePotionsHealing">
+        <p-dropdown 
+          *ngIf="usePotionsHealing"
+          [options]="potionsHealing" 
+          optionLabel="name" 
+          [(ngModel)]="selectedPotionHealing"
+          placeholder="Selecione a potion de cura"
+          styleClass="w-full"
+          id="usePotionHealingDropDown">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="selectedPotionHealing">
+              <img src="assets/gifs/potions/{{selectedPotionHealing.potion.imagePath}}" alt="{{selectedPotionHealing.potion.name}}" width="32" height="32"/>
+              <div>{{ selectedPotionHealing.potion.name }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-potion pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <img src="assets/gifs/potions/{{potion.potion.imagePath}}" alt="{{potion.potion.name}}" width="32" height="32"/>
+                <div>{{ potion.potion.name }}</div>
+              </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-12" *ngIf="potionsHealing?.length > 0 && usePotionsHealing">
+        <label for="potionHealingUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de vida?</label>
+        <div>
+          <input type="text" pInputText [(ngModel)]="lifeToUsePotion" class="w-full mb-3" readonly id="potionHealingUntil"/>
+          <p-slider id="slid3" [(ngModel)]="lifeToUsePotion" class="w-full" [min]="10" [max]="character.maxLife"/>
+        </div>
+      </div>
+      <!-- MANA POTE -->
+      <div class="col-12 md:col-12" *ngIf="potionsMana.length > 0">
+        <label for="usePotionsBtn2" class="block text-900 text-xl font-medium mb-2">Usar Potions de Mana?</label>
+        <p-toggleButton id="usePotionsBtn2" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="usePotionsMana" styleClass="w-full"></p-toggleButton>
+      </div>
+      <div class="col-12 md:col-12 pb-0" *ngIf="potionsMana?.length > 0 && usePotionsMana">
+        <p-dropdown 
+          *ngIf="usePotionsMana"
+          [options]="potionsMana" 
+          optionLabel="name" 
+          [(ngModel)]="selectedPotionMana"
+          placeholder="Selecione a potion de cura"
+          styleClass="w-full"
+          id="usePotionManaDropDown">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="selectedPotionMana">
+              <img src="assets/gifs/potions/{{selectedPotionMana.potion.imagePath}}" alt="{{selectedPotionMana.potion.name}}" width="32" height="32"/>
+              <div>{{ selectedPotionMana.potion.name }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-potion pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <img src="assets/gifs/potions/{{potion.potion.imagePath}}" alt="{{potion.potion.name}}" width="32" height="32"/>
+                <div>{{ potion.potion.name }}</div>
+              </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-12" *ngIf="potionsMana?.length > 0 && usePotionsMana">
+        <label for="potionManaUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de mana?</label>
+        <div>
+          <input type="text" pInputText [(ngModel)]="manaToUsePotion" class="w-full mb-3" readonly id="potionManaUntil"/>
+          <p-slider id="slid4" [(ngModel)]="manaToUsePotion" class="w-full" [min]="10" [max]="character.maxMana"/>
+        </div>
+      </div>
+      <!-- SPELL LIFE -->
+      <div class="col-12 md:col-12 pb-0" *ngIf="spellsHeal?.length > 0">
+        <label for="useSpellHealingBtn" class="block text-900 text-xl font-medium mb-2">Usar Magica de Cura?</label>
+        <p-toggleButton id="useSpellHealingBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="useSpellHealing" styleClass="w-full"></p-toggleButton>
+      </div>
+      <div class="col-12 md:col-12 pb-0" *ngIf="spellsHeal?.length > 0 && useSpellHealing">
+        <p-dropdown 
+          *ngIf="useSpellHealing"
+          [options]="spellsHeal" 
+          optionLabel="name" 
+          [(ngModel)]="selectedSpellHeal"
+          placeholder="Selecione a magia"
+          styleClass="w-full"
+          id="useSpellHealingDropDown">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="selectedSpellHeal">
+              <img src="assets/gifs/spells/{{selectedSpellHeal.imagePath}}" alt="{{selectedSpellHeal.spell}}" width="32" height="32"/>
+              <div>"{{ selectedSpellHeal.spell }}" - Mana: {{selectedSpellHeal.manaRequired}}</div>
+            </div>
+          </ng-template>
+          <ng-template let-spell pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <img src="assets/gifs/spells/{{spell.imagePath}}" alt="{{spell.spell}}" width="32" height="32"/>
+                <div>"{{ spell.spell }}" - Mana: {{spell.manaRequired}}</div>
+              </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-12" *ngIf="spellsHeal?.length > 0 && useSpellHealing">
+        <label for="spellUntil" class="block text-900 text-xl font-medium mb-2">Usar com quanto de vida?</label>
+        <div>
+          <input type="text" pInputText [(ngModel)]="lifeToUseSpell" class="w-full mb-3" readonly id="spellUntil"/>
+          <p-slider id="slid12" [(ngModel)]="lifeToUseSpell" class="w-full" [min]="10" [max]="character.maxLife"/>
+        </div>
+      </div>
+      <!-- SPELL STRIKE -->
+      <div class="col-12 md:col-12 pb-0" *ngIf="spellsStrike?.length > 0">
+        <label for="useSpellStrikeBtn" class="block text-900 text-xl font-medium mb-2">Usar Magica de Ataque?</label>
+        <p-toggleButton id="useSpellStrikeBtn" onLabel="Sim" offLabel="Não" [style]="{'width': '10em'}" [(ngModel)]="useSpellStrike" styleClass="w-full"></p-toggleButton>
+      </div>
+      <div class="col-12 md:col-12 pb-0" *ngIf="spellsStrike?.length > 0 && useSpellStrike">
+        <p-dropdown 
+          *ngIf="useSpellStrike"
+          [options]="spellsStrike" 
+          optionLabel="name" 
+          [(ngModel)]="selectedSpellStrike"
+          placeholder="Selecione a magia"
+          styleClass="w-full"
+          id="useSpellStrikeDropDown">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="selectedSpellStrike">
+              <img src="assets/gifs/spells/{{selectedSpellStrike.imagePath}}" alt="{{selectedSpellStrike.spell}}" width="32" height="32"/>
+              <div>"{{ selectedSpellStrike.spell }}" - Mana: {{selectedSpellStrike.manaRequired}}</div>
+            </div>
+          </ng-template>
+          <ng-template let-spell pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <img src="assets/gifs/spells/{{spell.imagePath}}" alt="{{spell.spell}}" width="32" height="32"/>
+                <div>"{{ spell.spell }}" - Mana: {{spell.manaRequired}}</div>
+              </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-12" *ngIf="spellsStrike?.length > 0 && useSpellStrike">
+        <label for="spellUntil2" class="block text-900 text-xl font-medium mb-2">Usar com a mana acima de?</label>
+        <div>
+          <input type="text" pInputText [(ngModel)]="manaToUseSpell" class="w-full mb-3" readonly id="spellUntil2"/>
+          <p-slider id="slid11" [(ngModel)]="manaToUseSpell" class="w-full" [min]="10" [max]="character.maxMana"/>
+        </div>
+      </div>
+      <div class="col-12 md:col-12">
+        <label for="huntStyle" class="block text-900 text-xl font-medium mb-2">Estilo</label>
+        <p-selectButton id="huntStyle" [options]="huntStyle" [(ngModel)]="huntStyleSelected" [allowEmpty]="false" optionLabel="name"></p-selectButton>
+      </div>
+      <div class="col-12 md:col-12 pb-0">
+        <label for="huntUntil" class="block text-900 text-xl font-medium mb-2">Parar com quanto de vida?</label>
+        <div>
+          <input type="text" pInputText [(ngModel)]="minLife" class="w-full mb-3" readonly id="huntUntil"/>
+          <p-slider id="slid2" [(ngModel)]="minLife" class="w-full" [min]="10" [max]="character.maxLife"/>
+        </div>
+      </div>
+    </p-accordionTab>
+  </p-accordion>  
+  <ng-template pTemplate="footer">
+    <button pButton icon="pi pi-save" (click)="saveLocalStorage()" label="Salvar Macro" class="p-button-primary"></button>
+    <button pButton icon="pi pi-check" (click)="showCharacterDetail=false; activeAccordionIndex=0;" label="Fechar" class="p-button-outlined"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Detalhes do Item" [(visible)]="showItemDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
+  <p><strong>Nome:</strong> {{ showItemDetailSelected?.name }}</p>
+  <p><strong>Ataque:</strong> {{ showItemDetailSelected?.atk }}</p>
+  <p><strong>Defesa:</strong> {{ showItemDetailSelected?.def }}</p>
+  <p><strong>Armadura:</strong> {{ showItemDetailSelected?.armor }}</p>
+  <ng-template pTemplate="footer">
+    <button pButton icon="pi pi-check" (click)="showItemDetail=false" label="Ok" class="p-button-outlined"></button>
+  </ng-template>
+</p-dialog>
+
+<div class="grid" *ngIf="character.huntOfflineDate">
+  <div class="col-12 md:col-12 pb-0">
+    <p>
+      Seu personagem está caçando offline.
+    </p>
+    <p>
+      Tempo restante: {{formatTime((character.huntOfflineTimeInHours*60*60) - getDifferenceFromNowInSeconds(this.character.huntOfflineDate))}}
+    </p>
+  </div>
+</div>

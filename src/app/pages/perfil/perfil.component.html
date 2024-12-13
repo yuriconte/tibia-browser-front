@@ -102,105 +102,104 @@
   </div>
 
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
-    <p-panel header="Skills" [toggleable]="true">
+    <p-panel header="Equipamentos" [toggleable]="true">
       <div class="grid">
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Sword" badge="{{character.sword}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotAmulet?.name || 'Sem Amuleto'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotAmulet.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotAmulet)" *ngIf="character.slotAmulet"/>
+          </p-card>
         </div>
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Axe" badge="{{character.axe}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot1Item?.name || 'Sem Helmo'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot1Item)" *ngIf="character.slot1Item"/>
+          </p-card>
         </div>
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Club" badge="{{character.club}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Level" styleClass="p-0">
+            <p-badge value="{{character.level}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Distance" badge="{{character.distance}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot2Item?.name || 'Sem Arma'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot2Item)" *ngIf="character.slot2Item"/>
+          </p-card>
         </div>
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Shielding" badge="{{character.shielding}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot3Item?.name || 'Sem Armadura'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot3Item)" *ngIf="character.slot3Item"/>
+          </p-card>
         </div>
-        <div class="col-6 md:col-4 lg:col-4 xl:col-2 pb-0">
-          <p-button label="Magic" badge="{{character.magicLevel}}" styleClass="w-full p-button-secondary"></p-button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot4Item?.name || 'Sem Escudo'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot4Item)" *ngIf="character.slot4Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotRing?.name || 'Sem Anel'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotRing.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotRing)" *ngIf="character.slotRing"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot5Item?.name || 'Sem Calça'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot5Item)" *ngIf="character.slot5Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slotAmmo?.name || 'Sem Municão'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotAmmo)" *ngIf="character.slotAmmo"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{selectedSkillLabel}}" styleClass="p-0">
+            <p-badge value="{{selectedSkillValue}}" size="large" severity="primary"></p-badge>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="{{character.slot6Item?.name || 'Sem Bota'}}" styleClass="p-0">
+            <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot6Item)" *ngIf="character.slot6Item"/>
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Shielding" styleClass="p-0">
+            <p-badge value="{{character.shielding}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
       </div>
     </p-panel>
   </div>
 
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
-    <p-panel header="Equipamentos" [toggleable]="true">
+    <p-panel header="Skills" [toggleable]="true">
       <div class="grid">
-        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot1Item">
-            Helmet
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot1Item)" *ngIf="character.slot1Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Sword" styleClass="p-0">
+            <p-badge value="{{character.sword}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot2Item">
-            Weapon
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot2Item)" *ngIf="character.slot2Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Axe" styleClass="p-0">
+            <p-badge value="{{character.axe}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot3Item">
-            Armor
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot3Item)" *ngIf="character.slot3Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Club" styleClass="p-0">
+            <p-badge value="{{character.club}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot4Item">
-            Shield
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot4Item)" *ngIf="character.slot4Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Distance" styleClass="p-0">
+            <p-badge value="{{character.distance}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <!-- Anel -->
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Shielding" styleClass="p-0">
+            <p-badge value="{{character.shielding}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot5Item">
-            Legs
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot5Item)" *ngIf="character.slot5Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
-        </div>
-        <div class="col-4 md:col-4 lg:col-4 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slotAmmo">
-            Ammunation
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slotAmmo)" *ngIf="character.slotAmmo" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
-        </div>
-        <div class="col-12 md:col-12 lg:col-12 pb-0 flex align-items-center justify-content-center">
-          <p-button styleClass="custom-button p-button-secondary" *ngIf="!character.slot6Item">
-            Boots
-          </p-button>
-          <button pButton styleClass="custom-button p-button-primary" (click)="confirmEquipedItem($event, character.slot6Item)" *ngIf="character.slot6Item" [disabled]="character.huntOfflineDate">
-            <span class="flex align-items-center font-bold">
-              <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" style="width: 2rem" >
-            </span>
-          </button>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+          <p-card header="Magic Level" styleClass="p-0">
+            <p-badge value="{{character.magicLevel}}" size="large" severity="primary"></p-badge>
+          </p-card>
         </div>
       </div>
     </p-panel>

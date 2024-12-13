@@ -46,6 +46,8 @@ export class Character {
     slot5Item: Item;
     slot6Item: Item;
     slotAmmo: Item;
+    slotAmulet: Item;
+    slotRing: Item;
     items: CharacterItem[];
     potions: CharacterPotion[];
 

@@ -7,4 +7,6 @@ export class Spell {
     levelRequired: number;
     manaRequired: number;
     imagePath?: string;
+    exaustedTime: number;
+    isArea: boolean;
 }

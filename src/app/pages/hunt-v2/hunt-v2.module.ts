@@ -1,7 +1,7 @@
-import { HuntRoutingModule } from './hunt-routing.module';
+import { HuntV2RoutingModule } from './hunt-v2-routing.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HuntComponent } from './hunt.component';
+import { HuntV2Component } from './hunt-v2.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { MessagesModule } from 'primeng/messages';
@@ -24,12 +24,13 @@ import { BadgeModule } from 'primeng/badge';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule } from 'primeng/accordion';
+import { CarouselModule } from 'primeng/carousel';
 
 @NgModule({
-  declarations: [HuntComponent],
+  declarations: [HuntV2Component],
   imports: [
     PanelModule,
-    HuntRoutingModule,
+    HuntV2RoutingModule,
     CommonModule,
     FormsModule,
     DropdownModule,
@@ -51,7 +52,8 @@ import { AccordionModule } from 'primeng/accordion';
     BadgeModule,
     CardModule,
     DialogModule,
-    AccordionModule
+    AccordionModule,
+    CarouselModule
   ]
 })
-export class HuntModule { }
+export class HuntV2Module { }
