@@ -19,6 +19,8 @@ import { ToastModule } from 'primeng/toast';
 import { ChipModule } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
 import { HuntOfflineRoutingModule } from './hunt-offline-routing.module';
+import { BadgeModule } from 'primeng/badge';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
   declarations: [HuntOfflineComponent],
@@ -41,7 +43,10 @@ import { HuntOfflineRoutingModule } from './hunt-offline-routing.module';
     InputNumberModule,
     ToastModule,
     ChipModule,
-    TooltipModule
+    TooltipModule,
+    BadgeModule,
+    CardModule,
+    SelectButtonModule
   ]
 })
 export class HuntOfflineModule { }

@@ -1078,7 +1078,7 @@ export class HuntComponent {
       if (shouldExtraDamage) {
         let selectedDamageIndex = Math.round(this.getRandomInRange(0, monster.damages.length-1))
         let selectedDamage = monster.damages[selectedDamageIndex]
-        let extraDamage = Math.round(this.getRandomInRange(monster.damages[selectedDamageIndex].minDamage, monster.damages[selectedDamageIndex].minDamage))
+        let extraDamage = Math.round(this.getRandomInRange(monster.damages[selectedDamageIndex].minDamage, monster.damages[selectedDamageIndex].maxDamage))
         if (selectedDamage.type === 'healing') {
           if (this.monster.life + extraDamage <= this.monster.maxLife) {
             this.monster.life += extraDamage

@@ -1,6 +1,6 @@
 <p-toast key="tst" [life]="10000"></p-toast>
 <div class="grid">
-  <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
+  <!-- <div class="col-12 md:col-12 pb-0 pl-0 pr-0">
     <p-panel header="Informações" [toggleable]="true" [collapsed]="true">
       <div class="grid">
         <div class="col-12 md:col-12 pb-0">
@@ -24,7 +24,7 @@
         </div>
       </div>
     </p-panel>
-  </div>
+  </div> -->
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="lootDrop?.length > 0">
     <p-panel header="Loot Ganho" [toggleable]="true">
       <p-table [value]="lootDrop">
@@ -77,6 +77,9 @@
         <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0" *ngIf="!character.huntOfflineDate">
           <p-dropdown [options]="timeOptions" optionLabel="name" [(ngModel)]="selectedTimeOption" styleClass="w-full" (onChange)="onTimeChange($event)"></p-dropdown>
         </div>
+        <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-3" style="text-align: center;" *ngIf="!character.huntOfflineDate">
+          <p-selectButton id="bonusType" [options]="bonusType" [(ngModel)]="bonusTypeSelected" optionLabel="name" [allowEmpty]="true" *ngIf="showSelectButton" (onChange)="onBonusChange($event)"></p-selectButton>
+        </div>
         <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="!character.huntOfflineDate">
           <p-dropdown 
             [options]="creatures" 
@@ -125,34 +128,109 @@
               <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-5 pl-0 pr-0" style="text-align: center;">
                 <img src="assets/gifs/creatures/{{selectedCreature.bestiary.creature.imagePath}}" alt="{{selectedCreature.bestiary.creature.name}}" width="72" height="72"/>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
-                Tier
+              <div class="col-6 md:col-6 lg:col-6 p-1 pt-0 equip">
+                <p-card header="Experiência Offline" styleClass="p-0">
+                  <p-badge value="{{selectedCreature.expHourStr}} exp/h" size="large" severity="primary"></p-badge>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
-                <i class="pi pi-star-fill" style="color: #CD7F32;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier1 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier2"> 10%</i>
-                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
-                <i class="pi pi-star-fill" style="color: #C0C0C0;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"> 15%</i>
-                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
-                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
-                <i class="pi pi-star-fill" style="color: #FFD700;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"> 20%</i>
+              <div class="col-6 md:col-6 lg:col-6 p-1 pt-0 equip">
+                <p-card header="Experiência Online" styleClass="p-0">
+                  <p-badge value="{{selectedCreature.expHourOrigStr}} exp/h" size="large" severity="primary" class="badge-physical"></p-badge>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
-                <img src="assets/gifs/items/Boots_of_Haste.gif" alt="BoH Equipada?" width="32" height="32"/>
+              <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+                Detalhes Sobre a Experiência
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
-                {{character.slot6Item?.id === 92 ? 'Equipado (+5%)' : 'Não Equipado (+0%)'}}
+              <div class="col-12 md:col-12 lg:col-12 p-1 pt-1 equip">
+                <p-card header="Porcentagem Total" styleClass="p-0">
+                  <p-badge value="{{selectedCreature.totalPercentage}}%" size="large" severity="primary"></p-badge>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
-                Exp/h Caçada Online
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip">
+                <p-card header="Tier do Bestiário" styleClass="p-0">
+                  <div style="text-align: center;">
+                    <i class="pi pi-star-fill" style="color: #CD7F32; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier1 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier2"></i>
+                    <i class="pi pi-star-fill" style="color: #C0C0C0; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
+                    <i class="pi pi-star-fill" style="color: #C0C0C0; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></i>
+                    <i class="pi pi-star-fill" style="color: #FFD700; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                    <i class="pi pi-star-fill" style="color: #FFD700; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                    <i class="pi pi-star-fill" style="color: #FFD700; font-size: 1.2rem;" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></i>
+                  </div>
+                  <span pBadge value="10%" severity="primary" style="top:16px; right:0px" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier1 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier2"></span>
+                  <span pBadge value="15%" severity="primary" style="top:16px; right:0px" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier2 && selectedCreature.totalKills < selectedCreature.bestiary.totalKillsTier3"></span>
+                  <span pBadge value="20%" severity="primary" style="top:16px; right:0px" *ngIf="selectedCreature.totalKills >= selectedCreature.bestiary.totalKillsTier3"></span>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
-                <p-tag severity="success" value="{{selectedCreature.expHourOrigStr}} exp/h" *ngIf="selectedCreature.expHourOrigStr"></p-tag>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slotAmulet?.bonusSpeed">
+                <p-card header="{{character.slotAmulet?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slotAmulet.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slotAmulet.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-5 pr-0" style="text-align: left;">
-                Exp/h No tier atual
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot1Item?.bonusSpeed">
+                <p-card header="{{character.slot1Item?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slot1Item.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
               </div>
-              <div class="col-6 md:col-6 lg:col-6 xl:col-6 pb-0 pl-0 pr-0" style="text-align: center;">
-                <p-tag severity="info" value="{{selectedCreature.expHourStr}} exp/h" *ngIf="selectedCreature.expHourStr"></p-tag>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot2Item?.bonusSpeed">
+                <p-card header="{{character.slot2Item?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slot2Item.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot3Item?.bonusSpeed">
+                <p-card header="{{character.slot3Item?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slot3Item.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot4Item?.bonusSpeed">
+                <p-card header="{{character.slot4Item?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slot4Item.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slotRing?.bonusSpeed">
+                <p-card header="{{character.slotRing?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slotRing.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slotRing.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot5Item?.bonusSpeed">
+                <p-card header="{{character.slot5Item?.name}}" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" width="32" height="32"/>
+                    <span pBadge value="+{{character.slot5Item.bonusSpeed}}" severity="primary" class="badge-overlay"></span>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="character.slot6Item?.bonusSpeed">
+                <p-card header="{{character.slot6Item?.name}}" styleClass="p-0">
+                  <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" width="32" height="32"/>
+                  <span pBadge value="+{{character.slot6Item.bonusSpeed/10}}%" severity="primary" style="top:21px; right:16px"></span>
+                </p-card>
+              </div>
+              <div class="col-4 md:col-4 lg:col-4 p-1 pt-1 equip" *ngIf="bonusTypeSelected?.value > 0">
+                <p-card header="Bônus" styleClass="p-0">
+                  <div class="image-container" style="position: relative; display: inline-block;">
+                    <span class="text-500"><img src="assets/gifs/items/Platinum_Coin.gif" width="32" height="32" style="vertical-align: middle" *ngIf="bonusTypeSelected?.cost*selectedTimeOption?.value < 10000"/></span>
+                    <span class="text-500"><img src="assets/gifs/items/Crystal_Coin.gif" width="32" height="32" style="vertical-align: middle" *ngIf="bonusTypeSelected?.cost*selectedTimeOption?.value >= 10000"/></span>
+                    <span pBadge value="+{{bonusTypeSelected.value}}%" severity="primary" style="top:34px; right:16px"></span>
+                  </div>
+                </p-card>
               </div>
             </div>
           </p-panel>
@@ -188,7 +266,11 @@
           </p-panel>
         </div>
         <div class="col-12 md:col-12 lg:col-12 xl:col-12 pb-0 pl-0 pr-0">
-          <p-button label="Caçar" [badge]="formatTime(remainingTime)" styleClass="w-full mb-2" *ngIf="!character.huntOfflineDate" (click)="startHunt()"></p-button>
+          <p-button label="Caçar" [badge]="formatTime(remainingTime)" styleClass="w-full mb-2" *ngIf="!character.huntOfflineDate" (click)="startHunt()">
+            <span class="text-500"><img src="assets/gifs/items/Platinum_Coin.gif" width="32" height="32" style="vertical-align: middle" *ngIf="bonusTypeSelected?.cost*selectedTimeOption?.value < 10000"/></span>
+            <span class="text-500"><img src="assets/gifs/items/Crystal_Coin.gif" width="32" height="32" style="vertical-align: middle" *ngIf="bonusTypeSelected?.cost*selectedTimeOption?.value >= 10000"/></span>
+            <span class="image-text ml-2" style="font-weight: bold;">{{ bonusTypeSelected?.cost*selectedTimeOption?.value > 10000 ? bonusTypeSelected?.cost*selectedTimeOption?.value/10000 : bonusTypeSelected?.cost*selectedTimeOption?.value / 100 }}</span>
+          </p-button>
           <p-button label="Cancelar" styleClass="w-full p-button-danger mb-2" *ngIf="character.huntOfflineDate" (click)="cancelHunt()"></p-button>
         </div>
       </div>

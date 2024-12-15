@@ -297,8 +297,8 @@ export class CharacterService {
     })
   }
 
-  startHuntOffline(characterId: number, huntHours, bestiaryId) {
-    this.httpClient.post<void>(this.apiUrl + "/startHuntOffline", { characterId, huntHours, bestiaryId }).subscribe({
+  startHuntOffline(characterId: number, huntHours, bestiaryId, bonusType: number, cost: number) {
+    this.httpClient.post<void>(this.apiUrl + "/startHuntOffline", { characterId, huntHours, bestiaryId, bonusType, cost }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },
@@ -332,6 +332,17 @@ export class CharacterService {
 
   sellAllItems(characterId: number) {
     this.httpClient.post<void>(this.apiUrl + "/sellAllItems", { characterId }).subscribe({
+      next: () => {
+        console.log('Requisição enviada e recebida com sucesso');
+      },
+      error: (err) => {
+        console.error('Erro ao enviar a requisição:', err);
+      }
+    })
+  }
+
+  sellAllItemsById(characterId: number, itemId: number) {
+    this.httpClient.post<void>(this.apiUrl + "/sellAllItemsById", { characterId, itemId }).subscribe({
       next: () => {
         console.log('Requisição enviada e recebida com sucesso');
       },

@@ -4,4 +4,8 @@ export class CharacterPotion {
     characterId: number;
     potion: Potion;
     quantity: number;
+
+    
+    highlight: boolean;
+    highlightRed: boolean;
 }

@@ -1,6 +1,7 @@
 import { Character } from "../model/character.model";
 import { CreatureDamage } from "../model/creature-damage.model";
 import { Creature } from "../model/creature.model";
+import { Item } from "../model/item.model";
 
 export class CombatUtil {
 
@@ -36,17 +37,49 @@ export class CombatUtil {
             switch (character.slot2Item.type) {
                 case 'sword':
                     skillValue = character.sword;
+                    skillValue += character.slotAmulet?.bonusSword || 0
+                    skillValue += character.slot1Item?.bonusSword || 0
+                    skillValue += character.slot2Item?.bonusSword || 0
+                    skillValue += character.slot3Item?.bonusSword || 0
+                    skillValue += character.slot4Item?.bonusSword || 0
+                    skillValue += character.slotRing?.bonusSword || 0
+                    skillValue += character.slot5Item?.bonusSword || 0
+                    skillValue += character.slot6Item?.bonusSword || 0
                     break;
                 case 'axe':
                     skillValue = character.axe;
+                    skillValue += character.slotAmulet?.bonusAxe || 0
+                    skillValue += character.slot1Item?.bonusAxe || 0
+                    skillValue += character.slot2Item?.bonusAxe || 0
+                    skillValue += character.slot3Item?.bonusAxe || 0
+                    skillValue += character.slot4Item?.bonusAxe || 0
+                    skillValue += character.slotRing?.bonusAxe || 0
+                    skillValue += character.slot5Item?.bonusAxe || 0
+                    skillValue += character.slot6Item?.bonusAxe || 0
                     break;
                 case 'club':
                     skillValue = character.club;
+                    skillValue += character.slotAmulet?.bonusClub || 0
+                    skillValue += character.slot1Item?.bonusClub || 0
+                    skillValue += character.slot2Item?.bonusClub || 0
+                    skillValue += character.slot3Item?.bonusClub || 0
+                    skillValue += character.slot4Item?.bonusClub || 0
+                    skillValue += character.slotRing?.bonusClub || 0
+                    skillValue += character.slot5Item?.bonusClub || 0
+                    skillValue += character.slot6Item?.bonusClub || 0
                     break;
                 case 'distance':
                 case 'arrow':
                 case 'bolt':
                     skillValue = character.distance;
+                    skillValue += character.slotAmulet?.bonusDistance || 0
+                    skillValue += character.slot1Item?.bonusDistance || 0
+                    skillValue += character.slot2Item?.bonusDistance || 0
+                    skillValue += character.slot3Item?.bonusDistance || 0
+                    skillValue += character.slot4Item?.bonusDistance || 0
+                    skillValue += character.slotRing?.bonusDistance || 0
+                    skillValue += character.slot5Item?.bonusDistance || 0
+                    skillValue += character.slot6Item?.bonusDistance || 0
                     break;
                 case 'wand':
                 case 'rod':
@@ -91,6 +124,32 @@ export class CombatUtil {
     static getCharacterTotalDefense(character: Character): number {
         return (character.slot2Item?.def || 0) + (character.slot4Item?.def || 0)
     }
+
+    static getCharacterTotalShielding(character: Character): number {
+        let shielding = character.shielding;
+        shielding += character.slotAmulet?.bonusShielding || 0
+        shielding += character.slot1Item?.bonusShielding || 0
+        shielding += character.slot2Item?.bonusShielding || 0
+        shielding += character.slot3Item?.bonusShielding || 0
+        shielding += character.slot4Item?.bonusShielding || 0
+        shielding += character.slotRing?.bonusShielding || 0
+        shielding += character.slot5Item?.bonusShielding || 0
+        shielding += character.slot6Item?.bonusShielding || 0
+        return shielding
+    }
+
+    static getCharacterTotalMagicLevel(character: Character): number {
+        let magicLevel = character.magicLevel;
+        magicLevel += character.slotAmulet?.bonusMagicLevel || 0
+        magicLevel += character.slot1Item?.bonusMagicLevel || 0
+        magicLevel += character.slot2Item?.bonusMagicLevel || 0
+        magicLevel += character.slot3Item?.bonusMagicLevel || 0
+        magicLevel += character.slot4Item?.bonusMagicLevel || 0
+        magicLevel += character.slotRing?.bonusMagicLevel || 0
+        magicLevel += character.slot5Item?.bonusMagicLevel || 0
+        magicLevel += character.slot6Item?.bonusMagicLevel || 0
+        return magicLevel
+    }
     
     static getCharacterDamage(character: Character, huntStyleFactor: number): number {
         /* (0.085*{D}*{X}*{Y})+({L}/5)
@@ -124,7 +183,7 @@ export class CombatUtil {
         return this.getRandomInRange(minArmor, maxArmor);
     }
 
-    static takeDamage(damage: number, def: number, shield: number, armor: number): number {
+    static takeDamage(damage: number, def: number, shield: number, armor: number, reduction: number): number {
         /* {A}-({B}*{D})/({E}*100)-({A}/100)*{C}
             A = ataque da criatura
             B = defesa total
@@ -132,7 +191,8 @@ export class CombatUtil {
             D = shielding
             E = fator de defesa  (Full ATK = 1, Balanced = 0.75, Full Def = 0.5)
         */
-        return Math.max(0,Math.round(damage-(def*shield)/(1*100)-(damage/100)*armor))
+        let damageAfterDefAndArmor = Math.max(0,Math.round(damage-(def*shield)/(1*100)-(damage/100)*armor))
+        return Math.max(0,Math.round(damageAfterDefAndArmor*(reduction/100)))
     }
 
     static getRandomCreatureSpell(creature: Creature): CreatureDamage {
@@ -148,12 +208,105 @@ export class CombatUtil {
         return null;
     }
 
-    //TODO implementar redução de dano
-    //TODO implementar dano elemental
+    static getCreatureResistence(creature: Creature, element: string): number {
+        let resistence = 100; // Ex: 100 = 0% de redução, dano normal / 80 = 20% de redução de dano / 120 = 20% de aumento no dano
+        switch (element) {
+            case 'fire':
+                resistence = creature.fireResistance
+                break;
+            case 'ice':
+                resistence = creature.iceResistance
+                break;
+            case 'earth':
+                resistence = creature.earthResistance
+                break;
+            case 'energy':
+                resistence = creature.energyResistance
+                break;
+            case 'death':
+                resistence = creature.deathResistance
+                break;
+            case 'holy':
+                resistence = creature.holyResistance
+                break;
+            case 'physical':
+                resistence = creature.physicalResistance
+                break;
+            default:
+                break;
+        }
+        return resistence;
+    }
+
+    static getCharacterResistence(character: Character, element: string): number {
+        let resistence = 100; // Ex: 100 = 0% de redução, dano normal / 80 = 20% de redução de dano / 120 = 20% de aumento no dano
+        resistence -= character.slotAmulet ? this.getItemResistence(character.slotAmulet, element) : 0
+        resistence -= character.slot1Item ? this.getItemResistence(character.slot1Item, element) : 0
+        resistence -= character.slot2Item ? this.getItemResistence(character.slot2Item, element) : 0
+        resistence -= character.slot3Item ? this.getItemResistence(character.slot3Item, element) : 0
+        resistence -= character.slot4Item ? this.getItemResistence(character.slot4Item, element) : 0
+        resistence -= character.slotRing ? this.getItemResistence(character.slotRing, element) : 0
+        resistence -= character.slot5Item ? this.getItemResistence(character.slot5Item, element) : 0
+        resistence -= character.slot6Item ? this.getItemResistence(character.slot6Item, element) : 0
+        return resistence;
+    }
+
+    static getItemResistence(item: Item, element: string): number {
+        let resistence = 0;
+        switch (element) {
+            case 'fire':
+                resistence = item?.fireResistance || 0
+                break;
+            case 'ice':
+                resistence = item?.iceResistance || 0
+                break;
+            case 'earth':
+                resistence = item?.earthResistance || 0
+                break;
+            case 'energy':
+                resistence = item?.energyResistance || 0
+                break;
+            case 'death':
+                resistence = item?.deathResistance || 0
+                break;
+            case 'holy':
+                resistence = item?.holyResistance || 0
+                break;
+            case 'physical':
+                resistence = item?.physicalResistance || 0
+                break;
+            default:
+                break;
+        }
+        return resistence;
+    }
+
+    static getCharacterBonusHealLife(character: Character): number {
+        let quantity = 0;
+        quantity += character.slotAmulet?.countHealing || 0
+        quantity += character.slot1Item?.countHealing || 0
+        quantity += character.slot2Item?.countHealing || 0
+        quantity += character.slot3Item?.countHealing || 0
+        quantity += character.slot4Item?.countHealing || 0
+        quantity += character.slotRing?.countHealing || 0
+        quantity += character.slot5Item?.countHealing || 0
+        quantity += character.slot6Item?.countHealing || 0
+        return quantity
+    }
+
+    static getCharacterBonusHealMana(character: Character): number {
+        let quantity = 0;
+        quantity += character.slotAmulet?.countMana || 0
+        quantity += character.slot1Item?.countMana || 0
+        quantity += character.slot2Item?.countMana || 0
+        quantity += character.slot3Item?.countMana || 0
+        quantity += character.slot4Item?.countMana || 0
+        quantity += character.slotRing?.countMana || 0
+        quantity += character.slot5Item?.countMana || 0
+        quantity += character.slot6Item?.countMana || 0
+        return quantity
+    }
+
     //TODO implementar colar e anel
-    //TODO implementar bonus de skill e de resistencia
-    // static getDamageReduction(min: number, max: number): number {
-
-    // }
-
+    //TODO implementar bonus de skill
 }

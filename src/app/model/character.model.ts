@@ -64,4 +64,6 @@ export class Character {
     arena1: number;
     arena2: number;
     arena3: number;
+    
+    bonusType: number;
 }

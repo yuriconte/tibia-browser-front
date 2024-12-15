@@ -7,8 +7,9 @@
         <p-progressBar [value]="character.life / character.maxLife * 100" [showValue]="false"></p-progressBar>
         <div class="progress-text">{{ character.life }} / {{ character.maxLife }}</div>
         <div class="status-icons">
-          <img src="assets/gifs/effects/Poisoned_Icon.gif" alt="Envenenado" class="status-icon" />
-          <img src="assets/gifs/effects/Burning_Icon.gif" alt="Queimando" class="status-icon" />
+          <img src="assets/gifs/effects/Poisoned_Icon.gif" alt="Envenenado" class="status-icon" *ngIf="poisonInterval"/>
+          <img src="assets/gifs/effects/Burning_Icon.gif" alt="Queimando" class="status-icon" *ngIf="burnInterval"/>
+          <img src="assets/gifs/effects/Cursed_Icon.gif" alt="Morrendo" class="status-icon" *ngIf="curseInterval"/>
         </div>
       </div>
     </div>
@@ -26,6 +27,41 @@
     </div>
   </div>
   <div class="grid w-full p-0 m-0">
+    <div class="col-6 md:col-6 lg:col-6 p-1 pt-0 equip" [ngClass]="{'highlight':highlightPotionLife}" *ngIf="usePotionsHealing">
+      <p-card styleClass="p-0">
+        <img src="assets/gifs/potions/{{selectedPotionHealing.potion.imagePath}}" width="32" height="32" style="margin-left: -60px;"/>
+        <span pBadge value="{{selectedPotionHealing.quantity}}" severity="primary" ></span>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 pt-0 equip" [ngClass]="{'highlight':highlightPotionMana}" *ngIf="usePotionsMana">
+      <p-card styleClass="p-0">
+        <img src="assets/gifs/potions/{{selectedPotionMana.potion.imagePath}}" width="32" height="32" style="margin-left: -60px;"/>
+        <span pBadge value="{{selectedPotionMana.quantity}}" severity="primary" ></span>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 pb-3 equip" [ngClass]="{'highlight':highlightSpellLife}" *ngIf="useSpellHealing">
+      <p-card styleClass="p-0">
+        <img src="assets/gifs/spells/{{selectedSpellHeal.imagePath}}" width="32" height="32" style="margin-top: 4px;"/>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 pb-3 equip" [ngClass]="{'highlight':highlightSpellAttack}" *ngIf="useSpellStrike">
+      <p-card styleClass="p-0">
+        <img src="assets/gifs/spells/{{selectedSpellStrike.imagePath}}" width="32" height="32" style="margin-top: 4px;"/>
+      </p-card>
+    </div>
+  </div>
+  <div class="grid w-full p-0 m-0 pb-2">
+    <div class="col-4 md:col-4 lg:col-4 p-1 pt-0 equip">
+      <p-tag value="Level {{character.level}}" class="config"></p-tag>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 pt-0 equip">
+      <p-tag value="Total Exp/h {{avgExpHour}}" class="config"></p-tag>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 pt-0 equip">
+      <p-tag value="Gold Ganho {{totalGoldEarned}}" class="config"></p-tag>
+    </div>
+  </div>
+  <div class="grid w-full p-0 m-0">
     <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-0" *ngIf="!statusHunt">
       <p-selectButton id="huntType" [options]="huntType" [(ngModel)]="huntTypeSelected" optionLabel="name" [allowEmpty]="false" (onChange)="changeHuntType($event)"></p-selectButton>
     </div>
@@ -35,7 +71,7 @@
     <div class="col-12 md:col-12 pl-0 pr-0 pb-1 pt-0" *ngIf="huntTypeSelected.value == 3 && !statusHunt">
       <p-selectButton id="bossType" [options]="bossType" [(ngModel)]="bossTypeSelected" optionLabel="name" [allowEmpty]="false" (onChange)="changeBossType($event)"></p-selectButton>
     </div>
-    <div class="pt-0 m-0 pt-3 pb-3 pl-0 pr-2" [ngClass]="{
+    <div class="pt-0 m-0 pt-2 pb-3 pl-0 pr-2" [ngClass]="{
                                                         'col-4 md:col-4 lg:col-4': huntTypeSelected.value == 1,
                                                         'col-6 md:col-6 lg:col-6': huntTypeSelected.value > 1
                                                         }">
@@ -55,8 +91,17 @@
           </div>
           <div class="col-12 md:col-12 p-0" style="text-align: center; position: relative;">
             <img src="assets/img/Citizen_Male.gif" width="96" height="96"/>
-            <img src="assets/gifs/effects/Death_Effect.gif" width="40" height="40" class="effect" />
-            <img src="assets/gifs/effects/Fire_Effect.gif" width="40" height="40" class="effect" />
+            <img src="assets/gifs/effects/Death_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterDeath"/>
+            <img src="assets/gifs/effects/Holy_Effect.gif" width="40" height="80" class="effect" style="top:0;" *ngIf="highlightCharacterHoly"/>
+            <img src="assets/gifs/effects/Fire_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCharacterFire"/>
+            <img src="assets/gifs/effects/Ice_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCharacterIce"/>
+            <img src="assets/gifs/effects/Energy_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterEnergy"/>
+            <img src="assets/gifs/effects/Earth_Effect.gif" width="40" height="80" class="effect" style="top:0;" *ngIf="highlightCharacterEarth"/>
+            <img src="assets/gifs/effects/Physical_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterPhysical"/>
+            <img src="assets/gifs/effects/Drain_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterDrain"/>
+            <img src="assets/gifs/effects/Block_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterBlock"/>
+            <img src="assets/gifs/effects/Poison_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCharacterPoison"/>
+            <img src="assets/gifs/effects/Heal_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightSpellLife || highlightPotionMana || highlightPotionLife"/>
           </div>
         </div>
         <ng-template pTemplate="footer">
@@ -68,6 +113,7 @@
     <div class="m-0 pb-3" *ngFor="let index of creaturesPositions" [ngClass]="{
                                                                                             'col-4 md:col-4 lg:col-4 pr-2': huntTypeSelected.value == 1,
                                                                                             'col-6 md:col-6 lg:col-6 pr-0': huntTypeSelected.value > 1,
+                                                                                            'pt-2': index == 0 || index == 1,
                                                                                             'pr-0': huntTypeSelected.value == 1 && (index == 1 || index == 4),
                                                                                             'pr-2': huntTypeSelected.value == 1 && (index == 0 || index == 2 || index == 3),
                                                                                             'pl-0': huntTypeSelected.value == 1 && index == 2,
@@ -76,7 +122,7 @@
                                                                                             }">
       <p-card header="{{selectedCreatures[index]?.creature.name || 'Selecione a Criatura'}}" styleClass="pl-0 pr-0">
         <div class="grid w-full ml-0">
-          <div class="col-12 md:col-12 lg:col-12 health-bar p-0 mt-3" style="height: 15px;">
+          <div class="col-12 md:col-12 lg:col-12 health-bar p-0 mt-2" style="height: 15px;">
             <div class="progress-container" *ngIf="!monsters[index]">
               <p-progressBar [value]="selectedCreatures[index].creature.life/selectedCreatures[index].creature.maxLife*100" [showValue]="false" class="status-bar" *ngIf="selectedCreatures[index]?.creature"></p-progressBar>
               <div class="progress-text-2" *ngIf="selectedCreatures[index]?.creature">{{selectedCreatures[index].creature.life}} / {{selectedCreatures[index].creature.maxLife}}</div>
@@ -88,15 +134,31 @@
           </div>
           <div class="col-12 md:col-12 lg:col-12 health-bar p-0" style="height: 15px;">
             <p-tag severity="{{index == 0 ? 'success' : 'info'}}" value="{{selectedCreatures[index].creature.expHour}} exp/h" *ngIf="selectedCreatures[index]?.creature && selectedCreatures[index].creature.expHour && !selectedCreatures[index].disabled" class="w-full" [ngStyle]="{height: '15px', display: 'flex'}"></p-tag>
-            <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="selectedCreatures[index]?.creature && !selectedCreatures[index].creature.expHour && !selectedCreatures[index].disabled" class="w-full inactive"></p-tag>
-            <p-tag severity="secondary" value="Arena" *ngIf="selectedCreatures[index]?.creature && selectedCreatures[index].disabled" class="w-full inactive"></p-tag>
+            <p-tag severity="info" value="0 exp/h" *ngIf="selectedCreatures[index]?.creature && !selectedCreatures[index].creature.expHour && !selectedCreatures[index].disabled" class="w-full inactive" [ngStyle]="{height: '15px', display: 'flex'}"></p-tag>
+            <p-tag severity="info" value="Arena" *ngIf="selectedCreatures[index]?.creature && selectedCreatures[index].disabled" class="w-full inactive" [ngStyle]="{height: '15px', display: 'flex'}"></p-tag>
           </div>
           
           <div class="col-12 md:col-12 p-0" style="text-align: center; position: relative;">
             <div class="image-container" style="position: relative; display: inline-block;">
               <img src="assets/gifs/estatues/Weretiger_Statue.gif" width="96" height="96" style="opacity: 0.2" *ngIf="!selectedCreatures[index]?.creature"/>
-              <img src="assets/gifs/creatures/{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="selectedCreatures[index]?.creature && (!monsters[index] || monsters[index].life > 0)"/>
-              <img src="assets/gifs/creatures/Dead_{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="monsters[index] && monsters[index].life <= 0"/>
+              <img src="assets/gifs/creatures/{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="selectedCreatures[index]?.creature"/>
+              <!-- <img src="assets/gifs/creatures/{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="selectedCreatures[index]?.creature && (!monsters[index] || monsters[index].life > 0)"/> -->
+              <!-- <img src="assets/gifs/creatures/Dead_{{selectedCreatures[index].creature.imagePath}}" width="96" height="96" *ngIf="monsters[index] && monsters[index].life <= 0"/> -->
+              <img src="assets/gifs/effects/Death_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreatureDeath[index]"/>
+              <img src="assets/gifs/effects/Holy_Effect.gif" width="40" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureHoly[index]"/>
+              <img src="assets/gifs/effects/Fire_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureFire[index]"/>
+              <img src="assets/gifs/effects/Ice_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureIce[index]"/>
+              <img src="assets/gifs/effects/Energy_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreatureEnergy[index]"/>
+              <img src="assets/gifs/effects/Earth_Effect.gif" width="40" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureEarth[index]"/>
+              <img src="assets/gifs/effects/Physical_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreaturePhysical[index]"/>
+              <img src="assets/gifs/effects/Drain_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreatureDrain[index]"/>
+              <img src="assets/gifs/effects/Block_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreatureBlock[index]"/>
+              <img src="assets/gifs/effects/Heal_Effect.gif" width="40" height="40" class="effect" *ngIf="highlightCreatureHeal[index]"/>
+              <img src="assets/gifs/effects/Fireball_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureMasFlam[index]"/>
+              <img src="assets/gifs/effects/Ice_Tornado_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureMasFrigo[index]"/>
+              <img src="assets/gifs/effects/Large_Plant_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureMasTera[index]"/>
+              <img src="assets/gifs/effects/Thunderstorm_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureMasVis[index]"/>
+              <img src="assets/gifs/effects/Holy_Cross_Effect.gif" width="80" height="80" class="effect" style="top:0;" *ngIf="highlightCreatureMasSan[index]"/>
               <span pBadge value="{{countMonsterKill[index]}}" severity="warning" class="badge-overlay-creatures" *ngIf="countMonsterKill[index] > 0"></span>
             </div>
           </div>
@@ -107,12 +169,39 @@
         </ng-template>
       </p-card>
     </div>
-    <!-- TODO mostrar loots ganhos -->
-    <div class="col-12 md:col-12 pb-0 pl-0 pr-0 pt-2">
+    <div class="col-12 md:col-12 pb-0 pt-3" *ngIf="lootDrop?.length > 0">
+      <p-carousel 
+        [value]="lootDrop" 
+        [numVisible]="6" 
+        [numScroll]="3" 
+        [circular]="false" 
+        [responsiveOptions]="responsiveCreaturesOptions"
+        autoplayInterval="5000">
+        <ng-template let-item pTemplate="item">
+          <div class="border-round m-2 text-center p-2" style="border: 1px solid var(--surface-d);">
+            <div>
+              <img src="assets/gifs/items/{{item.item.imagePath}}" width="32" height="32" (click)="showEquipDetail(item.item)"/>
+            </div>
+            <div>
+                <h6 class="mb-1" style="font-size: 0.8rem; height: 27px; align-content: center;">{{item.item.name}}</h6>
+                <img src="assets/gifs/items/Gold_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold < 100"/>
+                <img src="assets/gifs/items/Platinum_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold >= 100 && item.item.gold < 10000"/>
+                <img src="assets/gifs/items/Crystal_Coin.gif" width="30" style="vertical-align: middle" *ngIf="item.item.gold >= 10000"/>
+                <h6 class="mt-0 mb-3 image-text" style="font-size: 0.7rem;">{{item.item.gold < 100 ? item.item.gold : item.item.gold >= 100 && item.item.gold < 10000 ? (item.item.gold/100).toFixed(0) : (item.item.gold/10000).toFixed(0)}}</h6>
+                <span pBadge value="{{item.quantity}}" severity="info" class="badge-overlay-loot"></span>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+    </div>
+    <div class="col-6 md:col-6 pb-0 pl-0 pr-2 pt-2">
+      <button pButton icon="pi pi-save" (click)="saveLocalStorage()" label="Salvar Macro" class="p-button-primary w-full"></button>
+    </div>
+    <div class="col-6 md:col-6 pb-0 pl-0 pr-0 pt-2">
       <button label="Iniciar Caçada" pButton pRipple (click)="startHunt(character)" class="w-full" style="color:white" [disabled]="!selectedCreatures[0]" *ngIf="huntTypeSelected?.value !== 2 && !statusHunt"></button>
       <p-button label="Iniciar Arena" (click)="startHunt(character)" styleClass="w-full" [ngStyle]="{color:'white'}" [disabled]="!selectedCreatures[0] || character.balance < arenaTypeSelected?.cost" *ngIf="huntTypeSelected?.value === 2 && !statusHunt">
-          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 100 && arenaTypeSelected?.cost < 10000"><img src="assets/gifs/items/Platinum_Coin.gif" width="28" height="28" style="vertical-align: middle"/></span>
-          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 10000"><img src="assets/gifs/items/Crystal_Coin.gif" width="28" height="28" style="vertical-align: middle"/></span>
+          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 100 && arenaTypeSelected?.cost < 10000"><img src="assets/gifs/items/Platinum_Coin.gif" width="16" height="16" style="vertical-align: middle"/></span>
+          <span class="text-500" *ngIf="arenaTypeSelected?.cost >= 10000"><img src="assets/gifs/items/Crystal_Coin.gif" width="16" height="16" style="vertical-align: middle"/></span>
           <span class="image-text ml-2" style="font-weight: bold;">{{arenaTypeSelected?.cost < 100 ? arenaTypeSelected?.cost : arenaTypeSelected?.cost >= 100 && arenaTypeSelected?.cost < 10000 ? (arenaTypeSelected?.cost/100).toFixed(0) : (arenaTypeSelected?.cost/10000).toFixed(0)}}</span>
       </p-button>
       <button label="Cancelar" pButton pRipple class="w-full p-button-danger" (click)="cancelHunt()" *ngIf="statusHunt"></button>
@@ -131,6 +220,7 @@
       [filter]="true"
       filterBy="creature.name"
       [autofocusFilter]="false"
+      [showClear]="showCreatureIndex > 0"
       appendTo="body"
       id="creature">
       <ng-template pTemplate="selectedItem">
@@ -142,16 +232,34 @@
             <div class="col-3 md:col-3 pb-1" style="text-align: center;"></div>
             <div class="col-9 md:col-9">
               <div class="grid">
-                <div class="col-12 md:col-12 pb-0 pt-1" *ngIf="showCreatureIndex === 0">
-                  <p-tag severity="success" value="{{selectedCreatures[showCreatureIndex].creature.expHour}} exp/h" *ngIf="selectedCreatures[showCreatureIndex].creature.expHour" class="w-full"></p-tag>
-                  <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!selectedCreatures[showCreatureIndex].creature.expHour && !selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
-                  <p-tag severity="secondary" value="Arena" *ngIf="selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
+                <div class="col-4 md:col-4 pb-0 pt-1 pr-0">
+                  <p-tag severity="success" [style]="{ fontSize: '8px' }" value="{{selectedCreatures[showCreatureIndex].creature.expHour}} exp/h" *ngIf="selectedCreatures[showCreatureIndex].creature.expHour" class="w-full"></p-tag>
+                  <p-tag severity="secondary" [style]="{ fontSize: '8px' }" value="0 exp/h" *ngIf="!selectedCreatures[showCreatureIndex].creature.expHour && !selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
+                  <p-tag severity="secondary" [style]="{ fontSize: '8px' }" value="Arena" *ngIf="selectedCreatures[showCreatureIndex].disabled" class="w-full inactive"></p-tag>
+                </div>
+                <div class="col-8 md:col-8 pb-0 pt-1 pl-1">
+                  <p-tag [style]="{ background: '#a855f7', fontSize: '8px' }" value="Exp: {{selectedCreatures[showCreatureIndex].creature.experience}} Gold: {{selectedCreatures[showCreatureIndex].creature.maxGold > 0 ? 'até ' + selectedCreatures[showCreatureIndex].creature.maxGold : 0}}"></p-tag>
                 </div>
                 <div class="col-12 md:col-12 pb-0 pt-1">
-                  <p-tag severity="danger" value="❤️ Vida: {{selectedCreatures[showCreatureIndex].creature.life}}"></p-tag>
+                  <p-tag [style]="{ fontSize: '8px' }" severity="danger" value="Vida: {{selectedCreatures[showCreatureIndex].creature.life}} Dano Básico: {{selectedCreatures[showCreatureIndex].creature.maxDamage > 0 ? 'até ' + selectedCreatures[showCreatureIndex].creature.maxDamage : 0}}"></p-tag>
                 </div>
-                <div class="col-12 md:col-12 pb-0 pt-1 exp">
-                  <p-tag [style]="{ background: '#a855f7' }" value="⭐ Exp: {{selectedCreatures[showCreatureIndex].creature.experience}} 💰 Gold: 0 à {{selectedCreatures[showCreatureIndex].creature.maxGold}}"></p-tag>
+                <div class="col-2 md:col-2 pb-0 pt-1 pr-0">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-fire" value="{{100 - selectedCreatures[showCreatureIndex].creature.fireResistance}}%"></p-tag>
+                </div>
+                <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-ice" value="{{100 - selectedCreatures[showCreatureIndex].creature.iceResistance}}%"></p-tag>
+                </div>
+                <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-earth" value="{{100 - selectedCreatures[showCreatureIndex].creature.earthResistance}}%"></p-tag>
+                </div>
+                <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-energy" value="{{100 - selectedCreatures[showCreatureIndex].creature.energyResistance}}%"></p-tag>
+                </div>
+                <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-death" value="{{100 - selectedCreatures[showCreatureIndex].creature.deathResistance}}%"></p-tag>
+                </div>
+                <div class="col-2 md:col-2 pb-0 pt-1 pl-1">
+                  <p-tag [style]="{ fontSize: '8px' }" class="w-full tag-holy" value="{{100 - selectedCreatures[showCreatureIndex].creature.holyResistance}}%"></p-tag>
                 </div>
               </div>
             </div>
@@ -167,16 +275,34 @@
             <div class="grid">
               <div class="col-9 md:col-9">
                 <div class="grid">
-                  <div class="col-12 md:col-12 pb-0 pt-1"  *ngIf="showCreatureIndex === 0">
+                  <div class="col-4 md:col-4 pb-0 pt-1 pr-0">
                     <p-tag severity="success" value="{{creature.creature.expHour}} exp/h" *ngIf="creature.creature.expHour" class="w-full"></p-tag>
-                    <p-tag severity="secondary" value="Você nunca matou essa criatura" *ngIf="!creature.creature.expHour && !creature.disabled" class="w-full inactive"></p-tag>
+                    <p-tag severity="secondary" value="0 exp/h" *ngIf="!creature.creature.expHour && !creature.disabled" class="w-full inactive"></p-tag>
                     <p-tag severity="secondary" value="Arena" *ngIf="creature.disabled" class="w-full inactive"></p-tag>
                   </div>
-                  <div class="col-12 md:col-12 pb-0 pt-1">
-                    <p-tag severity="danger" value="❤️ Vida: {{creature.creature.life}} ⚔️ Dano Básico: {{creature.creature.maxDamage > 0 ? 'até ' + creature.creature.maxDamage : 0}}"></p-tag>
+                  <div class="col-8 md:col-8 pb-0 pt-1 pl-1">
+                    <p-tag [style]="{ background: '#a855f7' }" value="Exp: {{creature.creature.experience}} Gold: {{creature.creature.maxGold > 0 ? 'até ' + creature.creature.maxGold : 0}}"></p-tag>
                   </div>
                   <div class="col-12 md:col-12 pb-0 pt-1">
-                    <p-tag [style]="{ background: '#a855f7' }" value="⭐ Exp: {{creature.creature.experience}} 💰 Gold: {{creature.creature.maxGold > 0 ? 'até ' + creature.creature.maxGold : 0}}"></p-tag>
+                    <p-tag severity="danger" value="Vida: {{creature.creature.life}} Dano Básico: {{creature.creature.maxDamage > 0 ? 'até ' + creature.creature.maxDamage : 0}}"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pr-0">
+                    <p-tag class="w-full tag-fire" value="{{100 - creature.creature.fireResistance}}%"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                    <p-tag class="w-full tag-ice" value="{{100 - creature.creature.iceResistance}}%"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                    <p-tag class="w-full tag-earth" value="{{100 - creature.creature.earthResistance}}%"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                    <p-tag class="w-full tag-energy" value="{{100 - creature.creature.energyResistance}}%"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pl-1 pr-0">
+                    <p-tag class="w-full tag-death" value="{{100 - creature.creature.deathResistance}}%"></p-tag>
+                  </div>
+                  <div class="col-2 md:col-2 pb-0 pt-1 pl-1">
+                    <p-tag class="w-full tag-holy" value="{{100 - creature.creature.holyResistance}}%"></p-tag>
                   </div>
                 </div>
               </div>
@@ -229,12 +355,27 @@
         <ng-template let-damage pTemplate="item">
           <div class="border-round m-2 text-center p-2" style="border: 1px solid var(--surface-d);">
             <div>
-              <img src="assets/gifs/effects/Fire_Effect.gif" width="32" height="32"/>
+              <img src="assets/gifs/effects/Fire_Effect.gif" width="32" height="32" *ngIf="damage.type == 'fire' || damage.type == 'burning'"/>
+              <img src="assets/gifs/effects/Ice_Effect.gif" width="32" height="32" *ngIf="damage.type == 'ice'"/>
+              <img src="assets/gifs/effects/Earth_Effect.gif" width="32" height="32" *ngIf="damage.type == 'earth'"/>
+              <img src="assets/gifs/effects/Energy_Effect.gif" width="32" height="32" *ngIf="damage.type == 'energy'"/>
+              <img src="assets/gifs/effects/Death_Effect.gif" width="32" height="32" *ngIf="damage.type == 'death' || damage.type == 'cursed'"/>
+              <img src="assets/gifs/effects/Holy_Effect.gif" width="32" height="32" *ngIf="damage.type == 'holy'"/>
+              <img src="assets/gifs/effects/Physical_Effect.gif" width="32" height="32" *ngIf="damage.type == 'physical' || damage.type == 'distance'"/>
+              <img src="assets/gifs/effects/Poison_Effect.gif" width="32" height="32" *ngIf="damage.type == 'poison'"/>
+              <img src="assets/gifs/effects/Heal_Effect.gif" width="32" height="32" *ngIf="damage.type == 'healing' || damage.type == 'life drain' || damage.type == 'mana drain'"/>
             </div>
             <div>
-              <h6 class="mb-1" style="font-size: 0.8rem; height: 27px; align-content: center;">{{damage.type}}</h6>
-              <h6 class="mt-0 mb-3 image-text" style="font-size: 0.7rem;">{{damage.minDamage}} à {{damage.maxDamage}}</h6>
-              <p-tag severity="danger" value="Fogo"></p-tag>
+              <h6 class="mt-3 mb-3 image-text" style="font-size: 0.7rem;">{{damage.minDamage}} à {{damage.maxDamage}}</h6>
+              <p-tag value="Fogo" class="tag-fire" *ngIf="damage.type == 'fire' || damage.type == 'burning'"></p-tag>
+              <p-tag value="Gelo" class="tag-ice" *ngIf="damage.type == 'ice'"></p-tag>
+              <p-tag value="Terra" class="tag-earth" *ngIf="damage.type == 'earth'"></p-tag>
+              <p-tag value="Energia" class="tag-energy" *ngIf="damage.type == 'energy'"></p-tag>
+              <p-tag value="Morte" class="tag-death" *ngIf="damage.type == 'death' || damage.type == 'cursed'"></p-tag>
+              <p-tag value="Divino" class="tag-holy" *ngIf="damage.type == 'holy'"></p-tag>
+              <p-tag value="Físico" class="tag-physical" *ngIf="damage.type == 'physical' || damage.type == 'distance'"></p-tag>
+              <p-tag value="Veneno" class="tag-earth" *ngIf="damage.type == 'poison'"></p-tag>
+              <p-tag value="Cura" class="tag-ice" *ngIf="damage.type == 'healing' || damage.type == 'life drain' || damage.type == 'mana drain'"></p-tag>
             </div>
           </div>
         </ng-template>
@@ -246,7 +387,7 @@
 </p-dialog>
 
 <p-dialog header="Detalhes do Personagem" [(visible)]="showCharacterDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
-  <p-accordion [multiple]="false">
+  <p-accordion [multiple]="false" *ngIf="showCharacterDetail">
     <p-accordionTab header="Equipamentos" class="line-height-3 m-0">
       <div class="grid">
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
@@ -296,7 +437,8 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{selectedSkillLabel}}" styleClass="p-0">
-            <p-badge value="{{selectedSkillValue}}" size="large" severity="primary"></p-badge>
+            <p-badge value="{{selectedSkillValue}}" size="large" severity="primary" class="pr-1"></p-badge>
+            <p-badge value="+{{selectedSkillBonusValue}}" size="large" severity="info" *ngIf="selectedSkillBonusValue > 0"></p-badge>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
@@ -306,7 +448,8 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="Shielding" styleClass="p-0">
-            <p-badge value="{{character.shielding}}" size="large" severity="primary"></p-badge>
+            <p-badge value="{{character.shielding}}" size="large" severity="primary" class="pr-1"></p-badge>
+            <p-badge value="+{{selectedSkillValueShielding}}" size="large" severity="info" *ngIf="selectedSkillValueShielding > 0"></p-badge>
           </p-card>
         </div>
       </div>
@@ -352,7 +495,7 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="Magic Level" styleClass="p-0">
-            <p-badge value="{{character.magicLevel}}" size="large" severity="primary"></p-badge>
+            <p-badge value=" {{character.magicLevel}} " size="large" severity="primary"></p-badge>
           </p-card>
         </div>
       </div>
@@ -517,11 +660,136 @@
   </ng-template>
 </p-dialog>
 
-<p-dialog header="Detalhes do Item" [(visible)]="showItemDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
-  <p><strong>Nome:</strong> {{ showItemDetailSelected?.name }}</p>
-  <p><strong>Ataque:</strong> {{ showItemDetailSelected?.atk }}</p>
-  <p><strong>Defesa:</strong> {{ showItemDetailSelected?.def }}</p>
-  <p><strong>Armadura:</strong> {{ showItemDetailSelected?.armor }}</p>
+<p-dialog header="{{showItemDetailSelected?.name}}" [(visible)]="showItemDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
+  <div class="grid" *ngIf="showItemDetail">
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      <img src="assets/gifs/items/{{showItemDetailSelected?.imagePath}}" alt="Item Image" class="item-image" />
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Informações Básicas
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Ataque" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.atk}} " size="large" severity="primary" class="pr-1" [ngClass]="{'badge-physical':showItemDetailSelected.atk == 0}"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.fireDamage}}" size="large" class="badge-fire" *ngIf="showItemDetailSelected?.fireDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.iceDamage}}" size="large" class="badge-ice" *ngIf="showItemDetailSelected?.iceDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.earthDamage}}" size="large" class="badge-earth" *ngIf="showItemDetailSelected?.earthDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.energyDamage}}" size="large" class="badge-energy" *ngIf="showItemDetailSelected?.energyDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.deathDamage}}" size="large" class="badge-death" *ngIf="showItemDetailSelected?.deathDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.holyDamage}}" size="large" class="badge-holy" *ngIf="showItemDetailSelected?.holyDamage"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Armadura" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.armor}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.armor == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Defesa" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.def}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.def == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Bônus de Skill
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Sword" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusSword > 0 ? '+' + showItemDetailSelected?.bonusSword : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusSword == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Axe" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusAxe > 0 ? '+' + showItemDetailSelected?.bonusAxe : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusAxe == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Club" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusClub > 0 ? '+' + showItemDetailSelected?.bonusClub : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusClub == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Distance" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusDistance > 0 ? '+' + showItemDetailSelected?.bonusDistance : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusDistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Shielding" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusShielding > 0 ? '+' + showItemDetailSelected?.bonusShielding : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusShielding == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Magic Level" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusMagicLevel > 0 ? '+' + showItemDetailSelected?.bonusMagicLevel : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusMagicLevel == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Resistências
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Fogo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.fireResistance > 0 ? '+' + showItemDetailSelected?.fireResistance + '%' : showItemDetailSelected?.fireResistance + '%'}} " size="large" class="badge-fire" [ngClass]="{'badge-physical':showItemDetailSelected.fireResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Gelo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.iceResistance > 0 ? '+' + showItemDetailSelected?.iceResistance + '%' : showItemDetailSelected?.iceResistance + '%'}} " size="large" class="badge-ice" [ngClass]="{'badge-physical':showItemDetailSelected.iceResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Terra" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.earthResistance > 0 ? '+' + showItemDetailSelected?.earthResistance + '%' : showItemDetailSelected?.earthResistance + '%'}} " size="large" class="badge-earth" [ngClass]="{'badge-physical':showItemDetailSelected.earthResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Energia" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.energyResistance > 0 ? '+' + showItemDetailSelected?.energyResistance + '%' : showItemDetailSelected?.energyResistance + '%'}} " size="large" class="badge-energy" [ngClass]="{'badge-physical':showItemDetailSelected.energyResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Morte" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.deathResistance > 0 ? '+' + showItemDetailSelected?.deathResistance + '%' : showItemDetailSelected?.deathResistance + '%'}} " size="large" class="badge-death" [ngClass]="{'badge-physical':showItemDetailSelected.deathResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Divino" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.holyResistance > 0 ? '+' + showItemDetailSelected?.holyResistance + '%' : showItemDetailSelected?.holyResistance + '%'}} " size="large" class="badge-holy" [ngClass]="{'badge-physical':showItemDetailSelected.holyResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Físico" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.physicalResistance > 0 ? '+' + showItemDetailSelected?.physicalResistance + '%' : showItemDetailSelected?.physicalResistance + '%'}} " size="large" class="badge-physical" [ngClass]="{'badge-physical':showItemDetailSelected.physicalResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Outras Informações
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Vida por segundo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.countHealing > 0 ? '+' + showItemDetailSelected?.countHealing : 0}} " size="large" class="badge-fire" [ngClass]="{'badge-physical':showItemDetailSelected.countHealing == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Mana por segundo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.countMana > 0 ? '+' + showItemDetailSelected?.countMana : 0}} " size="large" class="badge-ice" [ngClass]="{'badge-physical':showItemDetailSelected.countMana == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Velocidade" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusSpeed > 0 ? '+' + showItemDetailSelected?.bonusSpeed : 0}} " size="large" class="badge-holy" [ngClass]="{'badge-physical':showItemDetailSelected.bonusSpeed == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 equip">
+      <p-card header="Slots Imbuements" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.imbuementsSlots > 0 ? showItemDetailSelected?.imbuementsSlots : 0}} " size="large" class="primary" [ngClass]="{'badge-physical':showItemDetailSelected.imbuementsSlots == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 equip">
+      <p-card header="Max Tier" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.maxTier > 0 ? showItemDetailSelected?.maxTier : 0}} " size="large" class="primary" [ngClass]="{'badge-physical':showItemDetailSelected.maxTier == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;"></div>
+  </div>
   <ng-template pTemplate="footer">
     <button pButton icon="pi pi-check" (click)="showItemDetail=false" label="Ok" class="p-button-outlined"></button>
   </ng-template>
@@ -536,4 +804,8 @@
       Tempo restante: {{formatTime((character.huntOfflineTimeInHours*60*60) - getDifferenceFromNowInSeconds(this.character.huntOfflineDate))}}
     </p>
   </div>
+</div>
+
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner"></div>
 </div>

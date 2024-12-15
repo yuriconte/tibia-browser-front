@@ -11,4 +11,5 @@ export class CharacterBestiary {
     expHourNum:number;
     expHourStr:string;
     expHourOrigStr:string;
+    totalPercentage: number;
 }

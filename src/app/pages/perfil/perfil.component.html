@@ -80,22 +80,22 @@
         </div>
         <div class="col-12 md:col-12 lg:col-12 pb-2">
           <div class="grid">
-            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+            <div class="col-3 md:col-3 lg:col-3 coin p-0 pb-2 pt-1">
               <span class="text-500"><img src="assets/gifs/items/Crystal_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
               <span class="image-text ml-2">{{ getCoins(character.balance).crystal }}</span>
             </div>
-            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+            <div class="col-3 md:col-3 lg:col-3 coin p-0 pb-2 pt-1">
               <span class="text-500"><img src="assets/gifs/items/Platinum_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
               <span class="image-text ml-2">{{ getCoins(character.balance).platinum }}</span>
             </div>
-            <div class="col-4 md:col-4 lg:col-4 coin pb-2 pt-1">
+            <div class="col-3 md:col-3 lg:col-3 coin p-0 pb-2 pt-1">
               <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="40" height="40" style="vertical-align: middle"/></span>
               <span class="image-text ml-2">{{ getCoins(character.balance).gold }}</span>
             </div>
+            <div class="col-3 md:col-3 lg:col-3 p-0 pb-2 money-character" style="text-align:left">
+              ({{ character.balance > 1000 ? (character.balance > 1000000000 ? ((character.balance/1000000000).toFixed(2) + ' kkk') : character.balance > 1000000 ? ((character.balance/1000000).toFixed(2) + ' kk') : ((character.balance/1000).toFixed(2) + ' k')) : ''}})
+            </div>
           </div>
-        </div>
-        <div class="col-12 md:col-12 lg:col-12 pb-2 vocation-character" style="text-align:center">
-          {{ character.balance > 1000 ? (character.balance > 1000000000 ? ((character.balance/1000000000).toFixed(2) + ' kkk') : character.balance > 1000000 ? ((character.balance/1000000).toFixed(2) + ' kk') : ((character.balance/1000).toFixed(2) + ' k')) : ''}}
         </div>
       </div>
     </p-panel>
@@ -106,12 +106,14 @@
       <div class="grid">
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slotAmulet?.name || 'Sem Amuleto'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slotAmulet.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotAmulet)" *ngIf="character.slotAmulet"/>
+            <p-menu #menuAmulet [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slotAmulet)"></p-menu>
+            <img src="assets/gifs/items/{{character.slotAmulet.imagePath}}" width="32" height="32" (click)="menuAmulet.toggle($event)" *ngIf="character.slotAmulet"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot1Item?.name || 'Sem Helmo'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot1Item)" *ngIf="character.slot1Item"/>
+            <p-menu #menu1 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot1Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot1Item.imagePath}}" width="32" height="32" (click)="menu1.toggle($event)" *ngIf="character.slot1Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
@@ -121,32 +123,38 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot2Item?.name || 'Sem Arma'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot2Item)" *ngIf="character.slot2Item"/>
+            <p-menu #menu2 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot2Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot2Item.imagePath}}" width="32" height="32" (click)="menu2.toggle($event)" *ngIf="character.slot2Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot3Item?.name || 'Sem Armadura'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot3Item)" *ngIf="character.slot3Item"/>
+            <p-menu #menu3 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot3Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot3Item.imagePath}}" width="32" height="32" (click)="menu3.toggle($event)" *ngIf="character.slot3Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot4Item?.name || 'Sem Escudo'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot4Item)" *ngIf="character.slot4Item"/>
+            <p-menu #menu4 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot4Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot4Item.imagePath}}" width="32" height="32" (click)="menu4.toggle($event)" *ngIf="character.slot4Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slotRing?.name || 'Sem Anel'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slotRing.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotRing)" *ngIf="character.slotRing"/>
+            <p-menu #menuRing [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slotRing)"></p-menu>
+            <img src="assets/gifs/items/{{character.slotRing.imagePath}}" width="32" height="32" (click)="menuRing.toggle($event)" *ngIf="character.slotRing"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot5Item?.name || 'Sem Calça'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot5Item)" *ngIf="character.slot5Item"/>
+            <p-menu #menu5 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot5Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot5Item.imagePath}}" width="32" height="32" (click)="menu5.toggle($event)" *ngIf="character.slot5Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slotAmmo?.name || 'Sem Municão'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slotAmmo)" *ngIf="character.slotAmmo"/>
+            <p-menu #menuAmmo [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slotAmmo)"></p-menu>
+            <img src="assets/gifs/items/{{character.slotAmmo.imagePath}}" width="32" height="32" (click)="menuAmmo.toggle($event)" *ngIf="character.slotAmmo"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
@@ -156,7 +164,8 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="{{character.slot6Item?.name || 'Sem Bota'}}" styleClass="p-0">
-            <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" width="32" height="32" (click)="confirmEquipedItem($event, character.slot6Item)" *ngIf="character.slot6Item"/>
+            <p-menu #menu6 [popup]="true" [model]="(equipedItemsMenu$ | async)!" appendTo="body" (onShow)="showEquipedItemsMenu(character.slot6Item)"></p-menu>
+            <img src="assets/gifs/items/{{character.slot6Item.imagePath}}" width="32" height="32" (click)="menu6.toggle($event)" *ngIf="character.slot6Item"/>
           </p-card>
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
@@ -198,102 +207,186 @@
         </div>
         <div class="col-4 md:col-4 lg:col-4 p-1 equip">
           <p-card header="Magic Level" styleClass="p-0">
-            <p-badge value="{{character.magicLevel}}" size="large" severity="primary"></p-badge>
+            <p-badge value=" {{character.magicLevel}} " size="large" severity="primary"></p-badge>
           </p-card>
         </div>
       </div>
     </p-panel>
   </div>
 
-  <div class="col-12 md:col-12 pb-5 pl-0 pr-0" *ngIf="character.potions">
+  <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="character.potions">
     <p-panel header="Potions" [toggleable]="true">
-      <p-table [value]="character.potions">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Valor</th>
-            <th>Quant.</th>
-            <th></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-potion>
-          <tr>
-            <td class="pl-1 pr-1">
-              <span class="image-text ml-2">{{potion.quantity*potion.potion.gold}}</span>
-              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
-            </td>
-            <td class="pl-1 pr-1">
-              <p-button styleClass="custom-button p-button-info" badge="{{potion.quantity}}">
-                <span class="flex align-items-center font-bold">
-                  <img src="assets/gifs/potions/{{potion.potion.imagePath}}" style="width: 2rem" >
-                </span>
-              </p-button>
-            </td>
-            <td class="pl-1 pr-1">
-              <p-button styleClass="custom-button p-button-primary" (click)="usePotion(potion)">
-                <span class="flex align-items-center font-bold">
-                  Usar
-                </span>
-              </p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="grid">
+        <div class="col-6 md:col-6 lg:col-6 p-1 equip" *ngFor="let potion of character.potions" [ngClass]="{'highlight':potion.highlight, 'highlight-red':potion.highlightRed}">
+          <p-card header="{{potion.potion.name}}" styleClass="p-0" (click)="menu.toggle($event)">
+            <p-menu #menu [popup]="true" [model]="(potionMenu$ | async)!" appendTo="body" (onShow)="showPotionMenu(potion)"></p-menu>
+            <div class="image-container" style="position: relative; display: inline-block;">
+              <img src="assets/gifs/potions/{{potion.potion.imagePath}}" width="32" height="32"/>
+              <span pBadge value="{{potion.quantity}}" severity="primary" class="badge-overlay"></span>
+            </div>
+          </p-card>
+        </div>
+      </div>
     </p-panel>
   </div>
 
   <div class="col-12 md:col-12 pb-0 pl-0 pr-0" *ngIf="character.items?.length > 0">
     <p-panel header="Depot" [toggleable]="true">
-      <p-table [value]="character.items">
-        <ng-template pTemplate="header">
-          <tr>
-            <th style="width: 30%;">Valor</th>
-            <th style="width: 30%;">Quant.</th>
-            <th style="width: 40%;">
-              <p-button styleClass="custom-button p-button-primary pl-1 pr-1 w-full" (click)="sellAllItems()" *ngIf="character.items?.length > 0">
-                <span class="flex align-items-center font-bold">
-                  Vender Tudo
-                </span>
-              </p-button>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item>
-          <tr>
-            <td style="width: 30%;">
-              <span class="image-text ml-2">{{item.quantity*item.item.gold}}</span>
-              <span class="text-500"><img src="assets/gifs/items/Gold_Coin.gif" width="32" height="32" style="vertical-align: middle"/></span>
-            </td>
-            <td style="width: 30%;">
-              <p-button styleClass="custom-button p-button-info" badge="{{item.quantity}}" (click)="confirmUnequipedItem($event, item.item)" [disabled]="character.huntOfflineDate">
-                <span class="flex align-items-center font-bold">
-                  <img src="assets/gifs/items/{{item.item.imagePath}}" style="width: 2rem" >
-                </span>
-              </p-button>
-            </td>
-            <td style="width: 40%;">
-              <p-button styleClass="custom-button p-button-primary w-full" (click)="sellItem(item.item)">
-                <span class="flex align-items-center font-bold pl-2">
-                  Vender
-                </span>
-              </p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <div class="grid">
+        <div class="col-12 md:col-12 lg:col-12 p-1 equip sell-all">
+          <p-card header="Vender Todos" styleClass="p-0" (click)="confirmSellAll($event)">
+          </p-card>
+        </div>
+        <div class="col-4 md:col-4 lg:col-4 p-1 equip" *ngFor="let item of character.items">
+          <p-card header="{{item.item.name}}" styleClass="p-0" (click)="menuItem.toggle($event)">
+            <p-menu #menuItem [popup]="true" [model]="(depotItemsMenu$ | async)!" appendTo="body" (onShow)="showDepotItemsMenu(item.item, item.quantity)"></p-menu>
+            <div class="image-container" style="position: relative; display: inline-block;">
+              <img src="assets/gifs/items/{{item.item.imagePath}}" width="32" height="32"/>
+              <span pBadge value="{{item.quantity}}" severity="primary" class="badge-overlay"></span>
+            </div>
+          </p-card>
+        </div>
+      </div>
     </p-panel>
   </div>
 
 </div>
-<p-dialog header="Detalhes do Item" [(visible)]="showItemDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '75vw'}">
-  <p><strong>Nome:</strong> {{ showItemDetailSelected?.name }}</p>
-  <p><strong>Ataque:</strong> {{ showItemDetailSelected?.atk }}</p>
-  <p><strong>Defesa:</strong> {{ showItemDetailSelected?.def }}</p>
-  <p><strong>Armadura:</strong> {{ showItemDetailSelected?.armor }}</p>
+
+<p-dialog header="{{showItemDetailSelected?.name}}" [(visible)]="showItemDetail" [modal]="true" showEffect="fade" [style]="{width: '30vw'}" [breakpoints]="{'960px': '90vw'}">
+  <div class="grid" *ngIf="showItemDetail">
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      <img src="assets/gifs/items/{{showItemDetailSelected?.imagePath}}" alt="Item Image" class="item-image" />
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Informações Básicas
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Ataque" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.atk}} " size="large" severity="primary" class="pr-1" [ngClass]="{'badge-physical':showItemDetailSelected.atk == 0}"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.fireDamage}}" size="large" class="badge-fire" *ngIf="showItemDetailSelected?.fireDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.iceDamage}}" size="large" class="badge-ice" *ngIf="showItemDetailSelected?.iceDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.earthDamage}}" size="large" class="badge-earth" *ngIf="showItemDetailSelected?.earthDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.energyDamage}}" size="large" class="badge-energy" *ngIf="showItemDetailSelected?.energyDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.deathDamage}}" size="large" class="badge-death" *ngIf="showItemDetailSelected?.deathDamage"></p-badge>
+        <p-badge value="+{{showItemDetailSelected?.holyDamage}}" size="large" class="badge-holy" *ngIf="showItemDetailSelected?.holyDamage"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Armadura" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.armor}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.armor == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Defesa" styleClass="p-0">
+        <p-badge value=" {{showItemDetailSelected?.def}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.def == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Bônus de Skill
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Sword" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusSword > 0 ? '+' + showItemDetailSelected?.bonusSword : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusSword == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Axe" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusAxe > 0 ? '+' + showItemDetailSelected?.bonusAxe : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusAxe == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Club" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusClub > 0 ? '+' + showItemDetailSelected?.bonusClub : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusClub == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Distance" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusDistance > 0 ? '+' + showItemDetailSelected?.bonusDistance : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusDistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Shielding" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusShielding > 0 ? '+' + showItemDetailSelected?.bonusShielding : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusShielding == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Magic Level" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusMagicLevel > 0 ? '+' + showItemDetailSelected?.bonusMagicLevel : 0}} " size="large" severity="primary" [ngClass]="{'badge-physical':showItemDetailSelected.bonusMagicLevel == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Resistências
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Fogo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.fireResistance > 0 ? '+' + showItemDetailSelected?.fireResistance + '%' : showItemDetailSelected?.fireResistance + '%'}} " size="large" class="badge-fire" [ngClass]="{'badge-physical':showItemDetailSelected.fireResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Gelo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.iceResistance > 0 ? '+' + showItemDetailSelected?.iceResistance + '%' : showItemDetailSelected?.iceResistance + '%'}} " size="large" class="badge-ice" [ngClass]="{'badge-physical':showItemDetailSelected.iceResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Terra" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.earthResistance > 0 ? '+' + showItemDetailSelected?.earthResistance + '%' : showItemDetailSelected?.earthResistance + '%'}} " size="large" class="badge-earth" [ngClass]="{'badge-physical':showItemDetailSelected.earthResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Energia" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.energyResistance > 0 ? '+' + showItemDetailSelected?.energyResistance + '%' : showItemDetailSelected?.energyResistance + '%'}} " size="large" class="badge-energy" [ngClass]="{'badge-physical':showItemDetailSelected.energyResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Morte" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.deathResistance > 0 ? '+' + showItemDetailSelected?.deathResistance + '%' : showItemDetailSelected?.deathResistance + '%'}} " size="large" class="badge-death" [ngClass]="{'badge-physical':showItemDetailSelected.deathResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Divino" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.holyResistance > 0 ? '+' + showItemDetailSelected?.holyResistance + '%' : showItemDetailSelected?.holyResistance + '%'}} " size="large" class="badge-holy" [ngClass]="{'badge-physical':showItemDetailSelected.holyResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Físico" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.physicalResistance > 0 ? '+' + showItemDetailSelected?.physicalResistance + '%' : showItemDetailSelected?.physicalResistance + '%'}} " size="large" class="badge-physical" [ngClass]="{'badge-physical':showItemDetailSelected.physicalResistance == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;">
+      Outras Informações
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Vida por segundo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.countHealing > 0 ? '+' + showItemDetailSelected?.countHealing : 0}} " size="large" class="badge-fire" [ngClass]="{'badge-physical':showItemDetailSelected.countHealing == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Mana por segundo" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.countMana > 0 ? '+' + showItemDetailSelected?.countMana : 0}} " size="large" class="badge-ice" [ngClass]="{'badge-physical':showItemDetailSelected.countMana == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-4 md:col-4 lg:col-4 p-1 equip">
+      <p-card header="Velocidade" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.bonusSpeed > 0 ? '+' + showItemDetailSelected?.bonusSpeed : 0}} " size="large" class="badge-holy" [ngClass]="{'badge-physical':showItemDetailSelected.bonusSpeed == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 equip">
+      <p-card header="Slots Imbuements" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.imbuementsSlots > 0 ? showItemDetailSelected?.imbuementsSlots : 0}} " size="large" class="primary" [ngClass]="{'badge-physical':showItemDetailSelected.imbuementsSlots == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-6 md:col-6 lg:col-6 p-1 equip">
+      <p-card header="Max Tier" styleClass="p-0">
+        <p-badge value="{{showItemDetailSelected?.maxTier > 0 ? showItemDetailSelected?.maxTier : 0}} " size="large" class="primary" [ngClass]="{'badge-physical':showItemDetailSelected.maxTier == 0}"></p-badge>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-12 pb-4" style="text-align: center;"></div>
+  </div>
   <ng-template pTemplate="footer">
     <button pButton icon="pi pi-check" (click)="showItemDetail=false" label="Ok" class="p-button-outlined"></button>
   </ng-template>
 </p-dialog>
 
-<p-dialog header="" [(visible)]="loading" [modal]="true" showEffect="fade" [style]="{width: '100vw', height: '100vh'}">
-  <p-progressSpinner ariaLabel="loading" />
-</p-dialog>
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner"></div>
+</div>

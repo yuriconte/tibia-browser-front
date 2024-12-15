@@ -7,4 +7,5 @@ export class CreatureDamage {
     name: string;
     imagePath: string;
     element: string;
+    ticks: number;
 }

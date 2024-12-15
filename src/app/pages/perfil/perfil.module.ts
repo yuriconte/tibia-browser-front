@@ -15,6 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BadgeModule } from 'primeng/badge';
 import { CardModule } from 'primeng/card';
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
     imports: [
@@ -33,7 +34,8 @@ import { CardModule } from 'primeng/card';
         DialogModule,
         ProgressSpinnerModule,
         BadgeModule,
-        CardModule
+        CardModule,
+        MenuModule
     ],
     declarations: [PerfilComponent]
 })

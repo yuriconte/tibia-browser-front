@@ -5,6 +5,8 @@ import { CharacterService } from 'src/app/service/character.service';
 import { AuthService } from '../auth/auth.service';
 import { Item } from 'src/app/model/item.model';
 import { CharacterPotion } from 'src/app/model/character-potion.model';
+import { Potion } from 'src/app/model/potion.model';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-perfil',
@@ -26,6 +28,11 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
       font-size: 30px;
     }
 
+    ::ng-deep .p-badge {
+      color: white;
+      font-weight: 100;
+    }
+
     .sex-character {
       text-align: left;
       font-size: 20px;
@@ -38,7 +45,12 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
 
     .vocation-character {
       text-align: left;
-      font-size: 30px;
+      font-size: 28px;
+    }
+
+    .money-character {
+      font-size: 17px;
+      align-content: center;
     }
 
     ::ng-deep .health-bar .p-progressbar .p-progressbar-value {
@@ -93,7 +105,8 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
     }
 
     ::ng-deep .equip .p-card {
-      background: #283443
+      background: #283443;
+      transition: background 1s ease-in-out; /* Define a transição */
     }
 
     ::ng-deep .p-card .p-card-body {
@@ -108,6 +121,101 @@ import { CharacterPotion } from 'src/app/model/character-potion.model';
       height: 30px;
       align-content: center;
     }
+
+    ::ng-deep .badge-death .p-badge {
+      background-color: #171717; /* Cinza Escuro */
+      color: #fff;
+    }
+
+    ::ng-deep .badge-fire .p-badge {
+      background-color: #ef4444; /* Vermelho */
+      color: #fff;
+    }
+
+    ::ng-deep .badge-ice .p-badge {
+      background-color: #60a5fa; /* Azul Claro */
+      color: #fff;
+    }
+
+    ::ng-deep .badge-holy .p-badge {
+      background-color: #facc15; /* Amarelo */
+      color: #000;
+    }
+
+    ::ng-deep .badge-energy .p-badge {
+      background-color: #553bf6; /* Roxo */
+      color: #fff;
+    }
+
+    ::ng-deep .badge-earth .p-badge {
+      background-color: #22c55e; /* Verde */
+      color: #fff;
+    }
+
+    ::ng-deep .badge-physical .p-badge {
+      background-color: #a3a3a3; /* Cinza Médio */
+      color: #fff;
+    }
+
+    .image-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .badge-overlay {
+      position: absolute;
+      top: 0;
+      right: -20px;
+      transform: translate(50%, -50%);
+      z-index: 10;
+    }
+
+    ::ng-deep .equip.highlight .p-card {
+      background: #4ade80;
+    }
+
+    ::ng-deep .equip.highlight-red .p-card {
+      background: #ff6767;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgb(0 0 0 / 95%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-spinner {
+      border: 8px solid rgba(255, 255, 255, 0.3);
+      border-top: 8px solid #ffffff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    ::ng-deep .sell-all .p-card .p-card-body .p-card-content {
+      height: 0px;
+    }
+
+    ::ng-deep .sell-all .p-card .p-card-title {
+      font-size: 2rem
+    }
   `],
   providers: [ConfirmationService, MessageService]
 })
@@ -115,6 +223,18 @@ export class PerfilComponent {
 
   character: Character = new Character;
   items: MenuItem[] = [];
+
+  potionMenu$: BehaviorSubject<MenuItem[]> = new BehaviorSubject(
+    [] as MenuItem[]
+  );
+
+  equipedItemsMenu$: BehaviorSubject<MenuItem[]> = new BehaviorSubject(
+    [] as MenuItem[]
+  );
+
+  depotItemsMenu$: BehaviorSubject<MenuItem[]> = new BehaviorSubject(
+    [] as MenuItem[]
+  );
   
   showItemDetailSelected: Item;
   showItemDetail: boolean = false;
@@ -146,6 +266,60 @@ export class PerfilComponent {
     }
     if (this.manaInterval) {
       clearInterval(this.manaInterval);
+    }
+  }
+
+  showPotionMenu(potion: CharacterPotion): void {
+    this.potionMenu$.next([
+      {
+        label: 'Usar',
+        icon: 'pi pi-fw pi-check',
+        command: () => this.usePotion(potion),
+      }
+    ]);
+  }
+
+  showEquipedItemsMenu(item: Item): void {
+    if (item) {
+      this.equipedItemsMenu$.next([
+        {
+          label: 'Detalhes',
+          icon: 'pi pi-fw pi-exclamation-circle',
+          command: () => this.showEquipDetail(item),
+        },
+        {
+          label: 'Remover',
+          icon: 'pi pi-fw pi-arrow-circle-down',
+          command: () => this.deequip(item, true),
+        }
+      ]);
+    }
+  }
+
+  showDepotItemsMenu(item: Item, quantity: number): void {
+    if (item) {
+      this.depotItemsMenu$.next([
+        {
+          label: 'Detalhes',
+          icon: 'pi pi-fw pi-exclamation-circle',
+          command: () => this.showEquipDetail(item),
+        },
+        {
+          label: 'Equipar',
+          icon: 'pi pi-fw pi-arrow-circle-up',
+          command: () => this.equip(item),
+        },
+        {
+          label: 'Vender 1 (' + item.gold + ')',
+          icon: 'pi pi-fw pi-dollar',
+          command: () => this.sellItem(item),
+        },
+        {
+          label: 'Vender Todos (' + item.gold*quantity + ')',
+          icon: 'pi pi-fw pi-dollar',
+          command: () => this.sellAllItemsById(item),
+        }
+      ]);
     }
   }
 
@@ -198,7 +372,6 @@ export class PerfilComponent {
             if (this.character.level >= 20 && this.character.vocationId > 1 && this.character.vocationId < 6) {
               this.labelPromotion = this.character.vocationId == 2 ? 'Elike Knight' : this.character.vocationId == 3 ? 'Royal Paladin' : this.character.vocationId == 4 ? 'Elder Druid' : 'Master Sorcerer'
             }
-            this.loading = false
             this.lifeInterval = setInterval(() => {
               if (this.character.life < this.character.maxLife) {
                 this.character.life += 1
@@ -242,29 +415,16 @@ export class PerfilComponent {
     });
   }
 
-  confirmEquipedItem(event: Event, item:Item) {
-    this.confirmationService.confirm({
-        key: 'confirm2',
-        target: event.target || new EventTarget,
-        message: 'O que deseja fazer?',
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Remover',
-        rejectLabel: 'Detalhes',
-        accept: () => {
-          this.deequip(item, true)
-        },
-        reject: () => {
-          this.showEquipDetail(item)
-        }
-    });
-  }
-   
   showEquipDetail(item: Item) {
     this.showItemDetailSelected = item
     this.showItemDetail = true;
   }
  
   equip(item: Item) {
+    if (item.levelRequired > this.character.level) {
+      this.service.add({ key: 'tst', severity: 'danger', summary: 'Não Permitido', detail: 'Você precisa de level ' + item.levelRequired + ' para equipar esse item' });
+      return;
+    }
     switch(item.slot) {
       case 1:
         if (this.character.slot1Item) {
@@ -275,6 +435,9 @@ export class PerfilComponent {
         if (this.character.slot2Item) {
           this.deequip({...this.character.slot2Item}, false)
         }
+        if (item.twoHanded == 1 && this.character.slot4Item) {
+          this.deequip({...this.character.slot4Item}, false)
+        }
         break;
       case 3:
         if (this.character.slot3Item) {
@@ -282,6 +445,10 @@ export class PerfilComponent {
         }
         break;
       case 4:
+        if (this.character.slot2Item?.twoHanded == 1) {
+          this.service.add({ key: 'tst', severity: 'danger', summary: 'Não Permitido', detail: 'Você não pode equipar esse item pois está usando uma arma de duas mãos' });
+          return;
+        }
         if (this.character.slot4Item) {
           this.deequip({...this.character.slot4Item}, false)
         }
@@ -299,6 +466,16 @@ export class PerfilComponent {
       case 7:
         if (this.character.slotAmmo) {
           this.deequip({...this.character.slotAmmo}, false)
+        }
+        break;
+      case 8:
+        if (this.character.slotAmulet) {
+          this.deequip({...this.character.slotAmulet}, false)
+        }
+        break;
+      case 9:
+        if (this.character.slotRing) {
+          this.deequip({...this.character.slotRing}, false)
         }
         break;
       default:
@@ -332,27 +509,14 @@ export class PerfilComponent {
     }
   }
 
-  confirmUnequipedItem(event: Event, item:Item) {
-    this.confirmationService.confirm({
-        key: 'confirm2',
-        target: event.target || new EventTarget,
-        message: 'O que deseja fazer?',
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Equipar',
-        rejectLabel: 'Detalhes',
-        accept: () => {
-          this.equip(item)
-        },
-        reject: () => {
-          this.showEquipDetail(item)
-        }
-    });
-  }
-
   usePotion(potion: CharacterPotion) {
     if (potion.potion.type === 'life') {
       if (this.character.life == this.character.maxLife) {
-        this.service.add({ key: 'tst', severity: 'warning', summary: 'Atenção', detail: 'Sua vida está cheia. Não é possível usar potion agora.' });
+        this.service.add({ key: 'tst', severity: 'warn', summary: 'Atenção', detail: 'Sua vida está cheia. Não é possível usar potion agora.' });
+        potion.highlightRed = true;
+        setTimeout(() => {
+          potion.highlightRed = false;
+        }, 500)
         return;
       }
       potion.quantity -= 1;
@@ -365,7 +529,11 @@ export class PerfilComponent {
       this.characterService.updateCharacterLifeManaStaminaByValues(this.character.id, this.character.life, this.character.mana, potion.potion.id, null);
     } else if (potion.potion.type === 'mana') {
       if (this.character.mana == this.character.maxMana) {
-        this.service.add({ key: 'tst', severity: 'warning', summary: 'Atenção', detail: 'Sua mana está cheia. Não é possível usar potion agora.' });
+        this.service.add({ key: 'tst', severity: 'warn', summary: 'Atenção', detail: 'Sua mana está cheia. Não é possível usar potion agora.' });
+        potion.highlightRed = true;
+        setTimeout(() => {
+          potion.highlightRed = false;
+        }, 500)
         return;
       }
       potion.quantity -= 1;
@@ -377,6 +545,10 @@ export class PerfilComponent {
       }
       this.characterService.updateCharacterLifeManaStaminaByValues(this.character.id, this.character.life, this.character.mana, null, potion.potion.id);
     }
+    potion.highlight = true;
+    setTimeout(() => {
+      potion.highlight = false;
+    }, 500)
   }
 
   getRandomInRange(min: number, max: number): number {
@@ -387,9 +559,20 @@ export class PerfilComponent {
     this.characterService.sellAllItems(this.character.id);
     this.character.items = []
     this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: 'Todos os items foram vendidos com sucesso.' });
+    this.loading = true;
     setTimeout(() => {
       window.location.reload();
-    }, 3000)
+    }, 5000)
+  }
+
+  sellAllItemsById(item: Item) {
+    this.characterService.sellAllItemsById(this.character.id, item.id);
+    this.character.items = []
+    this.service.add({ key: 'tst', severity: 'success', summary: 'Sucesso', detail: 'Todos os "' + item.name + '" foram vendidos com sucesso.' });
+    this.loading = true;
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000)
   }
 
   confirmPromotion(event: Event) {
@@ -405,6 +588,20 @@ export class PerfilComponent {
           this.character.balance -= 20000
           this.characterService.updateVocation(this.character.id, this.character.vocationId);
           this.service.add({ key: 'tst', severity: 'info', summary: 'Parabéns', detail: 'Agora você é um ' + this.labelPromotion });
+        },
+    });
+  }
+
+  confirmSellAll(event: Event) {
+    this.confirmationService.confirm({
+        key: 'confirm2',
+        target: event.target || new EventTarget,
+        message: 'Tem certeza que deseja vender todos os seus items?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sim',
+        rejectLabel: 'Não',
+        accept: () => {
+          this.sellAllItems();
         },
     });
   }
